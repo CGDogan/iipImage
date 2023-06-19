@@ -1,12 +1,8 @@
 FROM camicroscope/image-decoders:latest
 
 ### update
-ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get -q update
 RUN apt-get -q -y upgrade
-RUN apt-get -q -y dist-upgrade
-RUN apt-get clean
-RUN apt-get -q update
 
 RUN apt-get -q -y install git autoconf automake make libtool pkg-config apache2 libapache2-mod-fcgid libfcgi0ldbl g++ libmemcached-dev libjpeg-turbo8-dev
 RUN a2enmod rewrite
@@ -27,6 +23,8 @@ RUN ln -s /etc/apache2/mods-available/proxy.conf /etc/apache2/mods-enabled/proxy
 ## Add configuration file
 COPY apache2.conf /etc/apache2/apache2.conf
 COPY ports.conf /etc/apache2/ports.conf
+
+WORKDIR /root/src
 
 ###  iipsrv
 WORKDIR /root/src/iipsrv
