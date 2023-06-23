@@ -1,4 +1,4 @@
-FROM camicroscope/image-decoders:latest
+FROM cgd30/openslide:newv3
 
 ### update
 RUN apt-get -q update
