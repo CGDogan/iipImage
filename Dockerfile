@@ -41,7 +41,8 @@ RUN cp /root/src/iipsrv/src/iipsrv.fcgi /var/www/localhost/fcgi-bin/
 
 # print debug info https://serverfault.com/a/711172
 RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log && \
-    ln -sf /proc/self/fd/1 /var/log/apache2/error.log
+    ln -sf /proc/self/fd/1 /var/log/apache2/error.log && \
+    ln -sf /proc/self/fd/1 /var/log/apache2/other_vhosts_access.log
 
 
 # CMD service apache2 start && while true; do sleep 1000; done
