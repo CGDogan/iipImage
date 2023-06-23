@@ -124,6 +124,7 @@ void IIPImage::testImageType() throw(file_error)
 
     const char * vendor = openslide_detect_vendor( path.c_str() );
     if ( vendor != NULL && strcmp(vendor, "generic-tiff") )
+
     	format = OPENSLIDE;
     // Compare our header sequence to our magic byte signatures
     else if( memcmp( header, j2k, 10 ) == 0 ) format = JPEG2000;
@@ -169,8 +170,8 @@ void IIPImage::testImageType() throw(file_error)
         suffix=="mrxs" || 
         suffix=="vms" || 
         suffix=="scn" || 
-        suffix=="dcm" || 
-        suffix=="bif")
+        suffix=="bif" || 
+        suffix=="dcm")
     	format = OPENSLIDE;
     else if( suffix == "jp2" || suffix == "jpx" || suffix == "j2k" ) format = JPEG2000;
     else if( suffix == "ptif" || suffix == "tif" || suffix == "tiff" ) format = TIF;
