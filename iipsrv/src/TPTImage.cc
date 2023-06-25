@@ -306,7 +306,8 @@ RawTilePtr TPTImage::getTile( int seq, int ang, unsigned int res, int layers, un
   int length = TIFFReadEncodedTile( tiff, (ttile_t) tile,
 				    tile_buf, (tsize_t) - 1 );
   if( length == -1 ) {
-    throw file_error( "TIFFReadEncodedTile failed for " + getFileName( seq, ang ) );
+    __builtin_printf("hereeee %d", TIFFTileSize(tiff));
+    throw file_error( "TIFFReadEncodedTile failed for " + getFileName( seq, ang ));
   }
 
 
