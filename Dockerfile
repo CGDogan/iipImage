@@ -1,4 +1,4 @@
-FROM cgd30/openslide:newv4
+FROM cgd30/openslide:newv
 
 ### update
 RUN apt-get -q update
