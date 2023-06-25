@@ -40,9 +40,6 @@
 #include <ctime>
 #include <limits>
 
-extern "C" {
-#include "openslide.h"
-}
 
 using namespace std;
 
@@ -136,6 +133,15 @@ void IIPImage::testImageType() throw(file_error)
         suffix=="dcm")
     	format = OPENSLIDE;
     // Compare our header sequence to our magic byte signatures
+    if (suffix=="vtif" ||
+        suffix=="svs" || 
+        suffix=="ndpi" || 
+        suffix=="mrxs" || 
+        suffix=="vms" || 
+        suffix=="scn" || 
+        suffix=="bif" || 
+        suffix=="dcm")
+    	format = OPENSLIDE;
     else if( memcmp( header, j2k, 10 ) == 0 ) format = JPEG2000;
     else if( memcmp( header, stdtiff, 3 ) == 0
 	     || memcmp( header, lsbtiff, 4 ) == 0 || memcmp( header, msbtiff, 4 ) == 0
