@@ -40,7 +40,9 @@
 #include <ctime>
 #include <limits>
 
+extern "C" {
 #include "openslide.h"
+}
 
 using namespace std;
 
@@ -123,8 +125,7 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
 
     const char * vendor = openslide_detect_vendor( path.c_str() );
-    if ( vendor != NULL && strcmp(vendor, "generic-tiff") )
-
+    if ( vendor != NULL && strcmp(vendor, "generic-tiff"))
     	format = OPENSLIDE;
     // Compare our header sequence to our magic byte signatures
     else if( memcmp( header, j2k, 10 ) == 0 ) format = JPEG2000;
