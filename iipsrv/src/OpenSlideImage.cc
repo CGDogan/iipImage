@@ -481,12 +481,15 @@ RawTilePtr OpenSlideImage::getCachedTile(const size_t tilex, const size_t tiley,
 
   // is this a native layer?
   if (openslide_downsample_in_level[osi_level] == 1) {
+    __builtin_fprintf(stderr, "nativelayer");
     // supported by native openslide layer
 	// tile manager will cache if needed
     return getNativeTile(tilex, tiley, iipres);
 
 
   } else {
+    __builtin_fprintf(stderr, "nonnative layer");
+
     // not supported by native openslide layer, so need to compose from next level up,
     return halfsampleAndComposeTile(tilex, tiley, iipres);
 
