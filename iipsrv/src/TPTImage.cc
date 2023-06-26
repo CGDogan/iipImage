@@ -24,6 +24,7 @@
 #include "TPTImage.h"
 #include <sstream>
 #include <cstdio>
+extern std::ofstream logfile;
 
 
 using namespace std;
