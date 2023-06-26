@@ -307,10 +307,10 @@ RawTilePtr TPTImage::getTile( int seq, int ang, unsigned int res, int layers, un
   int length = TIFFReadEncodedTile( tiff, (ttile_t) tile,
 				    tile_buf, (tsize_t) - 1 );
   if( length == -1 ) {
-    __builtin_fprintf(stderr, "broken size %d %s\n", TIFFTileSize(tiff), filename.c_str());
+    logfile << "broken size" << TIFFTileSize(tiff) << filename;
     throw file_error( "TIFFReadEncodedTile failed for " + getFileName( seq, ang ));
   } else{
-    __builtin_fprintf(stderr, "worked size %d %s\n", TIFFTileSize(tiff), filename.c_str());
+    logfile << "worked size" << TIFFTileSize(tiff) << filename;
 
 }
 
