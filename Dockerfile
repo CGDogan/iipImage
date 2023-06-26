@@ -1,6 +1,8 @@
 FROM cgd30/openslide:newv6
 
 ### update
+RUN apt-get autoclean
+RUN apt-get clean
 RUN apt-get -q update
 RUN apt-get -q -y upgrade
 
