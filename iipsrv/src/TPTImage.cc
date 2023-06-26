@@ -29,6 +29,21 @@
 #include <cstdio>
 extern std::ofstream logfile;
 
+#include "TileManager.h"
+
+// from openslideh
+#include "OpenSlideImage.h"
+#include "Timer.h"
+#include <tiff.h>
+#include <tiffio.h>
+#include <cmath>
+#include <sstream>
+
+#include <cstdlib>
+#include <cassert>
+
+#include <limits>
+
 
 using namespace std;
 
