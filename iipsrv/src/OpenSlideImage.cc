@@ -400,7 +400,7 @@ RawTilePtr OpenSlideImage::getTile(int seq, int ang, unsigned int iipres, int la
   timer.start();
 #endif
 
-fprintf(stderr, "OpenSlide::getTile called: iipres %d numResolutions %d", iipres, numResolutions);
+fprintf(stderr, "OpenSlide::getTile called: iipres %d numResolutions %d\m", iipres, numResolutions);
 
   if (iipres > (numResolutions-1)) {
     ostringstream tile_no;
@@ -413,6 +413,8 @@ fprintf(stderr, "OpenSlide::getTile called: iipres %d numResolutions %d", iipres
   // image level nRes-1 has res of 0.
   uint32_t osi_level = numResolutions - 1 - iipres;
 
+fprintf(stderr, "tile requested: %u is_zoom/osi_level: %d", tile,osi_level);
+
 #ifdef DEBUG_OSI
   logfile << "OpenSlide :: getTile() :: res=" << iipres << " tile= " << tile  << " is_zoom= " << osi_level << endl;
 
@@ -420,9 +422,11 @@ fprintf(stderr, "OpenSlide::getTile called: iipres %d numResolutions %d", iipres
 
   //======= get the dimensions in pixels and num tiles for the current resolution
 
-  //    int64_t layer_width = image_widths[openslide_zoom];
-  //    int64_t layer_height = image_heights[openslide_zoom];
-  //openslide_get_layer_dimensions(osr, layers, &layer_width, &layer_height);
+      int64_t layer_width = 0;
+      int64_t layer_height = 0;
+  openslide_get_level_dimensions(osr, layers, &layer_width, &layer_height);
+fprintf(stderr, "layer: %d layer_width: %d layer_height: %d", layers,layer_width,layer_height);
+
 
 
   // Calculate the number of tiles in each direction
@@ -519,6 +523,8 @@ RawTilePtr OpenSlideImage::getNativeTile(const size_t tilex, const size_t tiley,
   if (!osr) {
     logfile << "openslide image not yet loaded " << endl;
   }
+
+  fprintf(stderr, "Get native file called EXCEPTIONAL, DIsTINGUISHING CALL?;\n");
 
 
   // compute the parameters (i.e. x and y offsets, w/h, and bestlayer to use.
