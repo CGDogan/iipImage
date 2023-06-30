@@ -395,14 +395,12 @@ void OpenSlideImage::closeImage() {
  */
 RawTilePtr OpenSlideImage::getTile(int seq, int ang, unsigned int iipres, int layers, unsigned int tile) throw (file_error) {
 
-printf("Getttile called stdout\n");
-fprintf(stderr, "Getttile called stderr\n");
-logfile << "Gettile called stream";
-
 #ifdef DEBUG_OSI
   Timer timer;
   timer.start();
 #endif
+
+fprintf(stderr, "OpenSlide::getTile called: iipres %d numResolutions %d", iipres, numResolutions);
 
   if (iipres > (numResolutions-1)) {
     ostringstream tile_no;
