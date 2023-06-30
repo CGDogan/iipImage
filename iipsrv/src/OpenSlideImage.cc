@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <cassert>
 
+#include <cstdio>
+
 #include <limits>
 //#define DEBUG_OSI 1
 using namespace std;
@@ -392,6 +394,10 @@ void OpenSlideImage::closeImage() {
     \param t tile number  (within the resolution level.)	specified as a sequential number = y * width + x;
  */
 RawTilePtr OpenSlideImage::getTile(int seq, int ang, unsigned int iipres, int layers, unsigned int tile) throw (file_error) {
+
+printf("Getttile called stdout\n");
+fprintf(stderr, "Getttile called stderr\n");
+logfile << "Gettile called stream";
 
 #ifdef DEBUG_OSI
   Timer timer;
