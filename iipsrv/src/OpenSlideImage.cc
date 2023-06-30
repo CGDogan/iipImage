@@ -524,8 +524,7 @@ RawTilePtr OpenSlideImage::getNativeTile(const size_t tilex, const size_t tiley,
     logfile << "openslide image not yet loaded " << endl;
   }
 
-  fprintf(stderr, "Get native file called EXCEPTIONAL, DIsTINGUISHING CALL?;\n");
-
+  fprintf(stderr, "OpenSlideImage::getNativeTile began;\ngetNativeTile params: tilex: %lu tiley: %lu iipres: %u\n", tilex, tiley, iipres);
 
   // compute the parameters (i.e. x and y offsets, w/h, and bestlayer to use.
   uint32_t osi_level = numResolutions - 1 - iipres;
