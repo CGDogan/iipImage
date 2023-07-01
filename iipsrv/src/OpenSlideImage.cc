@@ -137,6 +137,8 @@ void OpenSlideImage::loadImageInfo(int x, int y) throw (file_error) {
 
 
   openslide_get_level0_dimensions(osr, &w, &h);
+  cerr << "\n\nOpenSlideImage::loadImageInfo called. width: " << w << " height " << h << endl;
+  
   error = openslide_get_error(osr);
   if (error) {
     logfile << "ERROR: encountered error: " << error << " while getting level0 dim: " << error << endl;
@@ -164,10 +166,13 @@ void OpenSlideImage::loadImageInfo(int x, int y) throw (file_error) {
 
 
   int32_t openslide_levels = openslide_get_level_count(osr);
+  cerr << "level count" << openslide_levels << endl;
   error = openslide_get_error(osr);
   if (error) {
     logfile << "ERROR: encountered error: " << error << " while getting level count: " << error << endl;
   }
+
+  cerr << "ww,hh:"<<endl;
 
 #ifdef DEBUG_OSI
   logfile << "number of levels = " << openslide_levels << endl;
@@ -180,7 +185,7 @@ void OpenSlideImage::loadImageInfo(int x, int y) throw (file_error) {
     if (error) {
       logfile << "ERROR: encountered error: " << error << " while getting level dims: " << error << endl;
     }
-
+  cerr << ww << " " << hh << endl;
     openslide_widths.push_back(ww);
     openslide_heights.push_back(hh);
 #ifdef DEBUG_OSI
