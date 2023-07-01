@@ -644,7 +644,7 @@ RawTilePtr OpenSlideImage::getNativeTile(const size_t tilex, const size_t tiley,
  * store in cache, and return tile.  (causes recursion, stops at native layer or in cache.)
  */
 RawTilePtr OpenSlideImage::halfsampleAndComposeTile(const size_t tilex, const size_t tiley, const uint32_t iipres) {
-  cerr << "UNEXPEFCTED??? OpenSlideImage::halfsampleAndComposeTile called\n"
+  cerr << "UNEXPEFCTED??? OpenSlideImage::halfsampleAndComposeTile called\n";
   // not in cache and not a native tile, so create one from higher sampling.
 #ifdef DEBUG_OSI
       Timer timer;
