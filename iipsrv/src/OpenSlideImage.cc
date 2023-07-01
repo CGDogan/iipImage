@@ -819,7 +819,7 @@ void OpenSlideImage::bgra2rgb(uint8_t* data, const size_t w, const size_t h) {
  */
 void OpenSlideImage::halfsample_3(const uint8_t* in, const size_t in_w, const size_t in_h,
                                   uint8_t* out, size_t& out_w, size_t& out_h) {
-  cerr << "UNEXPEFCTED??? OpenSlideImage::halfsample_3 called\n"
+  cerr << "UNEXPEFCTED??? OpenSlideImage::halfsample_3 called\n";
 
 #ifdef DEBUG_OSI
       logfile
