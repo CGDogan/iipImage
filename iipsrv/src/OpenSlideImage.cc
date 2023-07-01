@@ -644,9 +644,10 @@ RawTilePtr OpenSlideImage::getNativeTile(const size_t tilex, const size_t tiley,
  * store in cache, and return tile.  (causes recursion, stops at native layer or in cache.)
  */
 RawTilePtr OpenSlideImage::halfsampleAndComposeTile(const size_t tilex, const size_t tiley, const uint32_t iipres) {
+  cerr << "UNEXPEFCTED??? OpenSlideImage::halfsampleAndComposeTile called\n"
   // not in cache and not a native tile, so create one from higher sampling.
 #ifdef DEBUG_OSI
-  Timer timer;
+      Timer timer;
   timer.start();
 #endif
 
@@ -818,10 +819,12 @@ void OpenSlideImage::bgra2rgb(uint8_t* data, const size_t w, const size_t h) {
  */
 void OpenSlideImage::halfsample_3(const uint8_t* in, const size_t in_w, const size_t in_h,
                                   uint8_t* out, size_t& out_w, size_t& out_h) {
-
+  cerr << "UNEXPEFCTED??? OpenSlideImage::halfsample_3 called\n"
 
 #ifdef DEBUG_OSI
-  logfile << "OpenSlide :: halfsample_3() :: start :: in " << (void*)in << " out " << (void*)out << endl << flush;
+      logfile
+       << "OpenSlide :: halfsample_3() :: start :: in " << (void *)in << " out " << (void *)out << endl
+       << flush;
   logfile << "                            :: in wxh " << in_w << "x" << in_h << endl << flush;
 #endif
 
@@ -905,7 +908,7 @@ void OpenSlideImage::halfsample_3(const uint8_t* in, const size_t in_w, const si
 void OpenSlideImage::compose(const uint8_t *in, const size_t in_w, const size_t in_h,
                              const size_t& xoffset, const size_t& yoffset,
                              uint8_t* out, const size_t& out_w, const size_t& out_h) {
-
+fprintf(stderr, "compose called\n");
 #ifdef DEBUG_OSI
   logfile << "OpenSlide :: compose() :: start " << endl << flush;
 #endif
