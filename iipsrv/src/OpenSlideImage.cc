@@ -533,14 +533,18 @@ RawTilePtr OpenSlideImage::getNativeTile(const size_t tilex, const size_t tiley,
   //
   uint32_t bestLayer = openslide_level_to_use[osi_level];
 
+  fprintf(stderr, "Best layer: %u\n", bestLayer);
+
   size_t ntlx = numTilesX[osi_level];
   size_t ntly = numTilesY[osi_level];
 
-
+  fprintf(stderr, "ntlx %lu ntly %lu\n", ntlx, ntly);
 
   // compute the correct width and height
   size_t tw = tile_width;
   size_t th = tile_height;
+
+  fprintf(stderr, "tilewidth %lu tileheight %lu\n", tw, th);
 
   // Get the width and height for last row and column tiles
   size_t rem_x = this->lastTileXDim[osi_level];
@@ -582,7 +586,10 @@ RawTilePtr OpenSlideImage::getNativeTile(const size_t tilex, const size_t tiley,
   size_t ty0 = (tiley * tile_height) << osi_level;
 
   openslide_read_region(osr, reinterpret_cast<uint32_t*>(rt->data), tx0, ty0, bestLayer, tw, th);
-  const char* error = openslide_get_error(osr);
+
+  cerr << "openslide_read_region params: " << tx0 << ty0 << bestLayer << tw << th;
+
+  const char *error = openslide_get_error(osr);
   if (error) {
     logfile << "ERROR: encountered error: " << error << " while reading region exact at  " << tx0 << "x" << ty0 << " dim " << tw << "x" << th << " with OpenSlide: " << error << endl;
   }
