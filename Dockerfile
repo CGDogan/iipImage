@@ -1,4 +1,4 @@
-FROM cgd30/openslide:newv6
+FROM cgd30/openslide:newv7
 
 ### update
 RUN apt-get autoclean
