@@ -48,7 +48,11 @@ char bf_is_floating_point(graal_isolatethread_t*);
 
 char* bf_get_dimension_order(graal_isolatethread_t*);
 
-char* bf_open_bytes(graal_isolatethread_t*, int, int, int, int);
+double bf_get_mpp_x(graal_isolatethread_t*);
+
+double bf_get_mpp_y(graal_isolatethread_t*);
+
+double bf_get_mpp_z(graal_isolatethread_t*);
 
 int run_main(int argc, char** argv);
 

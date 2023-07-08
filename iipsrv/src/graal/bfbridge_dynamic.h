@@ -48,7 +48,11 @@ typedef char (*bf_is_floating_point_fn_t)(graal_isolatethread_t*);
 
 typedef char* (*bf_get_dimension_order_fn_t)(graal_isolatethread_t*);
 
-typedef char* (*bf_open_bytes_fn_t)(graal_isolatethread_t*, int, int, int, int);
+typedef double (*bf_get_mpp_x_fn_t)(graal_isolatethread_t*);
+
+typedef double (*bf_get_mpp_y_fn_t)(graal_isolatethread_t*);
+
+typedef double (*bf_get_mpp_z_fn_t)(graal_isolatethread_t*);
 
 typedef int (*run_main_fn_t)(int argc, char** argv);
 
