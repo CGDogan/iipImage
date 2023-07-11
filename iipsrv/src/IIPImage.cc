@@ -41,6 +41,7 @@
 #include <limits>
 
 #include "openslide.h"
+#include "graal/bfbridge.h"
 
 using namespace std;
 
@@ -122,11 +123,24 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char lbigtiff[4] = {0x4D,0x4D,0x00,0x2B}; // Little Endian BigTIFF
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
 
-    const char * vendor = openslide_detect_vendor( path.c_str() );
-    if ( vendor != NULL )
-    	format = OPENSLIDE;
+// TODO: Reuse one
+    graal_isolate_t *graal_isolate_main = NULL;
+    graal_isolatethread_t *graal_thread_main = NULL;
+    int code = graal_create_isolate(NULL, &graal_isolate_main, &graal_thread_main);
+    if (code != 0)
+    {
+      throw "graal_create_isolate bad: " + code;
+    }
+
+    if (bf_is_compatible(graal_thread_main, (char *) path.c_str())) {
+      format = BIOFORMATS;
+    }
+    // const char * vendor = openslide_detect_vendor( path.c_str() );
+    // if ( vendor != NULL )
+    //	format = OPENSLIDE;
     else format = UNSUPPORTED;
 
+    graal_tear_down_isolate(graal_thread_main);
   }
   else{
 
