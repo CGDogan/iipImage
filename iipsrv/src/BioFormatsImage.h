@@ -88,7 +88,6 @@ private:
         int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
         if (code != 0)
         {
-            logfile << "ERROR: encountered error: " << code << " in graal_create_isolate" << endl;
             throw "graal_create_isolate: " + code;
         }
     };
