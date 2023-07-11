@@ -1,4 +1,4 @@
-FROM cgd30/openslide:newv7
+FROM cgd30/decoders:v1
 
 ### update
 RUN apt-get autoclean
