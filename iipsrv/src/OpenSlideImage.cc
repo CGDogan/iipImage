@@ -245,10 +245,6 @@ void OpenSlideImage::loadImageInfo(int x, int y) throw (file_error) {
       ++os_level;
       os_downsample_in_level = 1;  // just went to next smaller level, don't downsample internally yet.
 
-      // Handle duplicate levels:
-      while (w <= openslide_widths[os_level + 1] && h <= openslide_heights[os_level + 1]) {
-        ++os_level;
-      }
     } else {
       os_downsample_in_level <<= 1;  // next one, downsample internally by 2.
     }
