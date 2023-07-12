@@ -87,7 +87,7 @@ private:
     {
         fprintf(stderr, "dddBioFormatsImage.h: Creating isolate\n");
         int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
-        fprintf(stderr, "dddBioFormatsImage.h: Created isolate %d\n", code);
+        fprintf(stderr, "dddBioFormatsImage.h: Created isolate. should be 0: %d\n", code);
         if (code != 0)
         {
             fprintf(stderr, "dddBioFormatsImage.h: ERROR But with error!\n");
@@ -118,8 +118,8 @@ public:
     /** \param image IIPImage object
      */
     explicit BioFormatsImage(const BioFormatsImage &image) : IIPImage(image),
-                                                             // TODO Copy everything including JVM pointers for moving here.
-                                                             // osr(image.osr), tileCache(image.tileCache),
+                                                             // Copy everything including JVM pointers for moving here.
+                                                            tileCache(image.tileCache),
                                                              graal_isolate(image.graal_isolate),
                                                              graal_thread(image.graal_thread),
                                                              numTilesX(image.numTilesX),
