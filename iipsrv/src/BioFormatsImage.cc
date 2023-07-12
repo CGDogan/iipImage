@@ -10,7 +10,7 @@
 
 #include <limits>
 
-#define throw(a)
+//#define throw(file_error)
 
 // TODO: comment me
 #define DEBUG_OSI 1
