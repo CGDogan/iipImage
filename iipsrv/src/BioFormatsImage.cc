@@ -43,9 +43,9 @@ void BioFormatsImage::openImage() throw(file_error)
 
     if (graal_thread == NULL)
     {
-        logfile << "ERROR: can't open " << filename << " with BioFormats" << endl
+        logfile << "ERROR: can't open " << filename << " with BioFormats; thread uninitialized" << endl
                 << flush;
-        throw file_error(string("Error opening '" + filename + "' with BioFormats"));
+        throw file_error(string("Error opening '" + filename + "' with BioFormats; thread uninitialized"));
     }
 
     fprintf(stderr, "dddBioFormatsImage.cc entering file\n");
