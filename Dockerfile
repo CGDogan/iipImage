@@ -1,4 +1,4 @@
-FROM cgd30/decoders:v1
+FROM cgd30/decoders:v2
 
 ### update
 RUN apt-get autoclean
