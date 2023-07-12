@@ -10,7 +10,7 @@
 
 #include <limits>
 
-//#define throw(file_error)
+#define throw(file_error)
 
 // TODO: comment me
 #define DEBUG_OSI 1
@@ -129,8 +129,9 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 #endif
 
     fprintf(stderr, "ddddwill you receive: I won't read..?\n");
-        channels = bf_get_rgb_channel_count(graal_thread);
-    throw "I won't read..";
+    throw file_error("I won't read..");
+
+    channels = bf_get_rgb_channel_count(graal_thread);
     if (channels != 3)
     {
         // TODO: Allow RGBA
