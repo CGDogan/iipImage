@@ -24,11 +24,11 @@ extern std::ofstream logfile;
 
 void BioFormatsImage::openImage() throw(file_error)
 {
+    fprintf(stderr, "ddBioFormatsImage.cc:  BioFormatsImage::openImage() start\n");
     string filename = getFileName(currentX, currentY);
 
     // get the file modification date/time.   return false if not changed, return true if change compared to the stored info.
     bool modified = updateTimestamp(filename);
-
     // close previous
     closeImage();
 
@@ -323,8 +323,9 @@ void BioFormatsImage::closeImage()
     Timer timer;
     timer.start();
 #endif
-
+    fprintf(stderr, "Calling BioFormatsImage.cc\n");
     bf_close(graal_thread, 0);
+    fprintf(stderr, "Called BioFormatsImage.cc\n");
 
 #ifdef DEBUG_OSI
     logfile
