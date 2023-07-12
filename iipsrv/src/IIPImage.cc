@@ -133,14 +133,18 @@ void IIPImage::testImageType() throw(file_error)
     {
       throw "graal_create_isolate bad: " + code;
     }
-
+    fprintf(stderr, "Entering bf_is_compatible iipimage.cc\n");
     if (bf_is_compatible(graal_thread_main, (char *) path.c_str())) {
+      fprintf(stderr, "It is bf compatible! iipimage.cc\n");
+
       format = BIOFORMATS;
-    }
+    } else {
+    fprintf(stderr, "It is not bf compatible. iipimage.cc\n");
+
     // const char * vendor = openslide_detect_vendor( path.c_str() );
     // if ( vendor != NULL )
     //	format = OPENSLIDE;
-    else format = UNSUPPORTED;
+     format = UNSUPPORTED;}
     fprintf(stderr, "Tearing down isolate iipimage.cc\n");
     graal_tear_down_isolate(graal_thread_main);
     fprintf(stderr, "Teared down isolate iipimage.cc\n");
