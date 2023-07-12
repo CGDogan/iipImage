@@ -47,6 +47,7 @@ void BioFormatsImage::openImage() throw(file_error)
         throw file_error(string("Error opening '" + filename + "' with BioFormats"));
     }
 
+    fprintf(stderr, "BioFormatsImage.cc entering file");
     if (!bf_open(graal_thread, (char *)filename.c_str()))
     {
         const char *error = bf_get_error(graal_thread);
@@ -55,6 +56,8 @@ void BioFormatsImage::openImage() throw(file_error)
                 << flush;
         throw file_error(string("Error opening '" + filename + "' with BioFormats, error " + error));
     }
+    fprintf(stderr, "BioFormatsImage.cc entered file");
+
 #ifdef DEBUG_OSI
     logfile << "BioFormats :: openImage() :: " << timer.getTime() << " microseconds" << endl
             << flush;

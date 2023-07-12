@@ -85,7 +85,9 @@ private:
     /// Constructor
     BioFormatsImage() : IIPImage()
     {
+        fprintf(stderr, "BioFormatsImage.h: Creating isolate");
         int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
+        fprintf(stderr, "BioFormatsImage.h: Created isolate");
         if (code != 0)
         {
             throw "graal_create_isolate: " + code;
