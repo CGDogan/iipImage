@@ -326,9 +326,11 @@ void BioFormatsImage::closeImage()
     Timer timer;
     timer.start();
 #endif
-    fprintf(stderr, "Calling bfclose.cc in BioFormatsImage::closeImage: is the following 1: %d\n", !!graal_thread);
-    bf_close(graal_thread, 0);
-    fprintf(stderr, "Called bfclose.cc in BioFormatsImage::closeImage\n");
+    fprintf(stderr, "Calling bf_close in BioFormatsImage::closeImage: is the following 1: %d\n", !!graal_thread);
+    if (graal_thread) {
+        fprintf(stderr, "Called bf_close in BioFormatsImage::closeImage\n");
+        bf_close(graal_thread, 0);
+    }
 
 #ifdef DEBUG_OSI
     logfile
