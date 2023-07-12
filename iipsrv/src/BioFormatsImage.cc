@@ -82,6 +82,7 @@ void BioFormatsImage::openImage() throw(file_error)
 /// given an open OSI file, get information from the image.
 void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 {
+    fprintf(stderr, "ddddBioFormatsImage :: loadImageInfo starting\n");
 
 #ifdef DEBUG_OSI
     logfile << "BioFormatsImage :: loadImageInfo()" << endl;
@@ -127,7 +128,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     // logfile << "comment : " << comment << endl;
 #endif
 
-    channels = bf_get_rgb_channel_count(graal_thread);
+    fprintf(stderr, "ddddwill you receive: I won't read..?\n");
+        channels = bf_get_rgb_channel_count(graal_thread);
     throw "I won't read..";
     if (channels != 3)
     {
