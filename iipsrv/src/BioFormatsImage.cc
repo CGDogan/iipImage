@@ -326,7 +326,7 @@ void BioFormatsImage::closeImage()
     Timer timer;
     timer.start();
 #endif
-    fprintf(stderr, "Calling bfclose.cc in BioFormatsImage::closeImage\n");
+    fprintf(stderr, "Calling bfclose.cc in BioFormatsImage::closeImage: is the following 1: %d\n", !!graal_thread);
     bf_close(graal_thread, 0);
     fprintf(stderr, "Called bfclose.cc in BioFormatsImage::closeImage\n");
 
