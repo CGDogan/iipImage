@@ -126,9 +126,9 @@ void IIPImage::testImageType() throw(file_error)
 // TODO: Reuse one
     graal_isolate_t *graal_isolate_main = NULL;
     graal_isolatethread_t *graal_thread_main = NULL;
-    fprintf(stderr, "Entering isolate iipimage.cc");
+    fprintf(stderr, "Entering isolate iipimage.cc\n");
     int code = graal_create_isolate(NULL, &graal_isolate_main, &graal_thread_main);
-    fprintf(stderr, "Entered isolate iipimage.cc");
+    fprintf(stderr, "Entered isolate iipimage.cc\n");
     if (code != 0)
     {
       throw "graal_create_isolate bad: " + code;
@@ -141,9 +141,9 @@ void IIPImage::testImageType() throw(file_error)
     // if ( vendor != NULL )
     //	format = OPENSLIDE;
     else format = UNSUPPORTED;
-    fprintf(stderr, "Tearing down isolate iipimage.cc");
+    fprintf(stderr, "Tearing down isolate iipimage.cc\n");
     graal_tear_down_isolate(graal_thread_main);
-    fprintf(stderr, "Teared down isolate iipimage.cc");
+    fprintf(stderr, "Teared down isolate iipimage.cc\n");
   }
   else{
 
