@@ -183,7 +183,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     if (bpc != 8)
     {
         // TODO: downsample or keep as is
-        throw file_error("Unimplemented: bpc " + std::to_string(bpc) + "is not 8");
+        throw file_error("Unimplemented: bpc " + std::to_string(bpc) + " is not 8. bf_get_bits_per_pixel(graal_thread): " + std::to_string(bf_get_bits_per_pixel(graal_thread)) + " channels: " + std::to_string(channels));
     }
 
     if (bpc <= 0)
