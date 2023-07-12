@@ -120,7 +120,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         const char *err = bf_get_error(graal_thread);
 
         logfile << "ERROR: encountered error: " << err << " while getting level0 dim" << endl;
-        throw "Getting bioformats level0 dimensions: " + std::string(err);
+        throw file_error("Getting bioformats level0 dimensions: " + std::string(err));
     }
 
 #ifdef DEBUG_OSI
@@ -128,8 +128,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     // logfile << "comment : " << comment << endl;
 #endif
 
-    fprintf(stderr, "ddddwill you receive: I won't read..?\n");
-    throw file_error("I won't read..");
+    fprintf(stderr, "continue info: parsing file in bioformatsimage.cc\n");
 
     channels = bf_get_rgb_channel_count(graal_thread);
     if (channels != 3)
@@ -138,13 +137,13 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         if (channels > 0)
         {
             logfile << "Unimplemented: only support 3 channels, not " << channels << endl;
-            throw "Unimplemented: only support 3 channels, not " + channels;
+            throw file_error("Unimplemented: only support 3 channels, not " + channels);
         }
         else
         {
             const char *err = bf_get_error(graal_thread);
             logfile << "Error while getting channel count: " << err << endl;
-            throw "Error while getting channel count: " + std::string(err);
+            throw file_error("Error while getting channel count: " + std::string(err));
         }
     }
 
@@ -154,7 +153,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         // interleave them before giving them to C. Or do it in C.
         // Maybe code for the case that bpc is a multiple of 8, reject otherwise
         logfile << "Unimplemented: iipsrv requires uninterleaved" << endl;
-        throw "Unimplemented: iipsrv requires uninterleaved";
+        throw file_error("Unimplemented: iipsrv requires uninterleaved");
     }
 
     if (!bf_is_little_endian(graal_thread))
@@ -162,20 +161,20 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         // TODO: note somewhere in the class whether to swap
         // and when getting tiles, swap
         logfile << "Unimplemented: endian swapping" << endl;
-        throw "Unimplemented: endian swapping";
+        throw file_error("Unimplemented: endian swapping");
     }
 
     if (bf_is_floating_point(graal_thread))
     {
         // TODO. It should be easier to handle this when bf_floating_point_is_normalized == true
         logfile << "Unimplemented: floating point reading" << endl;
-        throw "Unimplemented: floating point reading";
+        throw file_error("Unimplemented: floating point reading");
     }
 
     if (bf_get_dimension_order(graal_thread) && bf_get_dimension_order(graal_thread)[2] != 'C')
     {
         logfile << "Unimplemented: unfamiliar dimension order " << bf_get_dimension_order(graal_thread) << endl;
-        throw "Unimplemented: unfamiliar dimension order " + std::string(bf_get_dimension_order(graal_thread));
+        throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bf_get_dimension_order(graal_thread)));
     }
 
     bpc = bf_get_bits_per_pixel(graal_thread) / channels;
@@ -184,14 +183,14 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     if (bpc != 8)
     {
         // TODO: downsample or keep as is
-        throw "Unimplemented: bpc " + std::to_string(bpc) + "is not 8";
+        throw file_error("Unimplemented: bpc " + std::to_string(bpc) + "is not 8");
     }
 
     if (bpc <= 0)
     {
         const char *err = bf_get_error(graal_thread);
         logfile << "Error while getting bits per pixel: " << err << endl;
-        throw "Error while getting bits per pixel: " + std::string(err);
+        throw file_error("Error while getting bits per pixel: " + std::string(err));
     }
 
     // save the openslide dimensions.
@@ -204,7 +203,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     {
         const char *err = bf_get_error(graal_thread);
         logfile << "ERROR: encountered error: " << err << " while getting level count" << endl;
-        throw "ERROR: encountered error: " + std::string(err) + " while getting level count";
+        throw file_error("ERROR: encountered error: " + std::string(err) + " while getting level count");
     }
 
 #ifdef DEBUG_OSI
@@ -221,7 +220,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         if (ww <= 0 || hh <= 0)
         {
             logfile << "ERROR: encountered error: while getting level dims for level " << i << endl;
-            throw "error while getting level dims for level " + i;
+            throw file_error("error while getting level dims for level " + i);
         }
         bioformats_widths.push_back(ww);
         bioformats_heights.push_back(hh);
@@ -576,7 +575,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     {
         const char *error = bf_get_error(graal_thread);
         logfile << "ERROR: encountered error: " << error << " while reading region exact at  " << tx0 << "x" << ty0 << " dim " << tw << "x" << th << " with BioFormats: " << error << endl;
-        throw "ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error);
+        throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
     }
 
 #ifdef DEBUG_OSI
