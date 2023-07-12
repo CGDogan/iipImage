@@ -128,7 +128,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 #endif
 
     channels = bf_get_rgb_channel_count(graal_thread);
-
+    throw "I won't read..";
     if (channels != 3)
     {
         // TODO: Allow RGBA
