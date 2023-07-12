@@ -39,6 +39,7 @@ void BioFormatsImage::openImage() throw(file_error)
     logfile << "BioFormats :: openImage() :: start" << endl
             << flush;
 #endif
+    fprintf(stderr, "ddBioFormatsImage.cc:  continue1 \n");
 
     if (graal_thread == NULL)
     {
@@ -50,6 +51,8 @@ void BioFormatsImage::openImage() throw(file_error)
     fprintf(stderr, "dddBioFormatsImage.cc entering file\n");
     if (!bf_open(graal_thread, (char *)filename.c_str()))
     {
+        fprintf(stderr, "dddBioFormatsImage.cc cant enter file:\n");
+
         const char *error = bf_get_error(graal_thread);
 
         logfile << "ERROR: encountered error: " << error << " while opening " << filename << " with BioFormats: " << endl
@@ -323,9 +326,9 @@ void BioFormatsImage::closeImage()
     Timer timer;
     timer.start();
 #endif
-    fprintf(stderr, "Calling BioFormatsImage.cc\n");
+    fprintf(stderr, "Calling bfclose.cc in BioFormatsImage::closeImage\n");
     bf_close(graal_thread, 0);
-    fprintf(stderr, "Called BioFormatsImage.cc\n");
+    fprintf(stderr, "Called bfclose.cc in BioFormatsImage::closeImage\n");
 
 #ifdef DEBUG_OSI
     logfile
