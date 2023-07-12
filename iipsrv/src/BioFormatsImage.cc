@@ -584,7 +584,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     bf_set_current_resolution(graal_thread, bestLayer);
 #ifdef DEBUG_VERBOSE
-    cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th;
+    cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
 #endif
     const char *bytes = bf_open_bytes(graal_thread, tx0, ty0, tw, th);
     if (!bytes)
