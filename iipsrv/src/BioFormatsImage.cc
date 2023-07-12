@@ -130,6 +130,13 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     fprintf(stderr, "continue info: parsing file in bioformatsimage.cc\n");
 
+    // TODO important: these need to be moved to getnativetile
+    // as these can change in the image
+    // should we make custom function that communicates these efficiently with bits?
+    // search for sampletype in this file perhaps
+    // see TPTImage.cc#L89 to see an example of setting these per tile, not per file
+    // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L61
+
     channels = bf_get_rgb_channel_count(graal_thread);
     if (channels != 3)
     {
@@ -177,8 +184,16 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bf_get_dimension_order(graal_thread)));
     }
 
-    bpc = bf_get_bits_per_pixel(graal_thread) / channels;
+    // Actually gives bits per channel per pixel, so don't divide by channels
+    bpc = bf_get_bits_per_pixel(graal_thread);
     colourspace = sRGB;
+
+    /*
+          if ((bpp % channels) != 0) {
+        // How can this be handled? Should be very rare.
+        throw file_error("Unimplemented: bad remainder when diving bits per pixel among channels. bf_get_bits_per_pixel(graal_thread): " + std::to_string(bf_get_bits_per_pixel(graal_thread)) + " channels: " + std::to_string(channels));
+    }
+    */
 
     if (bpc != 8)
     {
