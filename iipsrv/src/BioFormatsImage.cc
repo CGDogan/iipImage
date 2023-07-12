@@ -584,14 +584,18 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     bf_set_current_resolution(graal_thread, bestLayer);
 #ifdef DEBUG_VERBOSE
-    cerr << "bf_open_bytes params: " << bestLayer << tx0 << ty0 << tw << th;
+    cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th;
 #endif
-    if (!bf_open_bytes(graal_thread, tx0, ty0, tw, th))
+    const char *bytes = bf_open_bytes(graal_thread, tx0, ty0, tw, th);
+    if (!bytes)
     {
+        cerr << "bf_open_bytes got an error! ";
         const char *error = bf_get_error(graal_thread);
         logfile << "ERROR: encountered error: " << error << " while reading region exact at  " << tx0 << "x" << ty0 << " dim " << tw << "x" << th << " with BioFormats: " << error << endl;
         throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
     }
+    cerr << "bf_open_bytes returned with success ";
+    memcpy(rt->data, bytes, channels * bpc/8 * tw * th);
 
 #ifdef DEBUG_OSI
     logfile << "BioFormats :: getNativeTile() :: read_region() :: " << tilex << "x" << tiley << "@" << iipres << " " << timer.getTime() << " microseconds" << endl
