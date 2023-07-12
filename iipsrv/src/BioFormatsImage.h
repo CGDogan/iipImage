@@ -87,9 +87,11 @@ private:
     {
         fprintf(stderr, "dddBioFormatsImage.h: Creating isolate\n");
         int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
-        fprintf(stderr, "dddBioFormatsImage.h: Created isolate\n");
+        fprintf(stderr, "dddBioFormatsImage.h: Created isolate %d\n", code);
         if (code != 0)
         {
+            fprintf(stderr, "dddBioFormatsImage.h: ERROR But with error!\n");
+
             throw "graal_create_isolate: " + code;
         }
     };
