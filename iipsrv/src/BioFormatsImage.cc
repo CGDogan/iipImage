@@ -588,12 +588,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 #endif
 
     // BEGIN BREAK
-    cerr << "but, instead, callin bfinternal_deleteme";
-    bfinternal_deleteme(graal_thread, "/root/src/jcupitt.dcm");
-    cerr << "returned from there";
+    cerr << "but, instead, callin bfinternal_deleteme\n";
+    if (bfinternal_deleteme(graal_thread, "/root/src/jcupitt.dcm") < 0) {
+        cerr << "couldn't simulate - check path?\n";
+    }
+    cerr << "returned from there\n";
     // end BREAK
 
-    cerr << "calling bf_open_bytes";
+    cerr << "calling bf_open_bytes\n";
 
     const char *bytes = bf_open_bytes(graal_thread, tx0, ty0, tw, th);
     if (!bytes)
