@@ -586,6 +586,15 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 #ifdef DEBUG_VERBOSE
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
 #endif
+
+    // BEGIN BREAK
+    cerr << "but, instead, callin bfinternal_deleteme";
+    bfinternal_deleteme(graal_thread, "/root/src/jcupitt.dcm");
+    cerr << "returned from there";
+    // end BREAK
+
+    cerr << "calling bf_open_bytes";
+
     const char *bytes = bf_open_bytes(graal_thread, tx0, ty0, tw, th);
     if (!bytes)
     {
