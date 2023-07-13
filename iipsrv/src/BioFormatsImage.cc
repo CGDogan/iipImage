@@ -589,9 +589,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     // BEGIN BREAK
     // works: "images/deleteme.tif""text123.txt"
-    // doesn't work: "/images/LargeTestFile1g", 100m, 10m, 1m, 100k
-    // test: 10k
-    char *test = "/images/LargeTestFile10k";
+    // doesn't work: "/images/LargeTestFile1g", 100m, 10m, 1m, 100k, 10k
+    char *test = "/images/LargeTestFile1k";
     cerr << "but, instead, callin bfinternal_deleteme\n" << test << endl;
 
     if (bfinternal_deleteme(graal_thread, /*"/root/src/jcupitt.dcm"*/ /*"yes:/images/dcm5_dcm_conv.tif"*/ test) < 0)
