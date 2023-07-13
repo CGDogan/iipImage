@@ -589,7 +589,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     // BEGIN BREAK
     cerr << "but, instead, callin bfinternal_deleteme\n";
-    if (bfinternal_deleteme(graal_thread, "/root/src/jcupitt.dcm") < 0) {
+    if (bfinternal_deleteme(graal_thread, /*"/root/src/jcupitt.dcm"*/ "/images/dcm5_dcm_conv.tif") < 0)
+    {
         cerr << "couldn't simulate - check path?\n";
     }
     cerr << "returned from there\n";
