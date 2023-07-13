@@ -19,8 +19,8 @@
 
 #include "Cache.h"
 
-#include <bfbridge.h>
-#include <graal/graal_isolate.h>
+#include <libbfbridge.h>
+#include <graal_isolate.h>
 
 #define throw(a)
 
