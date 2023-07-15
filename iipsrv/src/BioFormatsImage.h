@@ -37,6 +37,19 @@ private:
     std::vector<size_t> lastTileXDim, lastTileYDim;
     std::vector<int> bioformats_level_to_use, bioformats_downsample_in_level;
 
+    void set_up_graal_bridge() {
+        fprintf(stderr, "dddBioFormatsImage.h3: Creating isolate\n");
+        int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
+        fprintf(stderr, "dddBioFormatsImage.h3: Created isolate. should be 0: %d\n", code);
+        if (code != 0)
+        {
+            fprintf(stderr, "dddBioFormatsImage.h3: ERROR But with error!\n");
+
+            throw "graal_create_isolate: " + code;
+        }
+        receive_buffer = bf_get_communication_buffer(graal_thread);
+    }
+
     // Unimplemented methods in line with OpenslideImage.h:
     //    void read(...);
     //    void downsample_region(...);
@@ -84,18 +97,8 @@ private:
                  uint8_t *out, const size_t &out_w, const size_t &out_h);
 
     /// Constructor
-    BioFormatsImage() : IIPImage()
-    {
-        fprintf(stderr, "dddBioFormatsImage.h3: Creating isolate\n");
-        int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
-        fprintf(stderr, "dddBioFormatsImage.h3: Created isolate. should be 0: %d\n", code);
-        if (code != 0)
-        {
-            fprintf(stderr, "dddBioFormatsImage.h3: ERROR But with error!\n");
-
-            throw "graal_create_isolate: " + code;
-        }
-        receive_buffer = bf_get_communication_buffer(graal_thread);
+    BioFormatsImage() : IIPImage(){
+        set_up_graal_bridge();
     };
 
 public:
@@ -104,16 +107,7 @@ public:
      */
     BioFormatsImage(const std::string &path, TileCache *tile_cache) : IIPImage(path), tileCache(tile_cache)
     {
-        fprintf(stderr, "dddBioFormatsImage.h2: Creating isolate\n");
-        int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
-        fprintf(stderr, "dddBioFormatsImage.h2: Created isolate. should be 0: %d\n", code);
-        if (code != 0)
-        {
-            fprintf(stderr, "dddBioFormatsImage.h2: ERROR But with error!\n");
-
-            throw "graal_create_isolate: " + code;
-        }
-        receive_buffer = bf_get_communication_buffer(graal_thread);
+        set_up_graal_bridge();
         // set tile width on loadimage, not here
     };
 
@@ -122,16 +116,7 @@ public:
     /** \param image IIPImage object
      */
     BioFormatsImage(const IIPImage &image, TileCache *tile_cache) : IIPImage(image), tileCache(tile_cache){
-        fprintf(stderr, "dddBioFormatsImage.h1: Creating isolate\n");
-        int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
-        fprintf(stderr, "dddBioFormatsImage.h1: Created isolate. should be 0: %d\n", code);
-        if (code != 0)
-        {
-            fprintf(stderr, "dddBioFormatsImage.h1: ERROR But with error!\n");
-
-            throw "graal_create_isolate: " + code;
-        }
-        receive_buffer = bf_get_communication_buffer(graal_thread);
+        set_up_graal_bridge();
     };
 
     /** \param image IIPImage object
@@ -153,6 +138,10 @@ public:
                                                                     fprintf(stderr, "Unitialized graal_thread found!");
                                                                 }
 
+                                                                if (!receive_buffer)
+                                                                {
+                                                                    fprintf(stderr, "Unitialized graal_thread found!");
+                                                                }
                                                              };
     /// Destructor
 

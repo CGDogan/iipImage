@@ -89,7 +89,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     if (!graal_thread)
     {
-        logfile << "Not ready" << endl;
+        logfile << "Graal_thread not initialized" << endl;
+        throw file_error("Graal_thread not initialized");
     }
 #endif
 
@@ -101,13 +102,13 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     // choose power of 2 to make downsample simpler.
     tile_width = bf_get_optimal_tile_width(graal_thread);
-    if (tile_width < 0 || tile_width & (tile_width - 1))
+    if (tile_width <= 0 || tile_width & (tile_width - 1))
     {
         tile_width = 256;
     }
 
     tile_height = bf_get_optimal_tile_height(graal_thread);
-    if (tile_height < 0 || tile_height & (tile_height - 1))
+    if (tile_height <= 0 || tile_height & (tile_height - 1))
     {
         tile_height = 256;
     }
@@ -590,18 +591,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     if (!rt->data)
         throw string("FATAL : BioFormatsImage read_region => allocation memory ERROR");
 
-    // BEGIN BREAK
-    // works: "images/deleteme.tif""text123.txt"
-    // doesn't work: "/images/LargeTestFile1g", 100m, 10m, 1m, 100k, 10k, 1k, 1, deleteme.tif, pngtest1.png
-    // not tested: 100, 10, 1
-    char *test = "/images/pngtest1.png";
+    /*char *test = "/images/pngtest1.png";
     cerr << "but, instead, callin bfinternal_deleteme\n" << test << endl;
 
-    if (bfinternal_deleteme(graal_thread, /*"/root/src/jcupitt.dcm"*/ /*"yes:/images/dcm5_dcm_conv.tif"*/ test) < 0)
+    if (bfinternal_deleteme(graal_thread, test) < 0)
     {
         cerr << "couldn't simulate - check path?\n";
     }
-    cerr << "returned from there\n";
+    cerr << "returned from there\n";*/
     // end BREAK
 
     cerr << "calling bf_open_bytes\n";
