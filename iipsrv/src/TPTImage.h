@@ -28,8 +28,6 @@
 #include <tiff.h>
 #include <tiffio.h>
 
-#define throw(a)
-
 
 
 
