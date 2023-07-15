@@ -146,8 +146,8 @@ public:
                                                              lastTileXDim(image.lastTileXDim),
                                                              lastTileYDim(image.lastTileYDim),
                                                              bioformats_level_to_use(image.bioformats_level_to_use),
-                                                             bioformats_downsample_in_level(image.bioformats_downsample_in_level,
-                                                             receive_buffer(image.receive_buffer)){
+                                                             bioformats_downsample_in_level(image.bioformats_downsample_in_level),
+                                                             receive_buffer(image.receive_buffer){
 
                                                                 if (!graal_thread) {
                                                                     fprintf(stderr, "Unitialized graal_thread found!");
