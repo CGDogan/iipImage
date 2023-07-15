@@ -1,4 +1,4 @@
-FROM cgd30/decoders:v5
+FROM cgd30/decoders:v6
 #breakv4v2
 
 ### update
