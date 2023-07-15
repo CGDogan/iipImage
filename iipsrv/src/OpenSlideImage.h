@@ -19,7 +19,6 @@
 #include <inttypes.h>
 #include <iostream>
 #include <fstream>
-#define throw(...)
 #include "Cache.h"  // for local cache of raw tiles.
 
 
