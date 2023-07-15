@@ -587,9 +587,12 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
 #endif
 
+    if (!rt->data)
+        throw string("FATAL : BioFormatsImage read_region => allocation memory ERROR");
+
     // BEGIN BREAK
     // works: "images/deleteme.tif""text123.txt"
-    // doesn't work: "/images/LargeTestFile1g", 100m, 10m, 1m, 100k, 10k, 1k, 1, deleteme.tif
+    // doesn't work: "/images/LargeTestFile1g", 100m, 10m, 1m, 100k, 10k, 1k, 1, deleteme.tif, pngtest1.png
     // not tested: 100, 10, 1
     char *test = "/images/pngtest1.png";
     cerr << "but, instead, callin bfinternal_deleteme\n" << test << endl;
@@ -603,8 +606,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     cerr << "calling bf_open_bytes\n";
 
-    const char *bytes = bf_open_bytes(graal_thread, tx0, ty0, tw, th);
-    if (!bytes)
+    int bytes_received = bf_open_bytes(graal_thread, tx0, ty0, tw, th);
+    if (bytes_received < 0)
     {
         cerr << "bf_open_bytes got an error! ";
         const char *error = bf_get_error(graal_thread);
@@ -612,15 +615,15 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
     }
     cerr << "bf_open_bytes returned with success ";
-    memcpy(rt->data, bytes, channels * bpc/8 * tw * th);
+    if (bytes_received != channels * bpc / 8 * tw * th) {
+        throw file_error("ERROR: expected len " + std::to_string(channels * bpc / 8 * tw * th) + " but got " + std::to_string(bytes_received));
+    }
+    memcpy(rt->data, receive_buffer, bytes_received);
 
 #ifdef DEBUG_OSI
     logfile << "BioFormats :: getNativeTile() :: read_region() :: " << tilex << "x" << tiley << "@" << iipres << " " << timer.getTime() << " microseconds" << endl
             << flush;
 #endif
-
-    if (!rt->data)
-        throw string("FATAL : BioFormatsImage read_region => allocation memory ERROR");
 
 #ifdef DEBUG_OSI
     timer.start();

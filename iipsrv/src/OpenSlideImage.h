@@ -19,7 +19,7 @@
 #include <inttypes.h>
 #include <iostream>
 #include <fstream>
-
+#define throw(...)
 #include "Cache.h"  // for local cache of raw tiles.
 
 
@@ -114,6 +114,8 @@ private:
 
     /// Constructor
     OpenSlideImage() : IIPImage() {
+        fprintf(stderr, "New thread\n\n");
+
         tile_width = OPENSLIDE_TILESIZE;
         tile_height = OPENSLIDE_TILESIZE;
         osr = NULL;
@@ -126,6 +128,8 @@ public:
     /** \param path image path
      */
     OpenSlideImage(const std::string& path, TileCache* tile_cache) : IIPImage(path), tileCache(tile_cache) {
+        fprintf(stderr, "New thread\n\n");
+
         tile_width = OPENSLIDE_TILESIZE;
         tile_height = OPENSLIDE_TILESIZE;
         osr = NULL;
@@ -136,6 +140,8 @@ public:
     /** \param image IIPImage object
      */
     OpenSlideImage(const IIPImage& image, TileCache* tile_cache) : IIPImage(image), tileCache(tile_cache) {
+        fprintf(stderr, "New thread\n\n");
+
         osr = NULL;
     };
 
@@ -154,6 +160,7 @@ public:
     /// Destructor
 
     virtual ~OpenSlideImage() {
+        fprintf(stderr, "Closing thread\n\n");
         closeImage();
     };
 

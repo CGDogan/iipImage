@@ -29,6 +29,7 @@ class BioFormatsImage : public IIPImage
 private:
     graal_isolate_t *graal_isolate = NULL;
     graal_isolatethread_t *graal_thread = NULL;
+    char *receive_buffer = NULL;
 
     TileCache *tileCache;
 
@@ -94,6 +95,7 @@ private:
 
             throw "graal_create_isolate: " + code;
         }
+        receive_buffer = bf_get_communication_buffer(graal_thread);
     };
 
 public:
@@ -111,6 +113,7 @@ public:
 
             throw "graal_create_isolate: " + code;
         }
+        receive_buffer = bf_get_communication_buffer(graal_thread);
         // set tile width on loadimage, not here
     };
 
@@ -128,6 +131,7 @@ public:
 
             throw "graal_create_isolate: " + code;
         }
+        receive_buffer = bf_get_communication_buffer(graal_thread);
     };
 
     /** \param image IIPImage object
@@ -142,7 +146,8 @@ public:
                                                              lastTileXDim(image.lastTileXDim),
                                                              lastTileYDim(image.lastTileYDim),
                                                              bioformats_level_to_use(image.bioformats_level_to_use),
-                                                             bioformats_downsample_in_level(image.bioformats_downsample_in_level){
+                                                             bioformats_downsample_in_level(image.bioformats_downsample_in_level,
+                                                             receive_buffer(image.receive_buffer)){
 
                                                                 if (!graal_thread) {
                                                                     fprintf(stderr, "Unitialized graal_thread found!");
