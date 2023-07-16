@@ -108,12 +108,11 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     }
 
     tile_height = bf_get_optimal_tile_height(graal_thread);
+    cerr << "optimalnatural " << tile_height << " " << tile_width;
     if (tile_height <= 0 || tile_height & (tile_height - 1))
     {
         tile_height = 256;
     }
-
-    cerr << "optimal " << tile_height << " " << tile_width;
 
     w = bf_get_size_x(graal_thread);
     h = bf_get_size_y(graal_thread);
