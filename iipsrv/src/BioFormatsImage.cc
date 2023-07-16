@@ -98,8 +98,6 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     currentX = x;
     currentY = y;
 
-    const char *prop_val;
-
     // choose power of 2 to make downsample simpler.
     tile_width = bf_get_optimal_tile_width(graal_thread);
     if (tile_width <= 0 || tile_width & (tile_width - 1))
@@ -108,7 +106,6 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     }
 
     tile_height = bf_get_optimal_tile_height(graal_thread);
-    cerr << "optimalnatural " << tile_height << " " << tile_width;
     if (tile_height <= 0 || tile_height & (tile_height - 1))
     {
         tile_height = 256;
@@ -569,7 +566,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // new a block ...
     // relying on delete [] to do the right thing.
     rt->data = new unsigned char[tw * th * channels * sizeof(unsigned char)];
-    rt->memoryManaged = 1; // allocated data, so use this flag to indicate that it needs to be cleared on destruction
+    rt->memoryManaged = 0; // allocated data, so use this flag to indicate that it needs to be cleared on destruction
                            // rawtile->padded = false;
 #ifdef DEBUG_OSI
     logfile << "Allocating tw * th * channels * sizeof(char) : " << tw << " * " << th << " * " << channels << " * sizeof(char) " << endl
@@ -616,7 +613,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     if (bytes_received != channels * bpc / 8 * tw * th) {
         throw file_error("ERROR: expected len " + std::to_string(channels * bpc / 8 * tw * th) + " but got " + std::to_string(bytes_received));
     }
-    memcpy(rt->data, receive_buffer, bytes_received);
+    //memcpy(rt->data, receive_buffer, bytes_received);
+    rt->data = receive_buffer;
 
 #ifdef DEBUG_OSI
     logfile << "BioFormats :: getNativeTile() :: read_region() :: " << tilex << "x" << tiley << "@" << iipres << " " << timer.getTime() << " microseconds" << endl
