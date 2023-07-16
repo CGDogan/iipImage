@@ -566,7 +566,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // new a block ...
     // relying on delete [] to do the right thing.
     rt->data = new unsigned char[tw * th * channels * sizeof(unsigned char)];
-    rt->memoryManaged = 0; // allocated data, so use this flag to indicate that it needs to be cleared on destruction
+    rt->memoryManaged = 1; // allocated data, so use this flag to indicate that it needs to be cleared on destruction
                            // rawtile->padded = false;
 #ifdef DEBUG_OSI
     logfile << "Allocating tw * th * channels * sizeof(char) : " << tw << " * " << th << " * " << channels << " * sizeof(char) " << endl
@@ -613,8 +613,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     if (bytes_received != channels * bpc / 8 * tw * th) {
         throw file_error("ERROR: expected len " + std::to_string(channels * bpc / 8 * tw * th) + " but got " + std::to_string(bytes_received));
     }
-    //memcpy(rt->data, receive_buffer, bytes_received);
-    rt->data = receive_buffer;
+    memcpy(rt->data, receive_buffer, bytes_received);
 
 #ifdef DEBUG_OSI
     logfile << "BioFormats :: getNativeTile() :: read_region() :: " << tilex << "x" << tiley << "@" << iipres << " " << timer.getTime() << " microseconds" << endl
