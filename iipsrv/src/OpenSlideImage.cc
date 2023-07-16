@@ -590,9 +590,8 @@ RawTilePtr OpenSlideImage::getNativeTile(const size_t tilex, const size_t tiley,
   //======= expected by openslide_read_region.
   size_t tx0 = (tilex * tile_width) << osi_level;  // same as multiply by z power of 2
   size_t ty0 = (tiley * tile_height) << osi_level;
-  //bf_open_bytes params : 0 4096 16640 256 256
-  cerr << "openslide_read_region params " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
-  openslide_read_region(osr, reinterpret_cast<uint32_t *>(rt->data), tx0, ty0, bestLayer, tw, th);
+
+  openslide_read_region(osr, reinterpret_cast<uint32_t*>(rt->data), tx0, ty0, bestLayer, tw, th);
 
   cerr << "openslide_read_region params: " << tx0 << ty0 << bestLayer << tw << th;
 
