@@ -581,13 +581,17 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     int tx0 = (tilex * tile_width) << osi_level; // same as multiply by z power of 2
     int ty0 = (tiley * tile_height) << osi_level;
 
-    bf_set_current_resolution(graal_thread, bestLayer);
+    if (!bf_set_current_resolution(graal_thread, bestLayer)) {
+        auto s = string("FATAL : bad resolution: " + std::to_string(best_layer) + " rather than up to " + std::to_string(bf_get_resolution_count(graal_thread)-1));
+        logfile << s;
+        throw file_error(s);
+    }
 #ifdef DEBUG_VERBOSE
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
 #endif
 
     if (!rt->data)
-        throw string("FATAL : BioFormatsImage read_region => allocation memory ERROR");
+        throw file_error(string("FATAL : BioFormatsImage read_region => allocation memory ERROR"));
 
     /*char *test = "/images/pngtest1.png";
     cerr << "but, instead, callin bfinternal_deleteme\n" << test << endl;
