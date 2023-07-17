@@ -590,7 +590,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     int ty0 = (tiley * tile_height) << osi_level;
 
     if (!bf_set_current_resolution(graal_thread, bestLayer)) {
-        auto s = string("FATAL : bad resolution: " + std::to_string(best_layer) + " rather than up to " + std::to_string(bf_get_resolution_count(graal_thread)-1));
+        auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bf_get_resolution_count(graal_thread) - 1));
         logfile << s;
         throw file_error(s);
     }
