@@ -127,6 +127,14 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     // logfile << "comment : " << comment << endl;
 #endif
 
+#ifdef DEBUG_VERBOSE
+    cerr << "Parsing details" << endl;
+    cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(graal_thread) << endl; // Number of colors returned with each openbytes call
+    cerr << "sizeC: " << bf_get_size_c(graal_thread) << endl;
+    cerr << "effectiveSizeC: " << bf_get_effective_size_c(graal_thread) << endl; // expected to be 1 for a composed image containing RGB channels
+
+#endif
+
     fprintf(stderr, "continue info: parsing file in bioformatsimage.cc\n");
 
     // TODO important: these need to be moved to getnativetile
