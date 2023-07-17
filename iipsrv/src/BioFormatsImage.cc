@@ -246,6 +246,10 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         bf_set_current_resolution(graal_thread, i);
         ww = bf_get_size_x(graal_thread);
         hh = bf_get_size_y(graal_thread);
+
+#ifdef DEBUG_VERBOSE
+        fprintf(stderr, "resolution %d has x=%d y=%d", i, ww, hh);
+#endif
         if (ww <= 0 || hh <= 0)
         {
             logfile << "ERROR: encountered error: while getting level dims for level " << i << endl;
@@ -606,7 +610,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
 #ifdef DEBUG_VERBOSE
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
-    cerr << "this layer has x=" << bf_get_size_x(graal_thread) << " y=" << bf_get_size_y(graal_thread) << endl;
+    cerr << "this layer has resolution x=" << bf_get_size_x(graal_thread) << " y=" << bf_get_size_y(graal_thread) << endl;
 #endif
 
     if (!rt->data)
