@@ -409,17 +409,17 @@ RawTilePtr BioFormatsImage::getTile(int seq, int ang, unsigned int iipres, int l
 #endif
 
     //======= get the dimensions in pixels and num tiles for the current resolution
-
+/*
     int64_t layer_width = 0;
     int64_t layer_height = 0;
-    bf_set_current_resolution(graal_thread, layers);
+    bf_set_current_resolution(graal_thread, osi_level);
     layer_width = bf_get_size_x(graal_thread);
     layer_height = bf_get_size_y(graal_thread);
 
 #ifdef DEBUG_VERBOSE
     fprintf(stderr, "layer: %d layer_width: %d layer_height: %d", layers, layer_width, layer_height);
 #endif
-
+*/
     // Calculate the number of tiles in each direction
     size_t ntlx = numTilesX[osi_level];
     size_t ntly = numTilesY[osi_level];
@@ -564,6 +564,9 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     {
         th = rem_y;
     }
+#ifdef DEBUG_VERBOSE
+    fprintf(stderr, "after remainder process: tilewidth %lu tileheight %lu\n", tw, th);
+#endif
 
     // create the RawTile object
     RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, channels, bpc));
@@ -603,6 +606,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
 #ifdef DEBUG_VERBOSE
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
+    cerr << "this layer has x=" << bf_get_size_x(graal_thread) << " y=" << bf_get_size_y(graal_thread) << endl;
 #endif
 
     if (!rt->data)
