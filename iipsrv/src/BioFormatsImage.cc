@@ -332,6 +332,13 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         numTilesX.push_back((w + tile_width - 1) / tile_width);
         numTilesY.push_back((h + tile_height - 1) / tile_height);
 
+#ifdef DEBUG_VERBOSE
+        cerr << "downsamplein levels:" << endl;
+        for (auto i : bioformats_downsample_in_level)
+            cerr << i << " ";
+        cerr << "\n";
+#endif
+
 #ifdef DEBUG_OSI
         logfile << "Create virtual layer : " << w << "x" << h << std::endl;
 #endif
