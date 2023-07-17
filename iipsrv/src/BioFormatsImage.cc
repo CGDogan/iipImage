@@ -617,6 +617,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
 #ifdef DEBUG_VERBOSE
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
+    cerr << "downsample in level " << bioformats_downsample_in_level[osi_level] << endl;
+
     cerr << "this layer has resolution x=" << bf_get_size_x(graal_thread) << " y=" << bf_get_size_y(graal_thread) << endl;
 #endif
 
