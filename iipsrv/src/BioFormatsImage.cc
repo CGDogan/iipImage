@@ -604,7 +604,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     int bytes_received = bf_open_bytes(graal_thread, tx0, ty0, tw, th);
     if (bytes_received < 0)
     {
-        cerr << "bf_open_bytes got an error! ";
+        cerr << "bf_open_bytes got an error! " << bf_get_error(graal_thread);
         const char *error = bf_get_error(graal_thread);
         logfile << "ERROR: encountered error: " << error << " while reading region exact at  " << tx0 << "x" << ty0 << " dim " << tw << "x" << th << " with BioFormats: " << error << endl;
         throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
