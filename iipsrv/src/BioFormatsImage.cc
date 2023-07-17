@@ -99,16 +99,22 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     currentY = y;
 
     // choose power of 2 to make downsample simpler.
-    tile_width = bf_get_optimal_tile_width(graal_thread);
-    if (tile_width <= 0 || tile_width & (tile_width - 1))
+    int suggested_width = bf_get_optimal_tile_width(graal_thread);
+    if (suggested_width <= 0 || suggested_width & (suggested_width - 1))
     {
         tile_width = 256;
+    } else {
+        tile_width = suggested_width;
     }
 
-    tile_height = bf_get_optimal_tile_height(graal_thread);
-    if (tile_height <= 0 || tile_height & (tile_height - 1))
+    int suggested_height = bf_get_optimal_tile_height(graal_thread);
+    if (suggested_height <= 0 || suggested_height & (suggested_height - 1))
     {
         tile_height = 256;
+    }
+    else
+    {
+        tile_height = suggested_height;
     }
 
     w = bf_get_size_x(graal_thread);
