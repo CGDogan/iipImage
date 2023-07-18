@@ -625,14 +625,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     if (!rt->data)
         throw file_error(string("FATAL : BioFormatsImage read_region => allocation memory ERROR"));
 
-    /*char *test = "/images/pngtest1.png";
+    char *test = "/images/pngtest1.png";
     cerr << "but, instead, callin bfinternal_deleteme\n" << test << endl;
 
     if (bfinternal_deleteme(graal_thread, test) < 0)
     {
         cerr << "couldn't simulate - check path?\n";
     }
-    cerr << "returned from there\n";*/
+    cerr << "returned from there\n";
     // end BREAK
 
     cerr << "calling bf_open_bytes\n";
