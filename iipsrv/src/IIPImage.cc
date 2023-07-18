@@ -133,6 +133,7 @@ void IIPImage::testImageType() throw(file_error)
     {
       throw file_error("graal_create_isolate bad: " + code);
     }
+    bf_initialize(graal_thread_main);
     fprintf(stderr, "Entering bf_is_compatible iipimage.cc\n");
     if (code = bf_is_compatible(graal_thread_main, (char *) path.c_str())) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
