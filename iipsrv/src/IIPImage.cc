@@ -41,7 +41,7 @@
 #include <limits>
 
 #include "openslide.h"
-#include "graal/bfbridge.h"
+#include <libbfbridge.h>
 
 using namespace std;
 
