@@ -158,11 +158,13 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         if (channels > 0)
         {
             logfile << "Unimplemented: only support 3 channels, not " << channels << endl;
+            fprintf(stderr, "branch1\n");
             throw file_error("Unimplemented: only support 3 channels, not " + channels);
         }
         else
         {
             const char *err = bf_get_error(graal_thread);
+            fprintf(stderr, "branch2\n");
             logfile << "Error while getting channel count: " << err << endl;
             throw file_error("Error while getting channel count: " + std::string(err));
         }
@@ -170,6 +172,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     if (!bf_is_interleaved(graal_thread))
     {
+        fprintf(stderr, "branch3\n");
+
         // TODO: find an example file, add java code to open all planes then
         // interleave them before giving them to C. Or do it in C.
         // Maybe code for the case that bpc is a multiple of 8, reject otherwise
@@ -179,6 +183,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     if (!bf_is_little_endian(graal_thread))
     {
+        fprintf(stderr, "branch4\n");
+
         // TODO: note somewhere in the class whether to swap
         // and when getting tiles, swap
         logfile << "Unimplemented: endian swapping" << endl;
@@ -187,6 +193,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     if (bf_is_floating_point(graal_thread))
     {
+        fprintf(stderr, "branch5\n");
+
         // TODO. It should be easier to handle this when bf_floating_point_is_normalized == true
         logfile << "Unimplemented: floating point reading" << endl;
         throw file_error("Unimplemented: floating point reading");
@@ -194,6 +202,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     if (bf_get_dimension_order(graal_thread) && bf_get_dimension_order(graal_thread)[2] != 'C')
     {
+        fprintf(stderr, "branch6\n");
+
         logfile << "Unimplemented: unfamiliar dimension order " << bf_get_dimension_order(graal_thread) << endl;
         throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bf_get_dimension_order(graal_thread)));
     }
@@ -211,12 +221,16 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     if (bpc != 8)
     {
+        fprintf(stderr, "branch7\n");
+
         // TODO: downsample or keep as is
         throw file_error("Unimplemented: bpc " + std::to_string(bpc) + " is not 8. bf_get_bits_per_pixel(graal_thread): " + std::to_string(bf_get_bits_per_pixel(graal_thread)) + " channels: " + std::to_string(channels));
     }
 
     if (bpc <= 0)
     {
+        fprintf(stderr, "branch8\n");
+
         const char *err = bf_get_error(graal_thread);
         logfile << "Error while getting bits per pixel: " << err << endl;
         throw file_error("Error while getting bits per pixel: " + std::string(err));
