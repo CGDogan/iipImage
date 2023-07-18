@@ -138,7 +138,7 @@ void IIPImage::testImageType() throw(file_error)
     if (code = bf_is_compatible(graal_thread_main, (char *) path.c_str())) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
 
-      format = BIOFORMATS;
+      format = OPENSLIDE; // TODO_DEBUG
     } else {
     fprintf(stderr, "It is not bf compatible. iipimage.cc %d\n", code);
     if (code < 0) {
