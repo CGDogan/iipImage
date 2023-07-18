@@ -47,6 +47,7 @@ private:
 
             throw "graal_create_isolate: " + code;
         }
+        bf_initialize(graal_thread);
         receive_buffer = bf_get_communication_buffer(graal_thread);
     }
 
