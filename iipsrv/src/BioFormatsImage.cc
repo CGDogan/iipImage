@@ -664,6 +664,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     if (bytes_received != channels * bpc / 8 * tw * th) {
         throw file_error("ERROR: expected len " + std::to_string(channels * bpc / 8 * tw * th) + " but got " + std::to_string(bytes_received));
     }
+    // Note: please don't copy anything to the output buffer except as much as
+    // bytes_received when it's positive
     memcpy(rt->data, receive_buffer, bytes_received);
 
 #ifdef DEBUG_OSI
