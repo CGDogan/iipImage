@@ -6,6 +6,7 @@
 #define ISOLATE_H
 
 #include <vector>
+#include <string>
 #include <graal_isolate.h>
 #include <libbfbridge.h>
 #include <stdio.h>
