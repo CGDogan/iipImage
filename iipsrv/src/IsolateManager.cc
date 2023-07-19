@@ -1,3 +1,3 @@
 #include "IsolateManager.h"
 
-std::vector<Isolate> free_list;
+std::vector<Isolate> IsolateManager::free_list;
