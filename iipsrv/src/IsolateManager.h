@@ -23,9 +23,9 @@ public:
         free_list.push_back(std::move(graal_isolate));
     }
 
-    static void get_new()
+    static Isolate get_new()
     {
-        return new Isolate();
+        return std::move(new Isolate());
     }
 }
 
