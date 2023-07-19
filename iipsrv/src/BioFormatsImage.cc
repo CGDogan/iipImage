@@ -139,6 +139,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(graal_thread) << endl; // Number of colors returned with each openbytes call
     cerr << "sizeC: " << bf_get_size_c(graal_thread) << endl;
     cerr << "effectiveSizeC: " << bf_get_effective_size_c(graal_thread) << endl; // expected to be 1 for a composed image containing RGB channels
+    cerr << "isRGB: " << bf_is_rgb(graal_thread) << endl; // whether separate planes
 
 #endif
 
