@@ -14,13 +14,13 @@
 class IsolateManager
 {
 private:
-    static std::vector<Isolate> free;
+    static std::vector<Isolate> free_list;
 
 public:
     // call me with std::move
     static void free(Isolate graal_isolate)
     {
-        free.push_back(std::move(graal_isolate));
+        free_list.push_back(std::move(graal_isolate));
     }
 
     static void get_new()
