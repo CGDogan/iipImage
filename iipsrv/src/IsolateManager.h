@@ -25,8 +25,8 @@ public:
 
     static Isolate get_new()
     {
-        return std::move(new Isolate());
+        return new Isolate();
     }
-}
+};
 
 #endif /* ISOLATEMANAGER_H */
