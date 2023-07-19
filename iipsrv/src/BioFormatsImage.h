@@ -118,8 +118,8 @@ public:
                                                              lastTileXDim(image.lastTileXDim),
                                                              lastTileYDim(image.lastTileYDim),
                                                              bioformats_level_to_use(image.bioformats_level_to_use),
-                                                             bioformats_downsample_in_level(image.bioformats_downsample_in_level),
-                                                             /*receive_buffer(image.receive_buffer)*/
+                                                             bioformats_downsample_in_level(image.bioformats_downsample_in_level)/*,
+                                                             receive_buffer(image.receive_buffer)*/
     {
         fprintf(stderr, "Error: copy constructor\n\n");
         throw "TODO: No copy constructors! We must reinitialize graal_thread. But this loses its state so since we don't have a serialize to bytes method in java from and to, rewrite c++ code to not call this.";
