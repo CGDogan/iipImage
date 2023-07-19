@@ -56,6 +56,6 @@ public:
             graal_tear_down_isolate(graal_thread);
         }
     }
-}
+};
 
 #endif /* ISOLATE_H */
