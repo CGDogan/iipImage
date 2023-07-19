@@ -9,6 +9,7 @@
 #define BIOFORMATSIMAGE_H
 
 #include "IIPImage.h"
+#include "IsolateManager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -27,29 +28,13 @@
 class BioFormatsImage : public IIPImage
 {
 private:
-    graal_isolate_t *graal_isolate = NULL;
-    graal_isolatethread_t *graal_thread = NULL;
-    char *receive_buffer = NULL;
+    Isolate gi;
 
     TileCache *tileCache;
 
     std::vector<size_t> numTilesX, numTilesY;
     std::vector<size_t> lastTileXDim, lastTileYDim;
     std::vector<int> bioformats_level_to_use, bioformats_downsample_in_level;
-
-    void set_up_graal_bridge() {
-        fprintf(stderr, "dddBioFormatsImage.h3: Creating isolate\n");
-        int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
-        fprintf(stderr, "dddBioFormatsImage.h3: Created isolate. should be 0: %d\n", code);
-        if (code != 0)
-        {
-            fprintf(stderr, "dddBioFormatsImage.h3: ERROR But with error!\n");
-
-            throw "graal_create_isolate: " + code;
-        }
-        bf_initialize(graal_thread);
-        receive_buffer = bf_get_communication_buffer(graal_thread);
-    }
 
     // Unimplemented methods in line with OpenslideImage.h:
     //    void read(...);
@@ -98,8 +83,9 @@ private:
                  uint8_t *out, const size_t &out_w, const size_t &out_h);
 
     /// Constructor
-    BioFormatsImage() : IIPImage(){
-        set_up_graal_bridge();
+    BioFormatsImage() : IIPImage()
+    {
+        gi = IsolateManager::get_new();
     };
 
 public:
@@ -108,7 +94,7 @@ public:
      */
     BioFormatsImage(const std::string &path, TileCache *tile_cache) : IIPImage(path), tileCache(tile_cache)
     {
-        set_up_graal_bridge();
+        gi = IsolateManager::get_new();
         // set tile width on loadimage, not here
     };
 
@@ -116,43 +102,43 @@ public:
 
     /** \param image IIPImage object
      */
-    BioFormatsImage(const IIPImage &image, TileCache *tile_cache) : IIPImage(image), tileCache(tile_cache){
-        set_up_graal_bridge();
+    BioFormatsImage(const IIPImage &image, TileCache *tile_cache) : IIPImage(image), tileCache(tile_cache)
+    {
+        gi = IsolateManager::get_new();
     };
 
     /** \param image IIPImage object
      */
     explicit BioFormatsImage(const BioFormatsImage &image) : IIPImage(image),
                                                              // Copy everything including JVM pointers for moving here.
-                                                            tileCache(image.tileCache),
-                                                             graal_isolate(image.graal_isolate),
-                                                             graal_thread(image.graal_thread),
+                                                             tileCache(image.tileCache),
+                                                             /*gi(image.gi)*/
                                                              numTilesX(image.numTilesX),
                                                              numTilesY(image.numTilesY),
                                                              lastTileXDim(image.lastTileXDim),
                                                              lastTileYDim(image.lastTileYDim),
                                                              bioformats_level_to_use(image.bioformats_level_to_use),
                                                              bioformats_downsample_in_level(image.bioformats_downsample_in_level),
-                                                             receive_buffer(image.receive_buffer){
-                                                                fprintf(stderr, "Warning: copy constructor\n\n");
-                                                                if (!graal_thread) {
-                                                                    fprintf(stderr, "Unitialized graal_thread found!");
-                                                                }
+                                                             /*receive_buffer(image.receive_buffer)*/
+    {
+        fprintf(stderr, "Error: copy constructor\n\n");
+        throw "TODO: No copy constructors! We must reinitialize graal_thread. But this loses its state so since we don't have a serialize to bytes method in java from and to, rewrite c++ code to not call this.";
+        fprintf(stderr, "Warning: copy constructor\n\n");
+        /*if (!graal_thread)
+        {
+            fprintf(stderr, "Unitialized graal_thread found!");
+        }
 
-                                                                if (!receive_buffer)
-                                                                {
-                                                                    fprintf(stderr, "Unitialized graal_thread found!");
-                                                                }
-                                                             };
+        if (!receive_buffer)
+        {
+            fprintf(stderr, "Unitialized receive buffer found!");
+        }*/
+    };
     /// Destructor
 
     virtual ~BioFormatsImage()
     {
-        if (graal_thread)
-        {
-            bf_reset(graal_thread);
-            graal_tear_down_isolate(graal_thread);
-        }
+        IsolateManager::free(std::move(gi));
     };
 
     virtual void openImage() throw(file_error);
