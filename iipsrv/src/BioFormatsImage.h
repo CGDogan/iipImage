@@ -150,7 +150,7 @@ public:
     {
         if (graal_thread)
         {
-            closeImage();
+            bf_reset(graal_thread);
             graal_tear_down_isolate(graal_thread);
         }
     };
