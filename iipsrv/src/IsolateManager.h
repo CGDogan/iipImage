@@ -25,7 +25,8 @@ public:
 
     static Isolate get_new()
     {
-        return new Isolate();
+        Isolate graal_isolate();
+        return std::move(graal_isolate);
     }
 };
 
