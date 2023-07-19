@@ -430,7 +430,7 @@ RawTilePtr BioFormatsImage::getTile(int seq, int ang, unsigned int iipres, int l
     timer.start();
 #endif
 #ifdef DEBUG_VERBOSE
-    fprintf(stderr, "BioFormats::getTile called: iipres %d numResolutions %d\m", iipres, numResolutions);
+    fprintf(stderr, "BioFormats::getTile called: iipres %d numResolutions %d\n", iipres, numResolutions);
 #endif
 
     if (iipres > (numResolutions - 1))
@@ -660,7 +660,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     if (!rt->data)
         throw file_error(string("FATAL : BioFormatsImage read_region => allocation memory ERROR"));
 
-    char *test = "/images/pngtest1.png";
+    char *test = (char*) "/images/pngtest1.png";
     cerr << "but, instead, callin bfinternal_deleteme\n" << test << endl;
 
     if (bfinternal_deleteme(gi.graal_thread, test) < 0)
