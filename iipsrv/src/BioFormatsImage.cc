@@ -79,6 +79,20 @@ void BioFormatsImage::openImage() throw(file_error)
     isSet = true;
 }
 
+static unsigned int getPowerOfTwoRoundDown(unsigned int a) {
+#if (defined(__GNUC__) && __GNUC__ > 4) || (defined(__clang__) && __clang_major__ > 6)
+// works for a > 0
+    return sizeof(unsigned int) * 8 - __builtin_clz(a) - 1;
+#else
+    unsigned int x = 0;
+    while (a >> 1)
+    {
+        x++;
+    }
+    return x-1;
+#endif
+}
+
 /// given an open OSI file, get information from the image.
 void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 {
@@ -100,15 +114,21 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     // choose power of 2 to make downsample simpler.
     int suggested_width = bf_get_optimal_tile_width(graal_thread);
-    if (suggested_width <= 0 || suggested_width & (suggested_width - 1))
-    {
+    if (suggested_width > 0) {
+        suggested_width = 1 << getPowerOfTwoRoundDown(suggested_width);
+    }
+    if (suggested_width > 4096 && suggested_width < 128) {
         tile_width = 256;
     } else {
         tile_width = suggested_width;
     }
 
-    int suggested_height = bf_get_optimal_tile_height(graal_thread);
-    if (suggested_height <= 0 || suggested_height & (suggested_height - 1))
+    int suggested_height = bf_get_optimal_tile_width(graal_thread);
+    if (suggested_height > 0)
+    {
+        suggested_height = 1 << getPowerOfTwoRoundDown(suggested_height);
+    }
+    if (suggested_height > 4096 && suggested_height < 128)
     {
         tile_height = 256;
     }
