@@ -33,7 +33,7 @@ public:
         if (bf_test(graal_thread) < 0)
         {
             fprintf(stderr, "isolate initialization got fatal error %s", bf_get_error(graal_thread));
-            throw "isolate initialization got fatal error" + std::to_string(bf_get_error(graal_thread));
+            throw "isolate initialization got fatal error" + std::string(bf_get_error(graal_thread));
         }
 
         // Do last part of bf_test
