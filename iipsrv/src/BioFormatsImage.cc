@@ -41,7 +41,7 @@ void BioFormatsImage::openImage() throw(file_error)
 #endif
     fprintf(stderr, "ddBioFormatsImage.cc:  continue1 \n");
 
-    if (graal_thread == NULL)
+    if (gi.graal_thread == NULL)
     {
         logfile << "ERROR: can't open " << filename << " with BioFormats; thread uninitialized" << endl
                 << flush;
@@ -49,11 +49,11 @@ void BioFormatsImage::openImage() throw(file_error)
     }
 
     fprintf(stderr, "dddBioFormatsImage.cc entering file\n");
-    if (!bf_open(graal_thread, (char *)filename.c_str()))
+    if (!bf_open(gi.graal_thread, (char *)filename.c_str()))
     {
         fprintf(stderr, "dddBioFormatsImage.cc cant enter file:\n");
 
-        const char *error = bf_get_error(graal_thread);
+        const char *error = bf_get_error(gi.graal_thread);
 
         logfile << "ERROR: encountered error: " << error << " while opening " << filename << " with BioFormats: " << endl
                 << flush;
@@ -101,7 +101,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 #ifdef DEBUG_OSI
     logfile << "BioFormatsImage :: loadImageInfo()" << endl;
 
-    if (!graal_thread)
+    if (!gi.graal_thread)
     {
         logfile << "Graal_thread not initialized" << endl;
         throw file_error("Graal_thread not initialized");
@@ -113,7 +113,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     currentY = y;
 
     // choose power of 2 to make downsample simpler.
-    int suggested_width = bf_get_optimal_tile_width(graal_thread);
+    int suggested_width = bf_get_optimal_tile_width(gi.graalthread);
     if (suggested_width > 0) {
         suggested_width = 1 << getPowerOfTwoRoundDown(suggested_width);
     }
@@ -123,7 +123,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         tile_width = suggested_width;
     }
 
-    int suggested_height = bf_get_optimal_tile_width(graal_thread);
+    int suggested_height = bf_get_optimal_tile_width(gi.graalthread);
     if (suggested_height > 0)
     {
         suggested_height = 1 << getPowerOfTwoRoundDown(suggested_height);
@@ -137,12 +137,12 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         tile_height = suggested_height;
     }
 
-    w = bf_get_size_x(graal_thread);
-    h = bf_get_size_y(graal_thread);
+    w = bf_get_size_x(gi.graalthread);
+    h = bf_get_size_y(gi.graalthread);
 
     if (w < 0 || h < 0)
     {
-        const char *err = bf_get_error(graal_thread);
+        const char *err = bf_get_error(gi.graalthread);
 
         logfile << "ERROR: encountered error: " << err << " while getting level0 dim" << endl;
         throw file_error("Getting bioformats level0 dimensions: " + std::string(err));
@@ -156,10 +156,10 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 #ifdef DEBUG_VERBOSE
     cerr << "Parsing details" << endl;
     cerr << "Optimal: " << tile_width << " " << tile_height << endl;
-    cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(graal_thread) << endl; // Number of colors returned with each openbytes call
-    cerr << "sizeC: " << bf_get_size_c(graal_thread) << endl;
-    cerr << "effectiveSizeC: " << bf_get_effective_size_c(graal_thread) << endl; // expected to be 1 for a composed image containing RGB channels
-    cerr << "isRGB: " << (int) bf_is_rgb(graal_thread) << endl; // whether separate planes
+    cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(gi.graalthread) << endl; // Number of colors returned with each openbytes call
+    cerr << "sizeC: " << bf_get_size_c(gi.graalthread) << endl;
+    cerr << "effectiveSizeC: " << bf_get_effective_size_c(gi.graalthread) << endl; // expected to be 1 for a composed image containing RGB channels
+    cerr << "isRGB: " << (int) bf_is_rgb(gi.graalthread) << endl; // whether separate planes
 
 #endif
 
@@ -172,7 +172,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     // see TPTImage.cc#L89 to see an example of setting these per tile, not per file
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L61
 
-    channels = bf_get_rgb_channel_count(graal_thread);
+    channels = bf_get_rgb_channel_count(gi.graalthread);
     if (channels != 3)
     {
         // TODO: Allow RGBA
@@ -184,14 +184,14 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         }
         else
         {
-            const char *err = bf_get_error(graal_thread);
+            const char *err = bf_get_error(gi.graalthread);
             fprintf(stderr, "branch2\n");
             logfile << "Error while getting channel count: " << err << endl;
             throw file_error("Error while getting channel count: " + std::string(err));
         }
     }
 
-    if (!bf_is_interleaved(graal_thread))
+    if (!bf_is_interleaved(gi.graalthread))
     {
         fprintf(stderr, "branch3\n");
 
@@ -202,7 +202,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         throw file_error("Unimplemented: iipsrv requires uninterleaved");
     }
 
-    if (!bf_is_little_endian(graal_thread))
+    if (!bf_is_little_endian(gi.graalthread))
     {
         fprintf(stderr, "branch4\n");
 
@@ -212,7 +212,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         throw file_error("Unimplemented: endian swapping");
     }
 
-    if (bf_is_floating_point(graal_thread))
+    if (bf_is_floating_point(gi.graalthread))
     {
         fprintf(stderr, "branch5\n");
 
@@ -221,22 +221,22 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         throw file_error("Unimplemented: floating point reading");
     }
 
-    if (bf_get_dimension_order(graal_thread) && bf_get_dimension_order(graal_thread)[2] != 'C')
+    if (bf_get_dimension_order(gi.graalthread) && bf_get_dimension_order(gi.graalthread)[2] != 'C')
     {
         fprintf(stderr, "branch6\n");
 
-        logfile << "Unimplemented: unfamiliar dimension order " << bf_get_dimension_order(graal_thread) << endl;
-        throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bf_get_dimension_order(graal_thread)));
+        logfile << "Unimplemented: unfamiliar dimension order " << bf_get_dimension_order(gi.graalthread) << endl;
+        throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bf_get_dimension_order(gi.graalthread)));
     }
 
     // Actually gives bits per channel per pixel, so don't divide by channels
-    bpc = bf_get_bits_per_pixel(graal_thread);
+    bpc = bf_get_bits_per_pixel(gi.graalthread);
     colourspace = sRGB;
 
     /*
           if ((bpp % channels) != 0) {
         // How can this be handled? Should be very rare.
-        throw file_error("Unimplemented: bad remainder when diving bits per pixel among channels. bf_get_bits_per_pixel(graal_thread): " + std::to_string(bf_get_bits_per_pixel(graal_thread)) + " channels: " + std::to_string(channels));
+        throw file_error("Unimplemented: bad remainder when diving bits per pixel among channels. bf_get_bits_per_pixel(gi.graalthread): " + std::to_string(bf_get_bits_per_pixel(gi.graalthread)) + " channels: " + std::to_string(channels));
     }
     */
 
@@ -245,14 +245,14 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         fprintf(stderr, "branch7\n");
 
         // TODO: downsample or keep as is
-        throw file_error("Unimplemented: bpc " + std::to_string(bpc) + " is not 8. bf_get_bits_per_pixel(graal_thread): " + std::to_string(bf_get_bits_per_pixel(graal_thread)) + " channels: " + std::to_string(channels));
+        throw file_error("Unimplemented: bpc " + std::to_string(bpc) + " is not 8. bf_get_bits_per_pixel(gi.graalthread): " + std::to_string(bf_get_bits_per_pixel(gi.graalthread)) + " channels: " + std::to_string(channels));
     }
 
     if (bpc <= 0)
     {
         fprintf(stderr, "branch8\n");
 
-        const char *err = bf_get_error(graal_thread);
+        const char *err = bf_get_error(gi.graalthread);
         logfile << "Error while getting bits per pixel: " << err << endl;
         throw file_error("Error while getting bits per pixel: " + std::string(err));
     }
@@ -262,10 +262,10 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     bioformats_widths.clear();
     bioformats_heights.clear();
 
-    int bioformats_levels = bf_get_resolution_count(graal_thread);
+    int bioformats_levels = bf_get_resolution_count(gi.graalthread);
     if (bioformats_levels <= 0)
     {
-        const char *err = bf_get_error(graal_thread);
+        const char *err = bf_get_error(gi.graalthread);
         logfile << "ERROR: encountered error: " << err << " while getting level count" << endl;
         throw file_error("ERROR: encountered error: " + std::string(err) + " while getting level count");
     }
@@ -278,9 +278,9 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     int ww, hh;
     for (int i = 0; i < bioformats_levels; i++)
     {
-        bf_set_current_resolution(graal_thread, i);
-        ww = bf_get_size_x(graal_thread);
-        hh = bf_get_size_y(graal_thread);
+        bf_set_current_resolution(gi.graalthread, i);
+        ww = bf_get_size_x(gi.graalthread);
+        hh = bf_get_size_y(gi.graalthread);
 
 #ifdef DEBUG_VERBOSE
         fprintf(stderr, "resolution %d has x=%d y=%d", i, ww, hh);
@@ -403,10 +403,10 @@ void BioFormatsImage::closeImage()
     Timer timer;
     timer.start();
 #endif
-    fprintf(stderr, "Calling bf_close in BioFormatsImage::closeImage: is the following 1: %d\n", !!graal_thread);
-    if (graal_thread) {
+    fprintf(stderr, "Calling bf_close in BioFormatsImage::closeImage: is the following 1: %d\n", !!gi.graalthread);
+    if (gi.graalthread) {
         fprintf(stderr, "Called bf_close in BioFormatsImage::closeImage\n");
-        bf_close(graal_thread, 0);
+        bf_close(gi.graalthread, 0);
     }
 
 #ifdef DEBUG_OSI
@@ -458,9 +458,9 @@ RawTilePtr BioFormatsImage::getTile(int seq, int ang, unsigned int iipres, int l
 /*
     int64_t layer_width = 0;
     int64_t layer_height = 0;
-    bf_set_current_resolution(graal_thread, osi_level);
-    layer_width = bf_get_size_x(graal_thread);
-    layer_height = bf_get_size_y(graal_thread);
+    bf_set_current_resolution(gi.graalthread, osi_level);
+    layer_width = bf_get_size_x(gi.graalthread);
+    layer_height = bf_get_size_y(gi.graalthread);
 
 #ifdef DEBUG_VERBOSE
     fprintf(stderr, "layer: %d layer_width: %d layer_height: %d", layers, layer_width, layer_height);
@@ -562,7 +562,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     timer.start();
 #endif
 
-    /*if (!graal_thread)
+    /*if (!gi.graalthread)
     {
         // TODO: should we check if file really opened here?
         // currently, we're checking if graal initialized only
@@ -645,8 +645,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     int tx0 = ((tilex * tile_width) << osi_level) / bioformats_downsample_in_level[osi_level]; // same as multiply by z power of 2
     int ty0 = ((tiley * tile_height) << osi_level) / bioformats_downsample_in_level[osi_level];
 
-    if (!bf_set_current_resolution(graal_thread, bestLayer)) {
-        auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bf_get_resolution_count(graal_thread) - 1));
+    if (!bf_set_current_resolution(gi.graalthread, bestLayer)) {
+        auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bf_get_resolution_count(gi.graalthread) - 1));
         logfile << s;
         throw file_error(s);
     }
@@ -654,7 +654,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
     cerr << "downsample in level " << bioformats_downsample_in_level[osi_level] << endl;
 
-    cerr << "this layer has resolution x=" << bf_get_size_x(graal_thread) << " y=" << bf_get_size_y(graal_thread) << endl;
+    cerr << "this layer has resolution x=" << bf_get_size_x(gi.graalthread) << " y=" << bf_get_size_y(gi.graalthread) << endl;
 #endif
 
     if (!rt->data)
@@ -663,7 +663,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     char *test = "/images/pngtest1.png";
     cerr << "but, instead, callin bfinternal_deleteme\n" << test << endl;
 
-    if (bfinternal_deleteme(graal_thread, test) < 0)
+    if (bfinternal_deleteme(gi.graalthread, test) < 0)
     {
         cerr << "couldn't simulate - check path?\n";
     }
@@ -672,11 +672,11 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     cerr << "calling bf_open_bytes\n";
 
-    int bytes_received = bf_open_bytes(graal_thread, tx0, ty0, tw, th);
+    int bytes_received = bf_open_bytes(gi.graalthread, tx0, ty0, tw, th);
     if (bytes_received < 0)
     {
-        cerr << "bf_open_bytes got an error! " << bf_get_error(graal_thread);
-        const char *error = bf_get_error(graal_thread);
+        cerr << "bf_open_bytes got an error! " << bf_get_error(gi.graalthread);
+        const char *error = bf_get_error(gi.graalthread);
         logfile << "ERROR: encountered error: " << error << " while reading region exact at  " << tx0 << "x" << ty0 << " dim " << tw << "x" << th << " with BioFormats: " << error << endl;
         throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
     }
