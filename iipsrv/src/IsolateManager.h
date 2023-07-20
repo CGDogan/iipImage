@@ -35,7 +35,7 @@ public:
             // todo delete me
             fprintf(stderr, "check2:.\n");
 
-            bf_is_compatible(graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm")
+            bf_is_compatible(graal_isolate.graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm")
                 fprintf(stderr, "check2 done\n");
 
             return std::move(graal_isolate);
