@@ -64,8 +64,11 @@ public:
     // count, in an int*, the number of copies and deallocate when reach 0
     Isolate(const Isolate &) = delete;
     /*Isolate(Isolate &&) = default;*/
-    Isolate(Isolate &&other) : graal_thread(std::exchange(other.graal_thread, nullptr)), receive_buffer(other.receive_buffer)
+    Isolate(Isolate &&other)
     {
+        graal_thread = other.graal_thread;
+        receive_buffer = other.receive_buffer;
+        other.graal_thread = NULL;
     }
      Isolate & operator=(const Isolate &) = delete;
     /*Isolate &operator=(Isolate &&) = default;*/
