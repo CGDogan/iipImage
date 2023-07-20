@@ -128,7 +128,7 @@ void IIPImage::testImageType() throw(file_error)
     fprintf(stderr, "got\n");
 try {
     int code;
-    if ((code = bf_is_compatible(gi.graal_thread, (char *) path.c_str())) == 1) {
+    if ((code = bf_is_compatible(gi.graal_thread, /*(char *) path.c_str()*/"/images/posdebug4.dcm")) == 1) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
 
       format = BIOFORMATS;
@@ -140,7 +140,8 @@ try {
     // const char * vendor = openslide_detect_vendor( path.c_str() );
     // if ( vendor != NULL )
     //	format = OPENSLIDE;
-     format = UNSUPPORTED;}
+     format = UNSUPPORTED;
+    }
 }
 catch (...)
 {
