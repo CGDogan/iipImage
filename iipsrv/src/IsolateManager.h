@@ -45,12 +45,17 @@ public:
     static Isolate get_new()
     {
         fprintf(stderr, "getnew start\n");
+        if (free_list.size() == 0)
+        {
+            fprintf(stderr, "Expect crash1\n");
+        }
+
         Isolate gi = std::move(free_list.back());
         fprintf(stderr, "getnew mid\n");
 
         if (free_list.size() == 0)
         {
-            fprintf(stderr, "Expect crash\n");
+            fprintf(stderr, "Expect crash2\n");
         }
             free_list.pop_back();
             fprintf(stderr, "getnew end\n");
