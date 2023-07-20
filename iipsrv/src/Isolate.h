@@ -52,11 +52,6 @@ public:
 
         bf_initialize(graal_thread);
         fprintf(stderr, "initialized.\n");
-
-
-        // todo deleteme
-        bf_is_compatible(graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm");
-            fprintf(stderr, "check1 done.\n");
     }
 
     // If we allow copy, the previous one might be destroyed then it'll call
