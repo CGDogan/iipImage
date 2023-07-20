@@ -39,6 +39,7 @@ public:
             free_list.push_back(std::move(gi));
             fprintf(stderr, "preparemid3\n");
         }
+        fprintf(stderr, "prepare end\n");
     }
 
     static Isolate get_new()
