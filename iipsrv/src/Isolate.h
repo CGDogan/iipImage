@@ -13,6 +13,9 @@
 
 class Isolate
 {
+private:
+    Isolate(const Isolate &) = delete;
+
 public:
     graal_isolatethread_t *graal_thread = NULL;
     char *receive_buffer = NULL;
