@@ -35,8 +35,13 @@ public:
 
     static Isolate get_new()
     {
+        fprintf(stderr, "getnew start\n");
         Isolate gi = std::move(free_list.back());
+        fprintf(stderr, "getnew mid\n");
+
         free_list.pop_back();
+        fprintf(stderr, "getnew end\n");
+
         return gi;
     }
 };
