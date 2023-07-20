@@ -28,14 +28,17 @@ public:
             fprintf(stderr, "dddBioFormatsImage.h3: ERROR But with error!\n");
             throw "graal_create_isolate: " + code;
         }
+        fprintf(stderr, "getting receive buffer\n");
 
         receive_buffer = bf_get_communication_buffer(graal_thread);
+        fprintf(stderr, "got.\n");
 
         if (bf_test(graal_thread) < 0)
         {
             fprintf(stderr, "isolate initialization got fatal error %s", bf_get_error(graal_thread));
             throw "isolate initialization got fatal error" + std::string(bf_get_error(graal_thread));
         }
+        fprintf(stderr, "bf_test complete.\n");
 
         // Do last part of bf_test
         for (int i = 0; i < 10; i++)
@@ -45,8 +48,10 @@ public:
                 throw "See the note in Isolate.h about unimplemented";
             }
         }
+        fprintf(stderr, "buffer check complete.\n");
 
         bf_initialize(graal_thread);
+        fprintf(stderr, "initialized.\n");
     }
 
     ~Isolate()
