@@ -85,6 +85,7 @@ private:
     /// Constructor
     BioFormatsImage() : IIPImage()
     {
+        IsolateManager::prepare();
         gi = IsolateManager::get_new();
     };
 
@@ -94,6 +95,7 @@ public:
      */
     BioFormatsImage(const std::string &path, TileCache *tile_cache) : IIPImage(path), tileCache(tile_cache)
     {
+        IsolateManager::prepare();
         gi = IsolateManager::get_new();
         // set tile width on loadimage, not here
     };
@@ -104,6 +106,7 @@ public:
      */
     BioFormatsImage(const IIPImage &image, TileCache *tile_cache) : IIPImage(image), tileCache(tile_cache)
     {
+        IsolateManager::prepare();
         gi = IsolateManager::get_new();
     };
 
