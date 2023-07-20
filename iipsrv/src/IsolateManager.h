@@ -44,6 +44,18 @@ public:
 
     static Isolate get_new()
     {
+        if (free_list.size() == 0)
+        {
+
+            fprintf(stderr, "preparemid1\n");
+
+            Isolate gi;
+            fprintf(stderr, "preparemid2\n");
+
+            free_list.push_back(std::move(gi));
+            fprintf(stderr, "preparemid3\n");
+        }
+
         fprintf(stderr, "getnew start\n");
         if (free_list.size() == 0)
         {
