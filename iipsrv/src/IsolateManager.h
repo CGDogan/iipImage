@@ -25,7 +25,7 @@ public:
     }
 
     // This cannot be merged with get_new, due to return value opt. restrictions
-    static int prepare()
+    static void prepare()
     {
         fprintf(stderr, "prepare start\n");
 
