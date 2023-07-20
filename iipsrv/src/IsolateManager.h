@@ -56,6 +56,7 @@ public:
             fprintf(stderr, "getnew end\n");
 
             return gi;
+    }
 };
 
 #endif /* ISOLATEMANAGER_H */
