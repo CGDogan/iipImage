@@ -71,9 +71,9 @@ public:
     {
         if (graal_thread)
         {
-            bf_reset(graal_thread);
+            /*bf_reset(graal_thread);
             // TODO: do tear me down
-            graal_tear_down_isolate(graal_thread);
+            graal_tear_down_isolate(graal_thread);*/
         }
     }
 };
