@@ -158,7 +158,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     cerr << "Optimal: " << tile_width << " " << tile_height << endl;
     cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(gi.graal_thread) << endl; // Number of colors returned with each openbytes call
     cerr << "sizeC: " << bf_get_size_c(gi.graal_thread) << endl;
-    cerr << "effectiveSizeC: " << bf_get_effective_size_c(gi.graal_thread) << endl; // expected to be 1 for a composed image containing RGB channels
+    cerr << "effectiveSizeC: " << bf_get_effective_size_c(gi.graal_thread) << endl; // colors on separate planes. 1 if all on same plane
     cerr << "sizeZ: " << bf_get_size_z(gi.graal_thread) << endl;
     cerr << "sizeT: " << bf_get_size_t(gi.graal_thread) << endl;
     cerr << "ImageCount: " << bf_get_image_count(gi.graal_thread) << endl; // number of planes in series
@@ -195,7 +195,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         }
     }
 
-    if (!bf_is_interleaved(gi.graal_thread))
+    if (should_interleave = !bf_is_interleaved(gi.graal_thread))
     {
         fprintf(stderr, "branch3\n");
 
@@ -203,7 +203,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         // interleave them before giving them to C. Or do it in C.
         // Maybe code for the case that bpc is a multiple of 8, reject otherwise
         logfile << "Unimplemented: iipsrv requires uninterleaved" << endl;
-        throw file_error("Unimplemented: iipsrv requires uninterleaved");
+        // TODO DEBUG
+        //throw file_error("Unimplemented: iipsrv requires uninterleaved");
     }
 
     if (!bf_is_little_endian(gi.graal_thread))
@@ -631,9 +632,16 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/IIPImage.h#L123
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L181
 
+    int allocate_length = rt->dataLength;
+
+    if (should_interleave)
+    {
+        allocate_length *= 2;
+    }
+
     // new a block ...
     // relying on delete [] to do the right thing.
-    rt->data = new unsigned char[tw * th * channels * sizeof(unsigned char)];
+    rt->data = new unsigned char[allocate_length];
     rt->memoryManaged = 1; // allocated data, so use this flag to indicate that it needs to be cleared on destruction
                            // rawtile->padded = false;
 #ifdef DEBUG_OSI
@@ -691,6 +699,27 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // Note: please don't copy anything to the output buffer except as much as
     // bytes_received when it's positive
     memcpy(rt->data, gi.receive_buffer, bytes_received);
+
+    if (should_interleave) {
+        char *buffer = &rt->data[rt->dataLength];
+
+        for (int i = 0; i < rt->dataLength/3; i++) {
+            buffer[3 * i] = rt->data[i];
+        }
+        for (int i = 0; i < rt->dataLength / 3; i++)
+        {
+            buffer[3 * i + 1] = rt->data[rt->dataLength / 3 + i];
+        }
+        for (int i = 0; i < rt->dataLength / 3; i++)
+        {
+            buffer[3 * i + 2] = rt->data[2*rt->dataLength / 3 + i];
+        }
+        // TODO: copy uint64_t
+        for (int i = 0; i < rt->dataLength; i++) {
+            rt->data[i] = buffer[i];
+        }
+    }
+
 
 #ifdef DEBUG_OSI
     logfile << "BioFormats :: getNativeTile() :: read_region() :: " << tilex << "x" << tiley << "@" << iipres << " " << timer.getTime() << " microseconds" << endl
