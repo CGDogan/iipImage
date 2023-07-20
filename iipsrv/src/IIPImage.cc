@@ -137,13 +137,15 @@ try {
       if (code < 0) {
       fprintf(stderr, "%s\n", bf_get_error(gi.graal_thread));
       }
-    } catch(...) {
-      fprintf(stderr, "got something \n");
-    }
     // const char * vendor = openslide_detect_vendor( path.c_str() );
     // if ( vendor != NULL )
     //	format = OPENSLIDE;
      format = UNSUPPORTED;}
+}
+catch (...)
+{
+    fprintf(stderr, "got something \n");
+}
     IsolateManager::free(std::move(gi));
   }
   else{
