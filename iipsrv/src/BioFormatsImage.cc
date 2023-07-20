@@ -701,22 +701,24 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     memcpy(rt->data, gi.receive_buffer, bytes_received);
 
     if (should_interleave) {
-        char *buffer = &rt->data[rt->dataLength];
+        char *data = (char *) rt->data;
+
+        char *buffer = &data[rt->dataLength];
 
         for (int i = 0; i < rt->dataLength/3; i++) {
-            buffer[3 * i] = rt->data[i];
+            buffer[3 * i] = data[i];
         }
         for (int i = 0; i < rt->dataLength / 3; i++)
         {
-            buffer[3 * i + 1] = rt->data[rt->dataLength / 3 + i];
+            buffer[3 * i + 1] = data[rt->dataLength / 3 + i];
         }
         for (int i = 0; i < rt->dataLength / 3; i++)
         {
-            buffer[3 * i + 2] = rt->data[2*rt->dataLength / 3 + i];
+            buffer[3 * i + 2] = data[2 * rt->dataLength / 3 + i];
         }
         // TODO: copy uint64_t
         for (int i = 0; i < rt->dataLength; i++) {
-            rt->data[i] = buffer[i];
+            data[i] = buffer[i];
         }
     }
 
