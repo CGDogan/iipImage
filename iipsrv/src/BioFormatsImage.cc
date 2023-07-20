@@ -553,7 +553,7 @@ RawTilePtr BioFormatsImage::getCachedTile(const size_t tilex, const size_t tiley
         // tile manager will cache this one.
     }
 }
-
+#pragma GCC optimize("O3")
 /**
  * read from file, color convert, store in cache, and return tile.
  *
@@ -698,7 +698,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
     // Note: please don't copy anything to the output buffer except as much as
     // bytes_received when it's positive
-    memcpy(rt->data, gi.receive_buffer, bytes_received);
 
     if (should_interleave) {
         char *data = (char *) rt->data;
@@ -706,20 +705,22 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         char *buffer = &data[rt->dataLength];
 
         for (int i = 0; i < rt->dataLength/3; i++) {
-            buffer[3 * i] = data[i];
+            buffer[3 * i] = gi.receive_buffer[i];
         }
         for (int i = 0; i < rt->dataLength / 3; i++)
         {
-            buffer[3 * i + 1] = data[rt->dataLength / 3 + i];
+            buffer[3 * i + 1] = gi.receive_buffer[rt->dataLength / 3 + i];
         }
         for (int i = 0; i < rt->dataLength / 3; i++)
         {
-            buffer[3 * i + 2] = data[2 * rt->dataLength / 3 + i];
+            buffer[3 * i + 2] = gi.receive_buffer[2 * rt->dataLength / 3 + i];
         }
         // TODO: copy uint64_t
         for (int i = 0; i < rt->dataLength; i++) {
             data[i] = buffer[i];
         }
+    } else {
+        memcpy(rt->data, gi.receive_buffer, bytes_received);
     }
 
 
