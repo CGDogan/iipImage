@@ -56,8 +56,10 @@ public:
         if (free_list.size() == 0)
         {
             fprintf(stderr, "Expect crash2\n");
+        } else {
+            fprintf(stderr, "not expect crash2\n");
         }
-            free_list.pop_back();
+            free_list.pop_back(); // calls destructuor
             fprintf(stderr, "getnew end\n");
 
             return gi;
