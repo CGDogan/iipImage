@@ -25,7 +25,6 @@ public:
 
     static Isolate get_new()
     {
-        fprintf(stderr, "get_new called\n\n");
         Isolate graal_isolate;
         return std::move(graal_isolate);
     }
