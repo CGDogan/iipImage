@@ -54,6 +54,7 @@ void BioFormatsImage::openImage() throw(file_error)
         fprintf(stderr, "dddBioFormatsImage.cc cant enter file:\n");
 
         const char *error = bf_get_error(gi.graal_thread);
+        fprintf(stderr, "dddBioFormatsImage.cc cant enter file %s:\n", error);
 
         logfile << "ERROR: encountered error: " << error << " while opening " << filename << " with BioFormats: " << endl
                 << flush;
