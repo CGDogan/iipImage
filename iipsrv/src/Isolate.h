@@ -64,6 +64,9 @@ public:
     // so the new one will be broken as well, so use std::move
     // https://www.codementor.io/@sandesh87/the-rule-of-five-in-c-1pdgpzb04f
     // https://en.cppreference.com/w/cpp/language/rule_of_three
+    // The alternative is reference counting
+    // https://ps.uci.edu/~cyu/p231C/LectureNotes/lecture13:referenceCounting/lecture13.pdf
+    // count, in an int*, the number of copies and deallocate when reach 0
     Isolate(const Isolate &) = delete;
     Isolate(Isolate &&) = default;
     Isolate &operator=(const Isolate &) = delete;
