@@ -123,9 +123,6 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char lbigtiff[4] = {0x4D,0x4D,0x00,0x2B}; // Little Endian BigTIFF
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
 
-    fprintf(stderr, "initialize in iipimage\n");
-    IsolateManager::prepare();
-    fprintf(stderr, "continue initialize in iipimage\n");
 
     Isolate gi = IsolateManager::get_new();
     fprintf(stderr, "got1 %p\n", &gi);

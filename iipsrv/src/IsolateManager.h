@@ -24,24 +24,6 @@ public:
         bf_close(free_list.back().graal_thread, 0);
     }
 
-    // This cannot be merged with get_new, due to return value opt. restrictions
-    static void prepare()
-    {
-        fprintf(stderr, "prepare start\n");
-
-        if (free_list.size() == 0) {
-
-            fprintf(stderr, "preparemid1\n");
-
-            Isolate gi;
-            fprintf(stderr, "preparemid2\n");
-
-            free_list.push_back(std::move(gi));
-            fprintf(stderr, "preparemid3\n");
-        }
-        fprintf(stderr, "prepare end\n");
-    }
-
     static Isolate get_new()
     {
         if (free_list.size() == 0)
