@@ -26,24 +26,16 @@ public:
 
     static Isolate get_new()
     {
-        Isolate gi;
-        if (free_list.size() != 0)
-        {
-            gi = std::move(free_list.back());
-            free_list.pop_back();
-            return std::move(gi);
-        }
-        else
-        {
+        if (free_list.size() == 0) {
             Isolate gi;
-            // todo delete me
-            fprintf(stderr, "check2:.\n");
 
-            bf_is_compatible(gi.graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm");
-                fprintf(stderr, "check2 done\n");
-
-            return std::move(gi);
+            free_list.push_back(std::move(gi));
         }
+        Isolate gi;
+
+        gi = std::move(free_list.back());
+        free_list.pop_back();
+        return gi;
     }
 };
 
