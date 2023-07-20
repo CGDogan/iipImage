@@ -128,7 +128,7 @@ void IIPImage::testImageType() throw(file_error)
     fprintf(stderr, "got1 %p\n", &gi);
 
     fprintf(stderr, "got2 %p\n", gi.graal_thread);
-    try {
+  
     int code;
     if ((code = bf_is_compatible(gi.graal_thread, /*(char *) path.c_str()*/"/images/posdebug4.dcm")) == 1) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
@@ -144,11 +144,7 @@ void IIPImage::testImageType() throw(file_error)
     //	format = OPENSLIDE;
      format = UNSUPPORTED;
     }
-}
-catch (...)
-{
-    fprintf(stderr, "got something \n");
-}
+
     IsolateManager::free(std::move(gi));
   }
   else{
