@@ -29,7 +29,7 @@ public:
         if (free_list.size() != 0) {
             Isolate gi = std::move(free_list.back());
             free_list.pop_back();
-            return gi;
+            return std::move(gi);
         } else {
             Isolate gi;
             // todo delete me
@@ -38,7 +38,7 @@ public:
             bf_is_compatible(gi.graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm");
                 fprintf(stderr, "check2 done\n");
 
-            return gi;
+            return std::move(gi);
         }
     }
 };
