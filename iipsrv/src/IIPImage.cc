@@ -123,8 +123,10 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char lbigtiff[4] = {0x4D,0x4D,0x00,0x2B}; // Little Endian BigTIFF
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
 
-
+    fprintf(stderr, "getting\n");
     Isolate gi = IsolateManager::get_new();
+    fprintf(stderr, "got\n");
+
     int code;
     if ((code = bf_is_compatible(gi.graal_thread, (char *) path.c_str())) == 1) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
