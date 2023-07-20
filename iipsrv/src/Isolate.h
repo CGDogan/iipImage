@@ -13,9 +13,6 @@
 
 class Isolate
 {
-private:
-    Isolate(const Isolate &) = delete;
-
 public:
     graal_isolatethread_t *graal_thread = NULL;
     char *receive_buffer = NULL;
@@ -61,6 +58,12 @@ public:
         bf_is_compatible(graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm");
             fprintf(stderr, "check1 done.\n");
     }
+
+    // If we allow copy, the previous one might be destroyed then it'll call
+    // graal_tear_down_isolate but while sharing a pointer with the new one
+    // so the new one will be broken as well, so use std::move
+    Isolate(const Isolate &) = delete;
+    Isolate &operator=(const Isolate &) = delete;
 
     ~Isolate()
     {
