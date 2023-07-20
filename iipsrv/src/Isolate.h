@@ -63,9 +63,24 @@ public:
     // https://ps.uci.edu/~cyu/p231C/LectureNotes/lecture13:referenceCounting/lecture13.pdf
     // count, in an int*, the number of copies and deallocate when reach 0
     Isolate(const Isolate &) = delete;
-    Isolate(Isolate &&) = default;
-    Isolate &operator=(const Isolate &) = delete;
-    Isolate &operator=(Isolate &&) = default;
+    /*Isolate(Isolate &&) = default;*/
+    Isolate(Isolate &&other) : graal_thread(std::exchange(other.graal_thread, nullptr)), receive_buffer(other.receive_buffer)
+    {
+    }
+     Isolate & operator=(const Isolate &) = delete;
+    /*Isolate &operator=(Isolate &&) = default;*/
+    // We cant use these two default ones because std::move still keeps
+    // the previous object so it calls the destructor
+    // Our isolate destructor frees if graal thread null.
+    // therefore movings of default is not enough, it should set null for previous,
+    // so that the new one will have a non-destroyed graal.
+     Isolate &operator=(Isolate && other)
+     {
+        graal_thread = other.graal_thread;
+        receive_buffer = other.receive_buffer;
+        other.graal_thread = NULL;
+        return *this;
+     }
 
     ~Isolate()
     {
