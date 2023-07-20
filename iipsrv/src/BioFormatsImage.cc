@@ -202,9 +202,15 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         // TODO: find an example file, add java code to open all planes then
         // interleave them before giving them to C. Or do it in C.
         // Maybe code for the case that bpc is a multiple of 8, reject otherwise
-        logfile << "Unimplemented: iipsrv requires uninterleaved" << endl;
+        //logfile << "Unimplemented: iipsrv requires uninterleaved" << endl;
         // TODO DEBUG
         //throw file_error("Unimplemented: iipsrv requires uninterleaved");
+    }
+
+    if (bf_get_effective_size_c(gi.graal_thread) != 1) {
+        fprintf(stderr, "branch3.5\n");
+        // TODO: find an example. To implement, call read three times
+        logfile << "Unimplemented: currently noninterleaved works if we have them on the same plane" << endl;
     }
 
     if (!bf_is_little_endian(gi.graal_thread))
