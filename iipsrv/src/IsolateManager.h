@@ -21,19 +21,12 @@ public:
     static void free(Isolate graal_isolate)
     {
         free_list.push_back(std::move(graal_isolate));
-        bf_close(free_list.back().graal_thread, 0);
     }
 
     static Isolate get_new()
     {
-        if (free_list.size() != 0) {
-            Isolate gi = std::move(free_list.back());
-            free_list.pop_back();
-            return std::move(gi);
-        } else {
-            Isolate graal_isolate;
-            return std::move(graal_isolate);
-        }
+        Isolate graal_isolate;
+        return std::move(graal_isolate);
     }
 };
 
