@@ -159,8 +159,12 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(gi.graal_thread) << endl; // Number of colors returned with each openbytes call
     cerr << "sizeC: " << bf_get_size_c(gi.graal_thread) << endl;
     cerr << "effectiveSizeC: " << bf_get_effective_size_c(gi.graal_thread) << endl; // expected to be 1 for a composed image containing RGB channels
-    cerr << "isRGB: " << (int) bf_is_rgb(gi.graal_thread) << endl; // whether separate planes
-
+    cerr << "sizeZ: " << bf_get_size_z(gi.graal_thread) << endl;
+    cerr << "sizeT: " << bf_get_size_t(gi.graal_thread) << endl;
+    cerr << "ImageCount: " << bf_get_image_count(gi.graal_thread) << endl; // number of planes in series
+    cerr << "isRGB: " << (int) bf_is_rgb(gi.graal_thread) << endl; // multiple colors per openbytes plane
+    cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
+    cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
 #endif
 
     fprintf(stderr, "continue info: parsing file in bioformatsimage.cc\n");
