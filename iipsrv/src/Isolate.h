@@ -55,7 +55,7 @@ public:
 
 
         // todo deleteme
-        bf_is_compatible(graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm")
+        bf_is_compatible(graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm");
             fprintf(stderr, "check1 done.\n");
     }
 
