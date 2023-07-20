@@ -24,8 +24,13 @@ public:
         bf_close(free_list.back().graal_thread, 0);
     }
 
-    static int is_available() {
-        return free_list.size() == 0;
+    // This cannot be merged with get_new, due to return value opt. restrictions
+    static int prepare()
+    {
+        if (free_list.size() == 0) {
+            Isolate gi;
+            free_list.push_back(std::move(gi));
+        }
     }
 
     static Isolate get_new()
