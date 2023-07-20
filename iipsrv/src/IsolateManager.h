@@ -24,16 +24,13 @@ public:
         bf_close(free_list.back().graal_thread, 0);
     }
 
+    static int is_available() {
+        return free_list.size() == 0;
+    }
+
     static Isolate get_new()
     {
-        if (free_list.size() == 0) {
-            Isolate gi;
-
-            free_list.push_back(std::move(gi));
-        }
-        Isolate gi;
-
-        gi = std::move(free_list.back());
+        Isolate gi = std::move(free_list.back());
         free_list.pop_back();
         return gi;
     }
