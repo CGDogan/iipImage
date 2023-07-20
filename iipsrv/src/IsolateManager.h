@@ -32,6 +32,12 @@ public:
             return std::move(gi);
         } else {
             Isolate graal_isolate;
+            // todo delete me
+            fprintf(stderr, "check2:.\n");
+
+            bf_is_compatible(graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm")
+                fprintf(stderr, "check2 done\n");
+
             return std::move(graal_isolate);
         }
     }
