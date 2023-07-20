@@ -36,6 +36,8 @@ private:
     std::vector<size_t> lastTileXDim, lastTileYDim;
     std::vector<int> bioformats_level_to_use, bioformats_downsample_in_level;
 
+    bool should_interleave = false;
+
     // Unimplemented methods in line with OpenslideImage.h:
     //    void read(...);
     //    void downsample_region(...);
