@@ -41,7 +41,7 @@
 #include <limits>
 
 #include "openslide.h"
-#include "IsolateManager.h"
+#include <libbfbridge.h>
 
 using namespace std;
 
@@ -123,24 +123,35 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char lbigtiff[4] = {0x4D,0x4D,0x00,0x2B}; // Little Endian BigTIFF
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
 
-
-    Isolate gi = IsolateManager::get_new();
-    int code;
-    if ((code = bf_is_compatible(gi.graal_thread, (char *) path.c_str())) == 1) {
+// TODO: Reuse one
+    graal_isolate_t *graal_isolate_main = NULL;
+    graal_isolatethread_t *graal_thread_main = NULL;
+    fprintf(stderr, "Entering isolate iipimage.cc\n");
+    int code = graal_create_isolate(NULL, &graal_isolate_main, &graal_thread_main);
+    fprintf(stderr, "Entered isolate iipimage.cc\n");
+    if (code != 0)
+    {
+      throw file_error("graal_create_isolate bad: " + code);
+    }
+    bf_initialize(graal_thread_main);
+    fprintf(stderr, "Entering bf_is_compatible iipimage.cc\n");
+    if (code = bf_is_compatible(graal_thread_main, (char *) path.c_str())) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
 
       format = BIOFORMATS;
     } else {
     fprintf(stderr, "It is not bf compatible. iipimage.cc %d\n", code);
     if (code < 0) {
-      fprintf(stderr, "%s\n", bf_get_error(gi.graal_thread));
+    fprintf(stderr, "%s\n", bf_get_error(graal_thread_main));
 }
 
     // const char * vendor = openslide_detect_vendor( path.c_str() );
     // if ( vendor != NULL )
     //	format = OPENSLIDE;
      format = UNSUPPORTED;}
-    IsolateManager::free(std::move(gi));
+    fprintf(stderr, "Tearing down isolate iipimage.cc\n");
+    graal_tear_down_isolate(graal_thread_main);
+    fprintf(stderr, "Teared down isolate iipimage.cc\n");
   }
   else{
 
