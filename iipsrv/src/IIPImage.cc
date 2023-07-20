@@ -126,18 +126,20 @@ void IIPImage::testImageType() throw(file_error)
     fprintf(stderr, "getting\n");
     Isolate gi = IsolateManager::get_new();
     fprintf(stderr, "got\n");
-
+try {
     int code;
     if ((code = bf_is_compatible(gi.graal_thread, (char *) path.c_str())) == 1) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
 
       format = BIOFORMATS;
     } else {
-    fprintf(stderr, "It is not bf compatible. iipimage.cc %d\n", code);
-    if (code < 0) {
+      fprintf(stderr, "It is not bf compatible. iipimage.cc %d\n", code);
+      if (code < 0) {
       fprintf(stderr, "%s\n", bf_get_error(gi.graal_thread));
-}
-
+      }
+    } catch(...) {
+      fprintf(stderr, "got something \n");
+    }
     // const char * vendor = openslide_detect_vendor( path.c_str() );
     // if ( vendor != NULL )
     //	format = OPENSLIDE;
