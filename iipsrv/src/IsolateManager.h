@@ -26,11 +26,15 @@ public:
 
     static Isolate get_new()
     {
-        if (free_list.size() != 0) {
-            Isolate gi = std::move(free_list.back());
+        Isolate gi;
+        if (free_list.size() != 0)
+        {
+            gi = std::move(free_list.back());
             free_list.pop_back();
             return std::move(gi);
-        } else {
+        }
+        else
+        {
             Isolate gi;
             // todo delete me
             fprintf(stderr, "check2:.\n");
