@@ -128,8 +128,9 @@ void IIPImage::testImageType() throw(file_error)
     fprintf(stderr, "got1 %p\n", &gi);
 
     fprintf(stderr, "got2 %p\n", gi.graal_thread);
-  
-    int code;
+    fprintf(stderr, "got3 %d\n", *(int*)gi.graal_thread);
+
+      int code;
     if ((code = bf_is_compatible(gi.graal_thread, /*(char *) path.c_str()*/"/images/posdebug4.dcm")) == 1) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
 
