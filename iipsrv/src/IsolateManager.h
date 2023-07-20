@@ -29,16 +29,16 @@ public:
         if (free_list.size() != 0) {
             Isolate gi = std::move(free_list.back());
             free_list.pop_back();
-            return std::move(gi);
+            return gi;
         } else {
-            Isolate graal_isolate;
+            Isolate gi;
             // todo delete me
             fprintf(stderr, "check2:.\n");
 
-            bf_is_compatible(graal_isolate.graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm");
+            bf_is_compatible(gi.graal_thread, /*(char *) path.c_str()*/ "/images/posdebug4.dcm");
                 fprintf(stderr, "check2 done\n");
 
-            return std::move(graal_isolate);
+            return gi;
         }
     }
 };
