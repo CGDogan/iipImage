@@ -6,7 +6,7 @@ noinst_PROGRAMS =	iipsrv.fcgi
 INCLUDES =		@INCLUDES@ @LIBFCGI_INCLUDES@ @JPEG_INCLUDES@ @TIFF_INCLUDES@
 LIBS =			@LIBS@ @LIBFCGI_LIBS@ @DL_LIBS@ @JPEG_LIBS@ @TIFF_LIBS@ -lm -lopenslide -lopenjp2 -lbfbridge
 AM_LDFLAGS =		@LIBFCGI_LDFLAGS@
-AM_CPPFLAGS = -I/usr/local/include/openslide -Wl,-rpath /bfbridge/
+AM_CPPFLAGS = -I/usr/local/include/openslide -Wl,-rpath /usr/local/lib
 
 iipsrv_fcgi_LDADD = Main.o
 
