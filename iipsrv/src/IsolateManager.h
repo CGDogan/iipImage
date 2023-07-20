@@ -48,11 +48,14 @@ public:
         Isolate gi = std::move(free_list.back());
         fprintf(stderr, "getnew mid\n");
 
-        free_list.pop_back();
-        fprintf(stderr, "getnew end\n");
+        if (free_list.size() == 0)
+        {
+            fprintf(stderr, "Expect crash\n");
+        }
+            free_list.pop_back();
+            fprintf(stderr, "getnew end\n");
 
-        return gi;
-    }
+            return gi;
 };
 
 #endif /* ISOLATEMANAGER_H */
