@@ -125,8 +125,10 @@ void IIPImage::testImageType() throw(file_error)
 
     fprintf(stderr, "getting\n");
     Isolate gi = IsolateManager::get_new();
-    fprintf(stderr, "got\n");
-try {
+    fprintf(stderr, "got1 %p\n", &gi);
+
+    fprintf(stderr, "got2 %p\n", gi.graal_thread);
+    try {
     int code;
     if ((code = bf_is_compatible(gi.graal_thread, /*(char *) path.c_str()*/"/images/posdebug4.dcm")) == 1) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
