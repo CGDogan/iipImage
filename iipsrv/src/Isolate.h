@@ -62,8 +62,12 @@ public:
     // If we allow copy, the previous one might be destroyed then it'll call
     // graal_tear_down_isolate but while sharing a pointer with the new one
     // so the new one will be broken as well, so use std::move
+    // https://www.codementor.io/@sandesh87/the-rule-of-five-in-c-1pdgpzb04f
+    // https://en.cppreference.com/w/cpp/language/rule_of_three
     Isolate(const Isolate &) = delete;
+    Isolate(Isolate &&) = default;
     Isolate &operator=(const Isolate &) = delete;
+    Isolate &operator=(Isolate &&) = default;
 
     ~Isolate()
     {
