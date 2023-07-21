@@ -627,12 +627,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     int allocate_length = rt->dataLength;
 
-    char should_interleave;
-    if (should_interleave = bf_is_interleaved(gi.graal_thread))
-    {
-        allocate_length *= 2;
-    }
-
     // new a block ...
     // relying on delete [] to do the right thing.
     rt->data = new unsigned char[allocate_length];
@@ -675,6 +669,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         logfile << s;
         throw file_error(s);
     }
+
+    // This is called after bf_set_current_resolution
+    char should_interleave;
+    if (should_interleave = !bf_is_interleaved(gi.graal_thread))
+    {
+        allocate_length *= 2;
+    }
+
 #ifdef DEBUG_VERBOSE
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
     cerr << "downsample in level " << bioformats_downsample_in_level[osi_level] << endl;
@@ -729,6 +731,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
             buffer[3 * i + 2] = gi.receive_buffer[2 * rt->dataLength / 3 + i];
         }
         // TODO: copy uint64_t
+        fprintf(stderr, "Check alignment %u %u", ((int)data) % 128, ((int)buffer) % 128);
         for (int i = 0; i < rt->dataLength; i++) {
             data[i] = buffer[i];
         }
