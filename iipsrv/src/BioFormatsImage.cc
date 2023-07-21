@@ -243,7 +243,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     // Actually gives bits per channel per pixel, so don't divide by channels
     bpc = bf_get_bits_per_pixel(gi.graal_thread);
-    colourspace = sRGB;
+    colourspace = GREYSCALE;
 
     /*
           if ((bpp % channels) != 0) {
