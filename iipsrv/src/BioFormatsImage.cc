@@ -658,6 +658,20 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     cerr << "Serving such tile: width " << rt->width << " height " << rt->height << " channels " << rt->channels << " bpc " << rt->bpc << "\n";
 #endif
 
+#ifdef DEBUG_VERBOSE
+    cerr << "Parsing details FOR TILE" << endl;
+    cerr << "Optimal: " << tile_width << " " << tile_height << endl;
+    cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(gi.graal_thread) << endl; // Number of colors returned with each openbytes call
+    cerr << "sizeC: " << bf_get_size_c(gi.graal_thread) << endl;
+    cerr << "effectiveSizeC: " << bf_get_effective_size_c(gi.graal_thread) << endl; // colors on separate planes. 1 if all on same plane
+    cerr << "sizeZ: " << bf_get_size_z(gi.graal_thread) << endl;
+    cerr << "sizeT: " << bf_get_size_t(gi.graal_thread) << endl;
+    cerr << "ImageCount: " << bf_get_image_count(gi.graal_thread) << endl; // number of planes in series
+    cerr << "isRGB: " << (int)bf_is_rgb(gi.graal_thread) << endl;          // multiple colors per openbytes plane
+    cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
+    cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
+#endif
+
     // READ FROM file
 
     //======= next compute the x and y coordinates (top left corner) in level 0 coordinates
