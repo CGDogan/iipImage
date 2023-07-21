@@ -708,7 +708,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // Note: please don't copy anything to the output buffer except as much as
     // bytes_received when it's positive
 
-    if (/*should_interleave*/false) {
+    if (should_interleave) {
         char *data = (char *) rt->data;
 
         char *buffer = &data[rt->dataLength];
