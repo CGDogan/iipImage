@@ -620,6 +620,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     rt->filename = getImagePath();
     rt->timestamp = timestamp;
 
+    int allocate_length = rt->dataLength;
+
     if (!bf_set_current_resolution(gi.graal_thread, bestLayer))
     {
         auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bf_get_resolution_count(gi.graal_thread) - 1));
@@ -638,8 +640,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L118
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/IIPImage.h#L123
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L181
-
-    int allocate_length = rt->dataLength;
 
     // new a block ...
     // relying on delete [] to do the right thing.
