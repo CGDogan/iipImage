@@ -155,6 +155,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 #endif
 
 #ifdef DEBUG_VERBOSE
+// PLEASE NOTE: these can differ between resolution levels
     cerr << "Parsing details" << endl;
     cerr << "Optimal: " << tile_width << " " << tile_height << endl;
     cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(gi.graal_thread) << endl; // Number of colors returned with each openbytes call
@@ -194,18 +195,6 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
             logfile << "Error while getting channel count: " << err << endl;
             throw file_error("Error while getting channel count: " + std::string(err));
         }
-    }
-
-    if (should_interleave = !bf_is_interleaved(gi.graal_thread))
-    {
-        fprintf(stderr, "branch3\n");
-
-        // TODO: find an example file, add java code to open all planes then
-        // interleave them before giving them to C. Or do it in C.
-        // Maybe code for the case that bpc is a multiple of 8, reject otherwise
-        //logfile << "Unimplemented: iipsrv requires uninterleaved" << endl;
-        // TODO DEBUG
-        //throw file_error("Unimplemented: iipsrv requires uninterleaved");
     }
 
     if (bf_get_effective_size_c(gi.graal_thread) != 1) {
@@ -638,7 +627,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     int allocate_length = rt->dataLength;
 
-    if (should_interleave)
+    char should_interleave;
+    if (should_interleave = bf_is_interleaved(gi.graal_thread))
     {
         allocate_length *= 2;
     }
