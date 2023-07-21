@@ -624,6 +624,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
 #ifdef DEBUG_VERBOSE
     fprintf(stderr, "after remainder process: tilewidth %lu tileheight %lu\n", tw, th);
+    cerr << "Serving such tile: width " << rt -> width << " height " << rt->height << " channels " << rt->channels << " bpc " << rt->bpc << "\n";
 #endif
 
     // create the RawTile object
