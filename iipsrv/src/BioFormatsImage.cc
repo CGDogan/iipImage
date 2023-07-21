@@ -620,6 +620,20 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     rt->filename = getImagePath();
     rt->timestamp = timestamp;
 
+    if (!bf_set_current_resolution(gi.graal_thread, bestLayer))
+    {
+        auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bf_get_resolution_count(gi.graal_thread) - 1));
+        logfile << s;
+        throw file_error(s);
+    }
+
+    // This is called after bf_set_current_resolution
+    char should_interleave;
+    if (should_interleave = !bf_is_interleaved(gi.graal_thread))
+    {
+        allocate_length *= 2;
+    }
+
     // TODO: sampletype can be implemented here, for float support
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L118
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/IIPImage.h#L123
@@ -663,19 +677,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // TODOOO doubt: Do we need shift here?
     int tx0 = ((tilex * tile_width) << osi_level) / bioformats_downsample_in_level[osi_level]; // same as multiply by z power of 2
     int ty0 = ((tiley * tile_height) << osi_level) / bioformats_downsample_in_level[osi_level];
-
-    if (!bf_set_current_resolution(gi.graal_thread, bestLayer)) {
-        auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bf_get_resolution_count(gi.graal_thread) - 1));
-        logfile << s;
-        throw file_error(s);
-    }
-
-    // This is called after bf_set_current_resolution
-    char should_interleave;
-    if (should_interleave = !bf_is_interleaved(gi.graal_thread))
-    {
-        allocate_length *= 2;
-    }
 
 #ifdef DEBUG_VERBOSE
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
