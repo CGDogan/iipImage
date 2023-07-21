@@ -731,7 +731,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
             buffer[3 * i + 2] = gi.receive_buffer[2 * rt->dataLength / 3 + i];
         }
         // TODO: copy uint64_t
-        fprintf(stderr, "Check alignment %u %u", ((int)data) % 128, ((int)buffer) % 128);
+        fprintf(stderr, "Check alignment %u %u", ((long int)data) % 128, ((long int)buffer) % 128);
         for (int i = 0; i < rt->dataLength; i++) {
             data[i] = buffer[i];
         }
