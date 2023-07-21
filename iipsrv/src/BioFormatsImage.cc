@@ -622,10 +622,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     {
         th = rem_y;
     }
-#ifdef DEBUG_VERBOSE
-    fprintf(stderr, "after remainder process: tilewidth %lu tileheight %lu\n", tw, th);
-    cerr << "Serving such tile: width " << rt -> width << " height " << rt->height << " channels " << rt->channels << " bpc " << rt->bpc << "\n";
-#endif
 
     // create the RawTile object
     RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, channels, bpc));
@@ -655,6 +651,11 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 #ifdef DEBUG_OSI
     logfile << "Allocating tw * th * channels * sizeof(char) : " << tw << " * " << th << " * " << channels << " * sizeof(char) " << endl
             << flush;
+#endif
+
+#ifdef DEBUG_VERBOSE
+    fprintf(stderr, "after remainder process: tilewidth %lu tileheight %lu\n", tw, th);
+    cerr << "Serving such tile: width " << rt->width << " height " << rt->height << " channels " << rt->channels << " bpc " << rt->bpc << "\n";
 #endif
 
     // READ FROM file
