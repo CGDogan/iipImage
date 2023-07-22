@@ -118,7 +118,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     int suggested_width = bf_get_optimal_tile_width(gi.graal_thread);
     if (suggested_width > 0)
     {
-        suggested_width = 1 << getPowerOfTwoRoundDown(suggested_width);
+        suggested_width = 256;//1 << getPowerOfTwoRoundDown(suggested_width);
     }
     if (suggested_width > 4096 && suggested_width < 128)
     {
@@ -132,7 +132,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     int suggested_height = bf_get_optimal_tile_width(gi.graal_thread);
     if (suggested_height > 0)
     {
-        suggested_height = 1 << getPowerOfTwoRoundDown(suggested_height);
+        suggested_height = 256;
     }
     if (suggested_height > 4096 && suggested_height < 128)
     {
