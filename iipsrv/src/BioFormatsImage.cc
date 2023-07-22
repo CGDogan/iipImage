@@ -179,7 +179,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L61
 
     channels = bf_get_rgb_channel_count(gi.graal_thread);
-    if (channels != 3 || channels != 4)
+    if (channels != 3 && channels != 4)
     {
         // TODO: Allow RGBA
         if (channels > 0)
