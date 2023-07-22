@@ -633,7 +633,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // Is it?
     char should_reduce_channels_from_4to3 = 0;
     int channels = bf_get_rgb_channel_count(gi.graal_thread);
-    if (channels != 3 || channels != 4) {
+    if (channels != 3 && channels != 4) {
         throw file_error("Channels not 3 or 4: " + std::to_string(channels));
     }
     if (channels == 4) {
