@@ -183,7 +183,9 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     // see TPTImage.cc#L89 to see an example of setting these per tile, not per file
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L61
 
-    channels = bf_get_rgb_channel_count(gi.graal_thread);
+    // iipsrv takes 1 or 3 only. we cant set this to 4 for internal use, iip will access that as well
+    channels = 3;
+    /*channels = bf_get_rgb_channel_count(gi.graal_thread);
     if (channels != 3 && channels != 4)
     {
         // TODO: Allow RGBA
@@ -200,7 +202,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
             logfile << "Error while getting channel count: " << err << endl;
             throw file_error("Error while getting channel count: " + std::string(err));
         }
-    }
+    }*/
 
     if (bf_get_effective_size_c(gi.graal_thread) != 1)
     {
