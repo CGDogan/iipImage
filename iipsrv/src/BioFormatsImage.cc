@@ -652,11 +652,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     // This must be called after bf_set_current_resolution
     // It's sometimes different between resolutions
-    char should_interleave;
-    if (should_interleave = !bf_is_interleaved(gi.graal_thread))
-    {
-        allocate_length *= 2;
-    }
+    char should_interleave = !bf_is_interleaved(gi.graal_thread);
 
     // TODO: sampletype can be implemented here, for float support
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L118
