@@ -744,10 +744,10 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     {
 
         char *red = gi.receive_buffer;
-        char *green = &gi.receive_buffer[rt->dataLength / 3];
-        char *blue = &gi.receive_buffer[2 * rt->dataLength / 3];
-        char *buffer; // the second half
         int pixels = rt->width * rt->height;
+        char *green = &gi.receive_buffer[pixels];
+        char *blue = &gi.receive_buffer[2 * pixels];
+        char *buffer; // the second half
 
         if (should_reduce_channels_from_4to3)
         {
