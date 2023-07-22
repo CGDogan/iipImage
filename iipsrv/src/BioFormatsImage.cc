@@ -735,14 +735,13 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     {
         throw file_error("ERROR: expected len " + std::to_string(channels * bpc / 8 * tw * th) + " but got " + std::to_string(bytes_received));
     }
-    // Note: please don't copy anything to the output buffer except as much as
+    // Note: please don't copy anything more than
     // bytes_received when it's positive
 
-    // TODO: should_reduce_channels_from_4to3. work with interleave
+    char *data_out = (char *)rt->data;
 
     if (should_interleave)
     {
-        char *data_out = (char *)rt->data;
 
         char *red = gi.receive_buffer;
         char *green = &gi.receive_buffer[rt->dataLength / 3];
@@ -786,9 +785,11 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
             for (int i = 0; i < pixels; i++)
             {
-                rt->data[3 * i] = gi.receive_buffer[4 * i];
-                rt->data[3 * i + 1] = gi.receive_buffer[4 * i + 1];
-                rt->data[3 * i + 2] = gi.receive_buffer[4 * i + 2];
+                // This can be optimized I think with uint64 operations?
+                // Depends on compiler
+                data_out[3 * i] = gi.receive_buffer[4 * i];
+                data_out[3 * i + 1] = gi.receive_buffer[4 * i + 1];
+                data_out[3 * i + 2] = gi.receive_buffer[4 * i + 2];
             }
         }
         else
