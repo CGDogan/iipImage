@@ -80,9 +80,10 @@ void BioFormatsImage::openImage() throw(file_error)
     isSet = true;
 }
 
-static unsigned int getPowerOfTwoRoundDown(unsigned int a) {
+static unsigned int getPowerOfTwoRoundDown(unsigned int a)
+{
 #if (defined(__GNUC__) && __GNUC__ > 4) || (defined(__clang__) && __clang_major__ > 6)
-// works for a > 0
+    // works for a > 0
     return sizeof(unsigned int) * 8 - __builtin_clz(a) - 1;
 #else
     unsigned int x = 0;
@@ -90,7 +91,7 @@ static unsigned int getPowerOfTwoRoundDown(unsigned int a) {
     {
         x++;
     }
-    return x-1;
+    return x - 1;
 #endif
 }
 
@@ -115,12 +116,16 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     // choose power of 2 to make downsample simpler.
     int suggested_width = bf_get_optimal_tile_width(gi.graal_thread);
-    if (suggested_width > 0) {
+    if (suggested_width > 0)
+    {
         suggested_width = 1 << getPowerOfTwoRoundDown(suggested_width);
     }
-    if (suggested_width > 4096 && suggested_width < 128) {
+    if (suggested_width > 4096 && suggested_width < 128)
+    {
         tile_width = 256;
-    } else {
+    }
+    else
+    {
         tile_width = suggested_width;
     }
 
@@ -155,7 +160,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 #endif
 
 #ifdef DEBUG_VERBOSE
-// PLEASE NOTE: these can differ between resolution levels
+    // PLEASE NOTE: these can differ between resolution levels
     cerr << "Parsing details" << endl;
     cerr << "Optimal: " << tile_width << " " << tile_height << endl;
     cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(gi.graal_thread) << endl; // Number of colors returned with each openbytes call
@@ -164,7 +169,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     cerr << "sizeZ: " << bf_get_size_z(gi.graal_thread) << endl;
     cerr << "sizeT: " << bf_get_size_t(gi.graal_thread) << endl;
     cerr << "ImageCount: " << bf_get_image_count(gi.graal_thread) << endl; // number of planes in series
-    cerr << "isRGB: " << (int) bf_is_rgb(gi.graal_thread) << endl; // multiple colors per openbytes plane
+    cerr << "isRGB: " << (int)bf_is_rgb(gi.graal_thread) << endl;          // multiple colors per openbytes plane
     cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
     cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
 #endif
@@ -197,7 +202,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         }
     }
 
-    if (bf_get_effective_size_c(gi.graal_thread) != 1) {
+    if (bf_get_effective_size_c(gi.graal_thread) != 1)
+    {
         fprintf(stderr, "branch3.5\n");
         // TODO: find an example. To implement, call read three times
         logfile << "Unimplemented: currently noninterleaved works if we have them on the same plane" << endl;
@@ -405,7 +411,8 @@ void BioFormatsImage::closeImage()
     timer.start();
 #endif
     fprintf(stderr, "Calling bf_close in BioFormatsImage::closeImage: is the following 1: %d\n", !!gi.graal_thread);
-    if (gi.graal_thread) {
+    if (gi.graal_thread)
+    {
         fprintf(stderr, "Called bf_close in BioFormatsImage::closeImage\n");
         bf_close(gi.graal_thread, 0);
     }
@@ -456,17 +463,17 @@ RawTilePtr BioFormatsImage::getTile(int seq, int ang, unsigned int iipres, int l
 #endif
 
     //======= get the dimensions in pixels and num tiles for the current resolution
-/*
-    int64_t layer_width = 0;
-    int64_t layer_height = 0;
-    bf_set_current_resolution(gi.graal_thread, osi_level);
-    layer_width = bf_get_size_x(gi.graal_thread);
-    layer_height = bf_get_size_y(gi.graal_thread);
+    /*
+        int64_t layer_width = 0;
+        int64_t layer_height = 0;
+        bf_set_current_resolution(gi.graal_thread, osi_level);
+        layer_width = bf_get_size_x(gi.graal_thread);
+        layer_height = bf_get_size_y(gi.graal_thread);
 
-#ifdef DEBUG_VERBOSE
-    fprintf(stderr, "layer: %d layer_width: %d layer_height: %d", layers, layer_width, layer_height);
-#endif
-*/
+    #ifdef DEBUG_VERBOSE
+        fprintf(stderr, "layer: %d layer_width: %d layer_height: %d", layers, layer_width, layer_height);
+    #endif
+    */
     // Calculate the number of tiles in each direction
     size_t ntlx = numTilesX[osi_level];
     size_t ntly = numTilesY[osi_level];
@@ -633,10 +640,12 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // Is it?
     char should_reduce_channels_from_4to3 = 0;
     int channels = bf_get_rgb_channel_count(gi.graal_thread);
-    if (channels != 3 && channels != 4) {
+    if (channels != 3 && channels != 4)
+    {
         throw file_error("Channels not 3 or 4: " + std::to_string(channels));
     }
-    if (channels == 4) {
+    if (channels == 4)
+    {
         should_reduce_channels_from_4to3 = 1;
         allocate_length = tw * th * 4 * sizeof(unsigned char);
     }
@@ -722,7 +731,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
     }
     cerr << "bf_open_bytes returned with success ";
-    if (bytes_received != channels * bpc / 8 * tw * th) {
+    if (bytes_received != channels * bpc / 8 * tw * th)
+    {
         throw file_error("ERROR: expected len " + std::to_string(channels * bpc / 8 * tw * th) + " but got " + std::to_string(bytes_received));
     }
     // Note: please don't copy anything to the output buffer except as much as
@@ -730,31 +740,62 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     // TODO: should_reduce_channels_from_4to3. work with interleave
 
-    if (should_interleave) {
-        char *data = (char *) rt->data;
+    if (should_interleave)
+    {
+        char *data_out = (char *)rt->data;
 
-        char *buffer = &data[rt->dataLength];
+        char *red = gi.receive_buffer;
+        char *green = &gi.receive_buffer[rt->dataLength / 3];
+        char *blue = &gi.receive_buffer[2 * rt->dataLength / 3];
+        char *buffer; // the second half
+        int pixels = rt->width * rt->height;
 
-        for (int i = 0; i < rt->dataLength/3; i++) {
-            buffer[3 * i] = gi.receive_buffer[i];
-        }
-        for (int i = 0; i < rt->dataLength / 3; i++)
+        if (should_reduce_channels_from_4to3)
         {
-            buffer[3 * i + 1] = gi.receive_buffer[rt->dataLength / 3 + i];
+            buffer = &data_out[pixels * 4];
         }
-        for (int i = 0; i < rt->dataLength / 3; i++)
+        else
         {
-            buffer[3 * i + 2] = gi.receive_buffer[2 * rt->dataLength / 3 + i];
+            buffer = &data_out[pixels * 3];
+        }
+
+        for (int i = 0; i < pixels; i++)
+        {
+            buffer[3 * i] = red[i];
+        }
+        for (int i = 0; i < pixels; i++)
+        {
+            buffer[3 * i + 1] = green[i];
+        }
+        for (int i = 0; i < pixels; i++)
+        {
+            buffer[3 * i + 2] = blue[i];
         }
         // TODO: copy uint64_t
-        fprintf(stderr, "Check alignment %u %u", ((long int)data) % 128, ((long int)buffer) % 128);
-        for (int i = 0; i < rt->dataLength; i++) {
-            data[i] = buffer[i];
+        fprintf(stderr, "Check alignment %u %u", ((long int)data_out) % 128, ((long int)buffer) % 128);
+        for (int i = 0; i < rt->dataLength; i++)
+        {
+            data_out[i] = buffer[i];
         }
-    } else {
-        memcpy(rt->data, gi.receive_buffer, bytes_received);
     }
+    else
+    {
+        if (should_reduce_channels_from_4to3)
+        {
+            int pixels = rt->width * rt->height;
 
+            for (int i = 0; i < pixels; i++)
+            {
+                rt->data[3 * i] = gi.receive_buffer[4 * i];
+                rt->data[3 * i + 1] = gi.receive_buffer[4 * i + 1];
+                rt->data[3 * i + 2] = gi.receive_buffer[4 * i + 2];
+            }
+        }
+        else
+        {
+            memcpy(rt->data, gi.receive_buffer, bytes_received);
+        }
+    }
 
 #ifdef DEBUG_OSI
     logfile << "BioFormats :: getNativeTile() :: read_region() :: " << tilex << "x" << tiley << "@" << iipres << " " << timer.getTime() << " microseconds" << endl
@@ -847,7 +888,7 @@ RawTilePtr BioFormatsImage::halfsampleAndComposeTile(const size_t tilex, const s
     RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, channels, bpc));
 
     // compute the size, etc
-    rt->dataLength = tw * th * channels;
+    rt->dataLength = tw * th * 3;
     rt->filename = getImagePath();
     rt->timestamp = timestamp;
 
