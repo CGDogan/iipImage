@@ -620,7 +620,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
 
     // create the RawTile object
-    RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, channels, bpc));
+    RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, 3, bpc));
 
     // compute the size, etc
     rt->dataLength = tw * th * 3 * sizeof(unsigned char);
@@ -1081,7 +1081,7 @@ void BioFormatsImage::compose(const uint8_t *in, const size_t in_w, const size_t
                               uint8_t *out, const size_t &out_w, const size_t &out_h)
 {
 #ifdef DEBUG_VERBOSE
-    fprintf(stderr, "compose called\n");
+    fprintf(stderr, "compose called. channels %d\n", channels);
 #endif
 #ifdef DEBUG_OSI
     logfile << "BioFormats :: compose() :: start " << endl
