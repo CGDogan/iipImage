@@ -629,7 +629,19 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         throw file_error(s);
     }
 
-    // This is called after bf_set_current_resolution
+    // We currently don't assume that this is the same among all resolutions
+    // Is it?
+    char should_reduce_channels_from_4to3 = 0;
+    int channels = bf_get_rgb_channel_count(gi.graal_thread);
+    if (channels != 3 || channels != 4) {
+        throw file_error("Channels not 3 or 4: " + std::to_string(channels));
+    }
+    if (channels == 4) {
+        should_reduce_channels_from_4to3 = 1;
+        allocate_length = tw * th * 4 * sizeof(unsigned char);
+    }
+
+    // This must be called after bf_set_current_resolution
     // It's sometimes different between resolutions
     char should_interleave;
     if (should_interleave = !bf_is_interleaved(gi.graal_thread))
