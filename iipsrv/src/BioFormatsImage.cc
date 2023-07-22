@@ -179,14 +179,14 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L61
 
     channels = bf_get_rgb_channel_count(gi.graal_thread);
-    if (channels != 3)
+    if (channels != 3 || channels != 4)
     {
         // TODO: Allow RGBA
         if (channels > 0)
         {
-            logfile << "Unimplemented: only support 3 channels, not " << channels << endl;
-            fprintf(stderr, "branch1\n");
-            throw file_error("Unimplemented: only support 3 channels, not " + channels);
+            logfile << "Unimplemented: only support 3, 4 channels, not " << channels << endl;
+            fprintf(stderr, "branch1 %d\n", channels);
+            throw file_error("Unimplemented: only support 3, 4 channels, not " + channels);
         }
         else
         {
@@ -232,7 +232,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     // Actually gives bits per channel per pixel, so don't divide by channels
     bpc = bf_get_bits_per_pixel(gi.graal_thread);
-    colourspace = GREYSCALE;
+    colourspace = sRGB;
 
     /*
           if ((bpp % channels) != 0) {
@@ -616,7 +616,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, channels, bpc));
 
     // compute the size, etc
-    rt->dataLength = tw * th * channels * sizeof(unsigned char);
+    rt->dataLength = tw * th * 3 * sizeof(unsigned char);
     rt->filename = getImagePath();
     rt->timestamp = timestamp;
 
@@ -630,6 +630,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
 
     // This is called after bf_set_current_resolution
+    // It's sometimes different between resolutions
     char should_interleave;
     if (should_interleave = !bf_is_interleaved(gi.graal_thread))
     {
@@ -714,6 +715,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
     // Note: please don't copy anything to the output buffer except as much as
     // bytes_received when it's positive
+
+    // TODO: should_reduce_channels_from_4to3. work with interleave
 
     if (should_interleave) {
         char *data = (char *) rt->data;
