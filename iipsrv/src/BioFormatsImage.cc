@@ -742,40 +742,25 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     if (should_interleave)
     {
-
         char *red = gi.receive_buffer;
         int pixels = rt->width * rt->height;
         char *green = &gi.receive_buffer[pixels];
         char *blue = &gi.receive_buffer[2 * pixels];
-        char *buffer; // the second half
-
-        if (should_reduce_channels_from_4to3)
-        {
-            buffer = &data_out[pixels * 4];
-        }
-        else
-        {
-            buffer = &data_out[pixels * 3];
-        }
 
         for (int i = 0; i < pixels; i++)
         {
-            buffer[3 * i] = red[i];
+            data_out[3 * i] = red[i];
         }
         for (int i = 0; i < pixels; i++)
         {
-            buffer[3 * i + 1] = green[i];
+            data_out[3 * i + 1] = green[i];
         }
         for (int i = 0; i < pixels; i++)
         {
-            buffer[3 * i + 2] = blue[i];
+            data_out[3 * i + 2] = blue[i];
         }
         // TODO: copy uint64_t
         fprintf(stderr, "Check alignment %u %u", ((long int)data_out) % 128, ((long int)buffer) % 128);
-        for (int i = 0; i < rt->dataLength; i++)
-        {
-            data_out[i] = buffer[i];
-        }
     }
     else
     {
