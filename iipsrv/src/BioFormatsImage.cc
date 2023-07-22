@@ -759,8 +759,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         {
             data_out[3 * i + 2] = blue[i];
         }
-        // TODO: copy uint64_t
-        fprintf(stderr, "Check alignment %u %u", ((long int)data_out) % 128, ((long int)buffer) % 128);
     }
     else
     {
