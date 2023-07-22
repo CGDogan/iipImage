@@ -120,7 +120,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     {
         suggested_width = 256;//1 << getPowerOfTwoRoundDown(suggested_width);
     }
-    if (suggested_width > 4096 && suggested_width < 128)
+    if (suggested_width > 4096 || suggested_width < 128)
     {
         tile_width = 256;
     }
@@ -134,7 +134,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     {
         suggested_height = 256;
     }
-    if (suggested_height > 4096 && suggested_height < 128)
+    if (suggested_height > 4096 || suggested_height < 128)
     {
         tile_height = 256;
     }
