@@ -185,15 +185,15 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     // iipsrv takes 1 or 3 only. we cant set this to 4 for internal use, iip will access that as well
     channels = 3;
-    /*channels = bf_get_rgb_channel_count(gi.graal_thread);
-    if (channels != 3 && channels != 4)
+    channels_internal = bf_get_rgb_channel_count(gi.graal_thread);
+    if (channels_internal != 3 && channels_internal != 4)
     {
         // TODO: Allow RGBA
-        if (channels > 0)
+        if (channels_internal > 0)
         {
-            logfile << "Unimplemented: only support 3, 4 channels, not " << channels << endl;
-            fprintf(stderr, "branch1 %d\n", channels);
-            throw file_error("Unimplemented: only support 3, 4 channels, not " + channels);
+            logfile << "Unimplemented: only support 3, 4 channels, not " << channels_internal << endl;
+            fprintf(stderr, "branch1 %d\n", channels_internal);
+            throw file_error("Unimplemented: only support 3, 4 channels, not " + channels_internal);
         }
         else
         {
@@ -202,7 +202,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
             logfile << "Error while getting channel count: " << err << endl;
             throw file_error("Error while getting channel count: " + std::string(err));
         }
-    }*/
+    }
 
     if (bf_get_effective_size_c(gi.graal_thread) != 1)
     {
@@ -730,8 +730,9 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
     }
     cerr << "bf_open_bytes returned with success ";
-    if (bytes_received != channels * bpc / 8 * tw * th)
+    if (bytes_received != channels_internal * bytespc_internal * tw * th)
     {
+        fprintf(stderr, "got an unexpected number of bytes");
         throw file_error("ERROR: expected len " + std::to_string(channels * bpc / 8 * tw * th) + " but got " + std::to_string(bytes_received));
     }
     // Note: please don't copy anything more than
