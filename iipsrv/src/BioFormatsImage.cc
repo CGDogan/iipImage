@@ -749,6 +749,9 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         char *buf = gi.receive_buffer;
         for (int i = 0; i < pixels * channels_internal; i++)
         {
+            // Unnecessary copy rather than adding these offset and coefficient
+            // variables to the required copies, but this allows more readable
+            // code and faster code for the most common 8-bit reading
             buf[i] = buf[coefficient * i + offset];
         }
     }
