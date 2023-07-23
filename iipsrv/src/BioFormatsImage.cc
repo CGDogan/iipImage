@@ -240,7 +240,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     }
     */
 
-    if (bpc_internal <= 0)
+    if (bytespc_internal <= 0)
     {
         fprintf(stderr, "branch8\n");
 
