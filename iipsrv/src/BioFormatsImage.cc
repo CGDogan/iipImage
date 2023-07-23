@@ -206,19 +206,9 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     if (bf_get_effective_size_c(gi.graal_thread) != 1)
     {
-        fprintf(stderr, "branch3.5\n");
+        fprintf(stderr, "branch3.5 %d\n", bf_get_effective_size_c(gi.graal_thread));
         // TODO: find an example. To implement, call read three times
         logfile << "Unimplemented: currently noninterleaved works if we have them on the same plane" << endl;
-    }
-
-    if (!bf_is_little_endian(gi.graal_thread))
-    {
-        fprintf(stderr, "branch4\n");
-
-        // TODO: note somewhere in the class whether to swap
-        // and when getting tiles, swap
-        logfile << "Unimplemented: endian swapping" << endl;
-        throw file_error("Unimplemented: endian swapping");
     }
 
     if (bf_is_floating_point(gi.graal_thread))
@@ -264,6 +254,16 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         const char *err = bf_get_error(gi.graal_thread);
         logfile << "Error while getting bits per pixel: " << err << endl;
         throw file_error("Error while getting bits per pixel: " + std::string(err));
+    }
+
+    if (!bf_is_little_endian(gi.graal_thread))
+    {
+        fprintf(stderr, "branch4\n");
+
+        // TODO: note somewhere in the class whether to swap
+        // and when getting tiles, swap
+        logfile << "Unimplemented: endian swapping" << endl;
+        throw file_error("Unimplemented: endian swapping");
     }
 
     // save the openslide dimensions.
