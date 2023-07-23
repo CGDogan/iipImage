@@ -229,7 +229,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     }
 
     // Actually gives bits per channel per pixel, so don't divide by channels
-    bpc = bf_get_bits_per_pixel(gi.graal_thread);
+    bytespc_internal = bf_get_bits_per_pixel(gi.graal_thread)/8;
+    bpc = 8;
     colourspace = sRGB;
 
     /*
@@ -239,15 +240,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     }
     */
 
-    if (bpc != 8)
-    {
-        fprintf(stderr, "branch7\n");
-
-        // TODO: downsample or keep as is
-        throw file_error("Unimplemented: bpc " + std::to_string(bpc) + " is not 8. bf_get_bits_per_pixel(gi.graal_thread): " + std::to_string(bf_get_bits_per_pixel(gi.graal_thread)) + " channels: " + std::to_string(channels));
-    }
-
-    if (bpc <= 0)
+    if (bpc_internal <= 0)
     {
         fprintf(stderr, "branch8\n");
 
@@ -258,12 +251,15 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     if (!bf_is_little_endian(gi.graal_thread))
     {
+        pick_byte = 0;
         fprintf(stderr, "branch4\n");
 
         // TODO: note somewhere in the class whether to swap
         // and when getting tiles, swap
         logfile << "Unimplemented: endian swapping" << endl;
         throw file_error("Unimplemented: endian swapping");
+    } else {
+        pick_byte = 1;
     }
 
     // save the openslide dimensions.
@@ -737,11 +733,20 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // bytes_received when it's positive
 
     char *data_out = (char *)rt->data;
+    int pixels = rt->width * rt->height;
+
+    if (bytespc_internal != 1) {
+        int coefficient = bytespc_internal;
+        int offset = pick_byte ? (coefficient-1) : 0;
+        char *buf = gi.receive_buffer;
+        for (int i = 0; i < pixels; i++) {
+            buf[i] = buf[coefficient * i + offset];
+        }
+    }
 
     if (should_interleave)
     {
         char *red = gi.receive_buffer;
-        int pixels = rt->width * rt->height;
         char *green = &gi.receive_buffer[pixels];
         char *blue = &gi.receive_buffer[2 * pixels];
 
@@ -762,8 +767,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     {
         if (should_reduce_channels_from_4to3)
         {
-            int pixels = rt->width * rt->height;
-
             for (int i = 0; i < pixels; i++)
             {
                 // This can be optimized I think with uint64 operations?
