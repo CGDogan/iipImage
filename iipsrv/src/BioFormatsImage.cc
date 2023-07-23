@@ -747,7 +747,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         int offset = !(pick_byte ? (coefficient - 1) : 0);
         fprintf(stderr, "coeff %d offset %d", coefficient, offset);
         char *buf = gi.receive_buffer;
-        for (int i = 0; i < pixels; i++)
+        for (int i = 0; i < pixels * channels_internal; i++)
         {
             buf[i] = buf[coefficient * i + offset];
         }
