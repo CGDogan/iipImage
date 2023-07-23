@@ -37,6 +37,7 @@ private:
     std::vector<int> bioformats_level_to_use, bioformats_downsample_in_level;
 
     int bytespc_internal;
+    int channels_internal;
     int pick_byte = 0; // 0 for pick first (big endian), 1 for pick last
 
     // Unimplemented methods in line with OpenslideImage.h:
