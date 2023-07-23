@@ -744,7 +744,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     if (bytespc_internal != 1)
     {
         int coefficient = bytespc_internal;
-        int offset = pick_byte ? (coefficient - 1) : 0;
+        int offset = !(pick_byte ? (coefficient - 1) : 0);
         char *buf = gi.receive_buffer;
         for (int i = 0; i < pixels; i++)
         {
