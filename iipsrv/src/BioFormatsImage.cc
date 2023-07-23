@@ -229,7 +229,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     }
 
     // Actually gives bits per channel per pixel, so don't divide by channels
-    bytespc_internal = bf_get_bits_per_pixel(gi.graal_thread)/8;
+    bytespc_internal = bf_get_bits_per_pixel(gi.graal_thread) / 8;
     bpc = 8;
     colourspace = sRGB;
 
@@ -252,8 +252,19 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     if (!bf_is_little_endian(gi.graal_thread))
     {
         pick_byte = 0;
-    } else {
+    }
+    else
+    {
         pick_byte = 1;
+    }
+
+#define too_big (tile_width * tile_height * bytespc_internal * bf_get_rgb_channel_count(gi.graal_thread) > bftools_get_communication_buffer_size(gi.graal_thread))
+    while (too_big)
+    {
+        tile_height >>= 1;
+        if (!too_big)
+            break;
+        tile_width >>= 1;
     }
 
     // save the openslide dimensions.
@@ -729,11 +740,13 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     char *data_out = (char *)rt->data;
     int pixels = rt->width * rt->height;
 
-    if (bytespc_internal != 1) {
+    if (bytespc_internal != 1)
+    {
         int coefficient = bytespc_internal;
-        int offset = pick_byte ? (coefficient-1) : 0;
+        int offset = pick_byte ? (coefficient - 1) : 0;
         char *buf = gi.receive_buffer;
-        for (int i = 0; i < pixels; i++) {
+        for (int i = 0; i < pixels; i++)
+        {
             buf[i] = buf[coefficient * i + offset];
         }
     }
