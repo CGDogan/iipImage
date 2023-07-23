@@ -695,8 +695,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     //======= next compute the x and y coordinates (top left corner) in level 0 coordinates
     //======= expected by bf_open_bytes.
     // TODOOO doubt: Do we need shift here?
-    int tx0 = ((tilex * tile_width) << osi_level) / bioformats_downsample_in_level[osi_level]; // same as multiply by z power of 2
-    int ty0 = ((tiley * tile_height) << osi_level) / bioformats_downsample_in_level[osi_level];
+    int tx0 = (tilex * tile_width) * bioformats_downsample_in_level[osi_level]; // same as multiply by z power of 2
+    int ty0 = (tiley * tile_height) * bioformats_downsample_in_level[osi_level];
 
 #ifdef DEBUG_VERBOSE
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
