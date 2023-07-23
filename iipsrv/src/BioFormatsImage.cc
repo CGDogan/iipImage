@@ -252,12 +252,6 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     if (!bf_is_little_endian(gi.graal_thread))
     {
         pick_byte = 0;
-        fprintf(stderr, "branch4\n");
-
-        // TODO: note somewhere in the class whether to swap
-        // and when getting tiles, swap
-        logfile << "Unimplemented: endian swapping" << endl;
-        throw file_error("Unimplemented: endian swapping");
     } else {
         pick_byte = 1;
     }
