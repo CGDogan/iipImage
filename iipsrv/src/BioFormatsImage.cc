@@ -720,7 +720,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     cerr << "calling bf_open_bytes\n";
 
-    int bytes_received = bf_open_bytes(gi.graal_thread, tx0, ty0, tw, th);
+    int bytes_received = bf_open_bytes(gi.graal_thread, tx0, ty0, tw * bioformats_downsample_in_level[osi_level], th * bioformats_downsample_in_level[osi_level]);
     if (bytes_received < 0)
     {
         cerr << "bf_open_bytes got an error! " << bf_get_error(gi.graal_thread);
