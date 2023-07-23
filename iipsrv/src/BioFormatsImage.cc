@@ -732,7 +732,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     cerr << "bf_open_bytes returned with success ";
     if (bytes_received != channels_internal * bytespc_internal * tw * th)
     {
-        fprintf(stderr, "got an unexpected number of bytes");
+        fprintf(stderr, "got an unexpected number of bytes\n");
         throw file_error("ERROR: expected len " + std::to_string(channels * bpc / 8 * tw * th) + " but got " + std::to_string(bytes_received));
     }
     // Note: please don't copy anything more than
@@ -745,6 +745,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     {
         int coefficient = bytespc_internal;
         int offset = !(pick_byte ? (coefficient - 1) : 0);
+        fprintf(stderr, "coeff %d offset %d", coefficient, offset);
         char *buf = gi.receive_buffer;
         for (int i = 0; i < pixels; i++)
         {
