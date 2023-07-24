@@ -207,13 +207,13 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     if (bf_get_effective_size_c(gi.graal_thread) != 1)
     {
         fprintf(stderr, "branch3.5 %d\n", bf_get_effective_size_c(gi.graal_thread));
-        // TODO: find an example. To implement, call read three times
+        // TODO: find an example. To implement, call read three times perhaps.
         logfile << "Unimplemented: currently noninterleaved works if we have them on the same plane" << endl;
     }
 
     if (bf_is_floating_point(gi.graal_thread))
     {
-        fprintf(stderr, "branch5\n");
+        fprintf(stderr, "branch5 %d %d %d\n", bf_floating_point_is_normalized(gi.graal_thread), bf_is_little_endian(gi.graal_thread), bf_get_bits_per_pixel(gi.graal_thread));
 
         // TODO. It should be easier to handle this when bf_floating_point_is_normalized == true
         logfile << "Unimplemented: floating point reading" << endl;
