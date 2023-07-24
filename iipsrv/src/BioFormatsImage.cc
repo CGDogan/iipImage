@@ -729,7 +729,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         logfile << "ERROR: encountered error: " << error << " while reading region exact at  " << tx0 << "x" << ty0 << " dim " << tw << "x" << th << " with BioFormats: " << error << endl;
         throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
     }
-    cerr << "bf_open_bytes returned with success ";
+    cerr << "bf_open_bytes returned with success for this many bytes: "
+         << "bytes_received" << std::endl;
     if (bytes_received != channels_internal * bytespc_internal * tw * th)
     {
         fprintf(stderr, "got an unexpected number of bytes\n");
