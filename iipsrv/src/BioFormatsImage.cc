@@ -828,7 +828,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
             unsigned long int *buf_as_long_int = (unsigned long int *)buf;
             for (int i = 0; i < pixels * channels_internal; i++)
             {
-                buf_as_long_int[i] = ((buf_as_long_int[i] >> 56) & 0xFFlu) | ((buf_as_long_int[i] >> 48) & 0xFF00lu) | ((buf_as_long_int[i] >> 40) & 0xFF0000lu) | ((buf_as_long_int[i] >> 32) & 0xFF000000lu) | ((buf_as_long_int[i] >> 24) & 0xFF00000000lu) | ((buf_as_long_int[i] >> 16) & 0xFF0000000000lu) | ((buf_as_long_int[i] >> 8) & 0xFF000000lu) | (buf_as_long_int[i] & 0xFF000000lu);
+                buf_as_long_int[i] = ((buf_as_long_int[i] >> 56) & 0xFFlu) | ((buf_as_long_int[i] >> 48) & 0xFF00lu) | ((buf_as_long_int[i] >> 40) & 0xFF0000lu) | ((buf_as_long_int[i] >> 32) & 0xFF000000lu) | ((buf_as_long_int[i] >> 24) & 0xFF00000000lu) | ((buf_as_long_int[i] >> 16) & 0xFF0000000000lu) | ((buf_as_long_int[i] >> 8) & 0xFF000000000000lu) | (buf_as_long_int[i] & 0xFF00000000000000lu);
             }
         }
 
