@@ -646,7 +646,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // These must be called after bf_set_current_resolution
     // It's sometimes different between resolutions
 
-    int bytespc_internal = bf_get_bits_per_pixel(gi.graal_thread);
+    int bytespc_internal = bf_get_bytes_per_pixel(gi.graal_thread);
     int should_interleave = !bf_is_interleaved(gi.graal_thread);
 
     // https://github.com/ome/bioformats/blob/metadata54/components/formats-api/src/loci/formats/FormatTools.java#L76
