@@ -10,8 +10,6 @@
 
 #include <limits>
 
-#define throw(file_error)
-
 // TODO: comment me
 #define DEBUG_OSI 1
 
@@ -793,7 +791,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // the data's endianness depends on platform, otherwise
     // on file format, so from bf_is_little_endian
     int pick_byte;
-    unsigned char *buf = gi.receive_buffer;
+    unsigned char *buf = (unsigned char *)gi.receive_buffer;
 
 // The common case for float and double branches, change later otherwise
 #if !defined(__BYTE_ORDER) || __BYTE_ORDER == __LITTLE_ENDIAN
