@@ -215,7 +215,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
         // TODO. It should be easier to handle this when bf_floating_point_is_normalized == true
         logfile << "Unimplemented: floating point reading" << endl;
-        throw file_error("Unimplemented: floating point reading");
+       // throw file_error("Unimplemented: floating point reading");
     }
 
     if (bf_get_dimension_order(gi.graal_thread) && bf_get_dimension_order(gi.graal_thread)[2] != 'C')
