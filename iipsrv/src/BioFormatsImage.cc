@@ -211,7 +211,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     if (bf_is_floating_point(gi.graal_thread))
     {
-        fprintf(stderr, "branch5 %d %d %d\n", bf_floating_point_is_normalized(gi.graal_thread), bf_is_little_endian(gi.graal_thread), bf_get_bits_per_pixel(gi.graal_thread));
+        fprintf(stderr, "branch5 %d %d\n", bf_is_little_endian(gi.graal_thread), bf_get_bits_per_pixel(gi.graal_thread));
 
         // TODO. It should be easier to handle this when bf_floating_point_is_normalized == true
         logfile << "Unimplemented: floating point reading" << endl;
