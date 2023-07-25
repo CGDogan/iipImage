@@ -817,7 +817,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
         for (int i = 0; i < pixels * channels_internal; i++)
         {
-            buf[i] = (unsigned char)(buf_as_float[i] * 255f);
+            buf[i] = (unsigned char)(buf_as_float[i] * 255.0);
         }
         bytespc_internal = 1;
     }
@@ -836,7 +836,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
         for (int i = 0; i < pixels * channels_internal; i++)
         {
-            buf[i] = (unsigned char)(buf_as_double[i] * 255f);
+            buf[i] = (unsigned char)((float)(buf_as_double[i]) * 255.0);
         }
         bytespc_internal = 1;
     }
