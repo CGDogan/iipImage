@@ -802,7 +802,17 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     pick_byte = 0;
 #endif
 
-    if (should_convert_from_float) {
+    if (should_convert_from_float)
+    {
+        if (bf_is_little_endian(gi.graal_thread) != pick_byte)
+        {
+            unsigned int *buf_as_int = (unsigned int *)buf;
+            for (int i = 0; i < pixels * channels_internal; i++)
+            {
+                buf_as_int[i] = ((buf_as_int[i] >> 24) & 0xFF) | ((buf_as_int[i] >> 16) & 0xFF00) | ((buf_as_int[i] >> 8) & 0xFF0000) | (buf_as_int[i] & 0xFF000000);
+            }
+        }
+
         float *buf_as_float = (float *)buf;
 
         for (int i = 0; i < pixels * channels_internal; i++)
@@ -811,7 +821,17 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         }
         bytespc_internal = 1;
     }
-    else if (should_convert_from_double)  {
+    else if (should_convert_from_double)
+    {
+        if (bf_is_little_endian(gi.graal_thread) != pick_byte)
+        {
+            unsigned long int *buf_as_long_int = (unsigned long int *)buf;
+            for (int i = 0; i < pixels * channels_internal; i++)
+            {
+                buf_as_long_int[i] = ((buf_as_long_int[i] >> 56) & 0xFFlu) | ((buf_as_long_int[i] >> 48) & 0xFF00lu) | ((buf_as_long_int[i] >> 40) & 0xFF0000lu) | ((buf_as_long_int[i] >> 32) & 0xFF000000lu) | ((buf_as_long_int[i] >> 24) & 0xFF00000000lu) | ((buf_as_long_int[i] >> 16) & 0xFF0000000000lu) | ((buf_as_long_int[i] >> 8) & 0xFF000000lu) | (buf_as_long_int[i] & 0xFF000000lu);
+            }
+        }
+
         double *buf_as_double = (double *)buf;
 
         for (int i = 0; i < pixels * channels_internal; i++)
@@ -820,11 +840,11 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         }
         bytespc_internal = 1;
     }
-    
+
     // int cases
     if (bytespc_internal != 1)
     {
-        pick_byte = !bf_is_little_endian(gi.graal_thread);
+        pick_byte = bf_is_little_endian(gi.graal_thread);
 
         int coefficient = bytespc_internal;
         int offset = pick_byte ? (coefficient - 1) : 0;
