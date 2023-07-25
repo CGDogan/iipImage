@@ -228,7 +228,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bf_get_dimension_order(gi.graal_thread)));
     }
 
-    // Actually gives bits per channel per pixel, so don't divide by channels
+    // bf_get_bytes_per_pixel actually gives bits per channel per pixel, so don't divide by channels
     int bytespc_internal = bf_get_bytes_per_pixel(gi.graal_thread);
     bpc = 8;
     colourspace = sRGB;
@@ -750,9 +750,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     /*
     Summary of next lines:
 
-    var signed = …
-
-    if (internalbpc != 8) {
+    var signed = ...
+    var bit = ...
 
     if (float) {
     bswap if needed (reinterpret cast)
@@ -761,11 +760,15 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     } else if (double) {
     …
     }
+
+    // int cases
+    if (internalbpc != 8) {
+
     // picking:
     // move to be consecutive bytes, bpc = 8
 
     } else if (bit) {
-        enlarge
+        scale
     }
 
     if (interleave) {
@@ -778,54 +781,50 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         read as signed, add -int_min, read as unsigned
     }
 
-
     */
 
     unsigned char *data_out = (unsigned char *)rt->data;
     int pixels = rt->width * rt->height;
 
-    if (bytespc_internal != 1)
-    {
-        unsigned char *buf = gi.receive_buffer;
+    // Truncate to 8 bits
+    // 1 for pick last byte, 0 for pick first byte.
+    // if data in le -> pick last, data be -> pick first.
+    // but there are two branches - if we cast from double/float
+    // the data's endianness depends on platform, otherwise
+    // on file format, so from bf_is_little_endian
+    int pick_byte;
+    unsigned char *buf = gi.receive_buffer;
 
-        // 1 for pick last byte, 0 for pick first byte.
-        // if data in le -> pick last, data be -> pick first.
-        // but there are two branches - if we cast from double/float
-        // the data's endianness depends on platform, otherwise
-        // on bf_is_little_endian (file format)
-        int pick_byte;
-
-// The common case for float and double, change later otherwise
+// The common case for float and double branches, change later otherwise
 #if !defined(__BYTE_ORDER) || __BYTE_ORDER == __LITTLE_ENDIAN
-        pick_byte = 1;
+    pick_byte = 1;
 #else
-        pick_byte = 0;
+    pick_byte = 0;
 #endif
 
-        if (should_convert_from_float)
-        {
-            float *buf_as_float = (float *)buf;
+    if (should_convert_from_float) {
+        float *buf_as_float = (float *)buf;
 
-            for (int i = 0; i < pixels * channels_internal; i++)
-            {
-                buf[i] = (unsigned char)(buf_as_float[i] * 255f);
-            }
-            bytespc_internal = 1;
-        }
-        else if (should_convert_from_double)
+        for (int i = 0; i < pixels * channels_internal; i++)
         {
-            double *buf_as_double = (double *)buf;
+            buf[i] = (unsigned char)(buf_as_float[i] * 255f);
+        }
+        bytespc_internal = 1;
+    }
+    else if (should_convert_from_double)  {
+        double *buf_as_double = (double *)buf;
 
-            for (int i = 0; i < pixels * channels_internal; i++)
-            {
-                buf[i] = (unsigned char)(buf_as_double[i] * 255f);
-            }
-            bytespc_internal = 1;
-        }
-        else
+        for (int i = 0; i < pixels * channels_internal; i++)
         {
-            pick_byte = !bf_is_little_endian(gi.graal_thread);
+            buf[i] = (unsigned char)(buf_as_double[i] * 255f);
         }
+        bytespc_internal = 1;
+    }
+    
+    // int cases
+    if (bytespc_internal != 1)
+    {
+        pick_byte = !bf_is_little_endian(gi.graal_thread);
 
         int coefficient = bytespc_internal;
         int offset = pick_byte ? (coefficient - 1) : 0;
@@ -842,7 +841,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
     else if (should_convert_from_bit)
     {
-        unsigned char *buf = gi.receive_buffer;
         for (int i = 0; i < pixels * channels_internal; i++)
         {
             // 0 -> 0
