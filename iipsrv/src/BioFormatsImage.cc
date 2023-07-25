@@ -229,7 +229,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     }
 
     // Actually gives bits per channel per pixel, so don't divide by channels
-    bytespc_internal = bf_get_bits_per_pixel(gi.graal_thread) / 8;
+    int bytespc_internal = bf_get_bytes_per_pixel(gi.graal_thread);
     bpc = 8;
     colourspace = sRGB;
 
@@ -249,15 +249,6 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         throw file_error("Error while getting bits per pixel: " + std::string(err));
     }
 
-    if (!bf_is_little_endian(gi.graal_thread))
-    {
-        pick_byte = 0;
-    }
-    else
-    {
-        pick_byte = 1;
-    }
-
 #define too_big (tile_width * tile_height * bytespc_internal * bf_get_rgb_channel_count(gi.graal_thread) > bftools_get_communication_buffer_size(gi.graal_thread))
     while (too_big)
     {
@@ -266,6 +257,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
             break;
         tile_width >>= 1;
     }
+#undef too_big
 
     // save the openslide dimensions.
     std::vector<int> bioformats_widths, bioformats_heights;
@@ -653,9 +645,25 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         allocate_length = tw * th * 4 * sizeof(unsigned char);
     }
 
-    // This must be called after bf_set_current_resolution
+    // These must be called after bf_set_current_resolution
     // It's sometimes different between resolutions
-    char should_interleave = !bf_is_interleaved(gi.graal_thread);
+
+    int bytespc_internal = bf_get_bits_per_pixel(gi.graal_thread);
+    int should_interleave = !bf_is_interleaved(gi.graal_thread);
+
+    // https://github.com/ome/bioformats/blob/metadata54/components/formats-api/src/loci/formats/FormatTools.java#L76
+    int pixel_type = bf_get_pixel_type(gi.graal_thread);
+
+    int should_remove_sign = 1;
+    // added float and double, because they are handled specially
+    if (pixel_type == 1 || pixel_type == 3 || pixel_type == 5 || pixel_type == 6 || pixel_type == 7 || pixel_type == 8)
+    {
+        should_remove_sign = 0;
+    }
+
+    int should_convert_from_float = pixel_type == 6;
+    int should_convert_from_double = pixel_type == 7;
+    int should_convert_from_bit = pixel_type == 8;
 
     // TODO: sampletype can be implemented here, for float support
     // https://github.com/camicroscope/iipImage/blob/030c8df59938089d431902f56461c32123298494/iipsrv/src/RawTile.h#L118
@@ -739,21 +747,107 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // Note: please don't copy anything more than
     // bytes_received when it's positive
 
-    char *data_out = (char *)rt->data;
+    /*
+    Summary of next lines:
+
+    var signed = …
+
+    if (internalbpc != 8) {
+
+    if (float) {
+    bswap if needed (reinterpret cast)
+    reinterpret same space, now fill with cast to int after scale 0 to 1
+    signed = false
+    } else if (double) {
+    …
+    }
+    // picking:
+    // move to be consecutive bytes, bpc = 8
+
+    } else if (bit) {
+        enlarge
+    }
+
+    if (interleave) {
+     interleave, discard alpha
+    } else {
+    copy, either skip alpha or not
+    ]
+
+    if (signed) {
+        read as signed, add -int_min, read as unsigned
+    }
+
+
+    */
+
+    unsigned char *data_out = (unsigned char *)rt->data;
     int pixels = rt->width * rt->height;
 
     if (bytespc_internal != 1)
     {
+        unsigned char *buf = gi.receive_buffer;
+
+        // 1 for pick last byte, 0 for pick first byte.
+        // if data in le -> pick last, data be -> pick first.
+        // but there are two branches - if we cast from double/float
+        // the data's endianness depends on platform, otherwise
+        // on bf_is_little_endian (file format)
+        int pick_byte;
+
+// The common case for float and double, change later otherwise
+#if !defined(__BYTE_ORDER) || __BYTE_ORDER == __LITTLE_ENDIAN
+        pick_byte = 1;
+#else
+        pick_byte = 0;
+#endif
+
+        if (should_convert_from_float)
+        {
+            float *buf_as_float = (float *)buf;
+
+            for (int i = 0; i < pixels * channels_internal; i++)
+            {
+                buf[i] = (unsigned char)(buf_as_float[i] * 255f);
+            }
+            bytespc_internal = 1;
+        }
+        else if (should_convert_from_double)
+        {
+            double *buf_as_double = (double *)buf;
+
+            for (int i = 0; i < pixels * channels_internal; i++)
+            {
+                buf[i] = (unsigned char)(buf_as_double[i] * 255f);
+            }
+            bytespc_internal = 1;
+        }
+        else
+        {
+            pick_byte = !bf_is_little_endian(gi.graal_thread);
+        }
+
         int coefficient = bytespc_internal;
         int offset = pick_byte ? (coefficient - 1) : 0;
         fprintf(stderr, "coeff %d offset %d", coefficient, offset);
-        char *buf = gi.receive_buffer;
         for (int i = 0; i < pixels * channels_internal; i++)
         {
-            // Unnecessary copy rather than adding these offset and coefficient
-            // variables to the required copies, but this allows more readable
-            // code and faster code for the most common 8-bit reading
+            // Unnecessary copy rather than considering these offset and coefficient
+            // variables when we'll already copy, but this allows readability
+            // and not making the common 8-bit reading slower
             buf[i] = buf[coefficient * i + offset];
+        }
+
+        bytespc_internal = 1;
+    }
+    else if (should_convert_from_bit)
+    {
+        unsigned char *buf = gi.receive_buffer;
+        for (int i = 0; i < pixels * channels_internal; i++)
+        {
+            // 0 -> 0
+            // 1 -> 255
+            buf[i] = (0 - buf[i]);
         }
     }
 
@@ -792,6 +886,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         else
         {
             memcpy(rt->data, gi.receive_buffer, bytes_received);
+        }
+    }
+
+    if (should_remove_sign)
+    {
+        for (int i = 0; i < pixels * 3; i++)
+        {
+            data_out[i] += 128;
         }
     }
 
