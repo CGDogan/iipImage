@@ -737,6 +737,9 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
     cerr << "bf_open_bytes returned with success for this many bytes: "
          << bytes_received << std::endl;
+    cerr << "channels_internal " << channels_internal << " bytespc_internal"
+         << bytespc_internal << " tw th " << tw << " " << th << std::endl;
+
     if (bytes_received != channels_internal * bytespc_internal * tw * th)
     {
         fprintf(stderr, "got an unexpected number of bytes\n");
