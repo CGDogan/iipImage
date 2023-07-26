@@ -805,7 +805,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     if (should_convert_from_float)
     {
-        cerr << "endianness of file is little: " << bf_is_little_endian(gi.graal_thread) << endl;
+        cerr << "endianness of file is little: " << (int) bf_is_little_endian(gi.graal_thread) << endl;
         if (bf_is_little_endian(gi.graal_thread) != pick_byte)
         {
             cerr << "swapping\n";
