@@ -215,7 +215,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
         // TODO. It should be easier to handle this when bf_floating_point_is_normalized == true
         logfile << "Unimplemented: floating point reading" << endl;
-       // throw file_error("Unimplemented: floating point reading");
+        // throw file_error("Unimplemented: floating point reading");
     }
 
     if (bf_get_dimension_order(gi.graal_thread) && bf_get_dimension_order(gi.graal_thread)[2] != 'C')
@@ -805,14 +805,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     if (should_convert_from_float)
     {
-        cerr << "endianness of file is little: " << (int) bf_is_little_endian(gi.graal_thread) << endl;
+        cerr << "endianness of file is little: " << (int)bf_is_little_endian(gi.graal_thread) << endl;
         if (bf_is_little_endian(gi.graal_thread) != pick_byte)
         {
             cerr << "swapping\n";
             unsigned int *buf_as_int = (unsigned int *)buf;
             for (int i = 0; i < pixels * channels_internal; i++)
             {
-                buf_as_int[i] = ((buf_as_int[i] >> 24) & 0xFF) | ((buf_as_int[i] >> 16) & 0xFF00) | ((buf_as_int[i] >> 8) & 0xFF0000) | (buf_as_int[i] & 0xFF000000);
+                buf_as_int[i] = ((buf_as_int[i] & 0xFF000000) >> 24) | ((buf_as_int[i] & 0xFF0000) >> 8) | ((buf_as_int[i] & 0xFF00) << 8) | (buf_as_int[i] & 0xFF) << 16;
             }
         }
 
