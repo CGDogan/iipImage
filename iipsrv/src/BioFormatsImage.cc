@@ -209,7 +209,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         logfile << "Unimplemented: currently noninterleaved works if we have them on the same plane" << endl;
     }
 
-    if (bf_is_false_color(gi.graal_thread) && 0)
+    if (bf_is_indexed_color(gi.graal_thread) && !bf_is_false_color(gi.graal_thread))
     {
         /*To implement this, get8BitLookupTable() or get16BitLookupTable()
         and then read from there. in theory, whether we need this can change between series/resolutions*/
