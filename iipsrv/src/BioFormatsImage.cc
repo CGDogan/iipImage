@@ -186,7 +186,6 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     channels_internal = bf_get_rgb_channel_count(gi.graal_thread);
     if (channels_internal != 3 && channels_internal != 4)
     {
-        // TODO: Allow RGBA
         if (channels_internal > 0)
         {
             logfile << "Unimplemented: only support 3, 4 channels, not " << channels_internal << endl;
@@ -205,17 +204,19 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     if (bf_get_effective_size_c(gi.graal_thread) != 1)
     {
         fprintf(stderr, "branch3.5 %d\n", bf_get_effective_size_c(gi.graal_thread));
-        // TODO: find an example. To implement, call read three times perhaps.
+        // TODO: find an example. To implement, call openBytes three times perhaps.
+        // Or maybe this is when we have a RGB plus a grayscale channel?
         logfile << "Unimplemented: currently noninterleaved works if we have them on the same plane" << endl;
     }
 
-    if (bf_is_floating_point(gi.graal_thread))
+    if (bf_is_false_color(gi.graal_thread))
     {
-        fprintf(stderr, "branch5 %d %d\n", bf_is_little_endian(gi.graal_thread), bf_get_bits_per_pixel(gi.graal_thread));
+        /*To implement this, get8BitLookupTable() or get16BitLookupTable()
+        and then read from there. in theory, whether we need this can change between series/resolutions*/
+        fprintf(stderr, "False color image detected!\n");
 
-        // TODO. It should be easier to handle this when bf_floating_point_is_normalized == true
-        logfile << "Unimplemented: floating point reading" << endl;
-        // throw file_error("Unimplemented: floating point reading");
+        logfile << "Unimplemented: False color image" << endl;
+        throw file_error("Unimplemented: False color image");
     }
 
     if (bf_get_dimension_order(gi.graal_thread) && bf_get_dimension_order(gi.graal_thread)[2] != 'C')
