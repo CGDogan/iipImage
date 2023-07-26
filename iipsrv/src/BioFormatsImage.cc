@@ -212,7 +212,11 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     if (bf_is_indexed_color(gi.graal_thread) && !bf_is_false_color(gi.graal_thread))
     {
         /*To implement this, get8BitLookupTable() or get16BitLookupTable()
-        and then read from there. in theory, whether we need this can change between series/resolutions*/
+        and then read from there. in theory, this might change between series/resolutions.
+
+        One way is: check isfalsecolor when initializing new file in java
+then do for 0th plane: check is fake color, then do get8BitLookupTable and get16bitlt, save these, and to read, if the sample format when reading bytes is same type (8 bit or 16 bit) for table index, access it. when closing file, reset table
+*/
         fprintf(stderr, "False color image detected!\n");
 
         logfile << "Unimplemented: False color image" << endl;
