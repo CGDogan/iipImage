@@ -39,6 +39,7 @@ private:
     /// Tile data buffer pointer
 
     TileCache *tileCache;
+    int milliseconds = 0;
  
     //uint32_t *osr_buf;
     // tdata_t tile_buf;
