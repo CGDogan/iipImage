@@ -4,7 +4,7 @@
 #include <tiffio.h>
 #include <cmath>
 #include <sstream>
-
+#include <chrono>
 #include <cstdlib>
 #include <cassert>
 
