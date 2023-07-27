@@ -38,6 +38,7 @@ private:
 
     int channels_internal;
     int pick_byte = 0; // 0 for pick first (big endian), 1 for pick last
+    int milliseconds = 0;
 
     // Unimplemented methods in line with OpenslideImage.h:
     //    void read(...);

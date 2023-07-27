@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include <cstdio>
+#include <chrono>
 
 #include <limits>
 
@@ -732,7 +733,13 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     cerr << "calling bf_open_bytes\n";
 
+    // https://stackoverflow.com/questions/31657511/chrono-the-difference-between-two-points-in-time-in-milliseconds
+    auto start = std::chrono::high_resolution_clock::now();
     int bytes_received = bf_open_bytes(gi.graal_thread, tx0, ty0, tw, th);
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> elapsed = finish - start;
+    milliseconds += elapsed.count();
+    cerr << "Milliseconds: " << milliseconds << endl;
     if (bytes_received < 0)
     {
         cerr << "bf_open_bytes got an error! expected this many bytes: " << (channels_internal * bytespc_internal * tw * th) << " but got " << bf_get_error(gi.graal_thread);
