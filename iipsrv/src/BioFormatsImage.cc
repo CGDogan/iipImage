@@ -599,6 +599,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     size_t ntly = numTilesY[osi_level];
 #ifdef DEBUG_VERBOSE
     fprintf(stderr, "ntlx %lu ntly %lu\n", ntlx, ntly);
+    cerr << "tile requested: " << tilex << " "  << tiley << endl;
 #endif
 
     // compute the correct width and height
