@@ -623,8 +623,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         th = rem_y;
     }
 
-    // create the RawTile object
-    RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, 3, bpc));
+    if (tilex > ntlx || tiley > ntly)
+    {
+        cerr << "Inexistant tile!";
+        throw file_error("inexistant");
+    }
+
+        // create the RawTile object
+        RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, 3, bpc));
 
     // compute the size, etc
     rt->dataLength = tw * th * 3 * sizeof(unsigned char);
