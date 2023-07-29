@@ -378,6 +378,11 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
         for (auto i : bioformats_downsample_in_level)
             cerr << i << " ";
         cerr << "\n";
+
+        cerr << "numtilex:" << endl;
+        for (auto i : numTilesX)
+            cerr << i << " ";
+        cerr << "\n";
 #endif
 
 #ifdef DEBUG_OSI
