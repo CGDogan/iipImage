@@ -591,8 +591,6 @@ RawTilePtr OpenSlideImage::getNativeTile(const size_t tilex, const size_t tiley,
   size_t tx0 = (tilex * tile_width) << osi_level;  // same as multiply by z power of 2
   size_t ty0 = (tiley * tile_height) << osi_level;
   auto start = std::chrono::high_resolution_clock::now();
-  // bf_open_bytes params : 0 4096 16640 256 256
-  cerr << "openslide_read_region params " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
   openslide_read_region(osr, reinterpret_cast<uint32_t *>(rt->data), tx0, ty0, bestLayer, tw, th);
   auto finish = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double, std::milli> elapsed = finish - start;
