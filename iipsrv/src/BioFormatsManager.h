@@ -31,7 +31,7 @@ public:
 
             fprintf(stderr, "preparemid1\n");
 
-            Isolate gi;
+            BioFormatsInstance gi;
             fprintf(stderr, "preparemid2\n");
 
             free_list.push_back(std::move(gi));
