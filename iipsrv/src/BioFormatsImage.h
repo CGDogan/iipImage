@@ -28,7 +28,7 @@
 class BioFormatsImage : public IIPImage
 {
 private:
-    BioFormatsInstance gi;
+    BioFormatsInstance bfi;
 
     TileCache *tileCache;
 
@@ -89,7 +89,7 @@ private:
     /// Constructor
     BioFormatsImage() : IIPImage()
     {
-        gi = BioFormatsManager::get_new();
+        bfi = BioFormatsManager::get_new();
     };
 
 public:
@@ -98,7 +98,7 @@ public:
      */
     BioFormatsImage(const std::string &path, TileCache *tile_cache) : IIPImage(path), tileCache(tile_cache)
     {
-        gi = BioFormatsManager::get_new();
+        bfi = BioFormatsManager::get_new();
         // set tile width on loadimage, not here
     };
 
@@ -108,7 +108,7 @@ public:
      */
     BioFormatsImage(const IIPImage &image, TileCache *tile_cache) : IIPImage(image), tileCache(tile_cache)
     {
-        gi = BioFormatsManager::get_new();
+        bfi = BioFormatsManager::get_new();
     };
 
     /** \param image IIPImage object
@@ -116,7 +116,7 @@ public:
     explicit BioFormatsImage(const BioFormatsImage &image) : IIPImage(image),
                                                              // Copy everything including JVM pointers for moving here.
                                                              tileCache(image.tileCache),
-                                                             /*gi(image.gi)*/
+                                                             /*bfi(image.bfi)*/
                                                              numTilesX(image.numTilesX),
                                                              numTilesY(image.numTilesY),
                                                              lastTileXDim(image.lastTileXDim),
@@ -142,7 +142,7 @@ public:
 
     virtual ~BioFormatsImage()
     {
-        BioFormatsManager::free(std::move(gi));
+        BioFormatsManager::free(std::move(bfi));
     };
 
     virtual void openImage() throw(file_error);

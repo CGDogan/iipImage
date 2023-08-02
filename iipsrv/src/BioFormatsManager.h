@@ -31,10 +31,10 @@ public:
 
             fprintf(stderr, "preparemid1\n");
 
-            BioFormatsInstance gi;
+            BioFormatsInstance bfi;
             fprintf(stderr, "preparemid2\n");
 
-            free_list.push_back(std::move(gi));
+            free_list.push_back(std::move(bfi));
             fprintf(stderr, "preparemid3\n");
         }
 
@@ -44,7 +44,7 @@ public:
             fprintf(stderr, "Expect crash1\n");
         }
 
-        BioFormatsInstance gi = std::move(free_list.back());
+        BioFormatsInstance bfi = std::move(free_list.back());
         fprintf(stderr, "getnew mid\n");
 
         if (free_list.size() == 0)
@@ -56,7 +56,7 @@ public:
             free_list.pop_back(); // calls destructuor
             fprintf(stderr, "getnew end\n");
 
-            return gi;
+            return bfi;
     }
 };
 

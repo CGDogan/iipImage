@@ -40,7 +40,7 @@ void BioFormatsImage::openImage() throw(file_error)
 #endif
     fprintf(stderr, "ddBioFormatsImage.cc:  continue1 \n");
 
-    if (gi.graal_thread == NULL)
+    if (bfi.graal_thread == NULL)
     {
         logfile << "ERROR: can't open " << filename << " with BioFormats; thread uninitialized" << endl
                 << flush;
@@ -48,11 +48,11 @@ void BioFormatsImage::openImage() throw(file_error)
     }
 
     fprintf(stderr, "dddBioFormatsImage.cc entering file\n");
-    if (!bf_open(gi.graal_thread, (char *)filename.c_str()))
+    if (!bf_open(bfi.graal_thread, (char *)filename.c_str()))
     {
         fprintf(stderr, "dddBioFormatsImage.cc cant enter file:\n");
 
-        const char *error = bf_get_error(gi.graal_thread);
+        const char *error = bf_get_error(bfi.graal_thread);
         fprintf(stderr, "dddBioFormatsImage.cc cant enter file %s:\n", error);
 
         logfile << "ERROR: encountered error: " << error << " while opening " << filename << " with BioFormats: " << endl
@@ -102,7 +102,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 #ifdef DEBUG_OSI
     logfile << "BioFormatsImage :: loadImageInfo()" << endl;
 
-    if (!gi.graal_thread)
+    if (!bfi.graal_thread)
     {
         logfile << "Graal_thread not initialized" << endl;
         throw file_error("Graal_thread not initialized");
@@ -114,7 +114,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     currentY = y;
 
     // choose power of 2 to make downsample simpler.
-    int suggested_width = bf_get_optimal_tile_width(gi.graal_thread);
+    int suggested_width = bf_get_optimal_tile_width(bfi.graal_thread);
     if (suggested_width > 0)
     {
         suggested_width = 1 << getPowerOfTwoRoundDown(suggested_width);
@@ -128,7 +128,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         tile_width = suggested_width;
     }
 
-    int suggested_height = bf_get_optimal_tile_width(gi.graal_thread);
+    int suggested_height = bf_get_optimal_tile_width(bfi.graal_thread);
     if (suggested_height > 0)
     {
         suggested_height = 1 << getPowerOfTwoRoundDown(suggested_height);
@@ -142,12 +142,12 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         tile_height = suggested_height;
     }
 
-    w = bf_get_size_x(gi.graal_thread);
-    h = bf_get_size_y(gi.graal_thread);
+    w = bf_get_size_x(bfi.graal_thread);
+    h = bf_get_size_y(bfi.graal_thread);
 
     if (w < 0 || h < 0)
     {
-        const char *err = bf_get_error(gi.graal_thread);
+        const char *err = bf_get_error(bfi.graal_thread);
 
         logfile << "ERROR: encountered error: " << err << " while getting level0 dim" << endl;
         throw file_error("Getting bioformats level0 dimensions: " + std::string(err));
@@ -162,15 +162,15 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     // PLEASE NOTE: these can differ between resolution levels
     cerr << "Parsing details" << endl;
     cerr << "Optimal: " << tile_width << " " << tile_height << endl;
-    cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(gi.graal_thread) << endl; // Number of colors returned with each openbytes call
-    cerr << "sizeC: " << bf_get_size_c(gi.graal_thread) << endl;
-    cerr << "effectiveSizeC: " << bf_get_effective_size_c(gi.graal_thread) << endl; // colors on separate planes. 1 if all on same plane
-    cerr << "sizeZ: " << bf_get_size_z(gi.graal_thread) << endl;
-    cerr << "sizeT: " << bf_get_size_t(gi.graal_thread) << endl;
-    cerr << "ImageCount: " << bf_get_image_count(gi.graal_thread) << endl; // number of planes in series
-    cerr << "isRGB: " << (int)bf_is_rgb(gi.graal_thread) << endl;          // multiple colors per openbytes plane
-    cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
-    cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
+    cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(bfi.graal_thread) << endl; // Number of colors returned with each openbytes call
+    cerr << "sizeC: " << bf_get_size_c(bfi.graal_thread) << endl;
+    cerr << "effectiveSizeC: " << bf_get_effective_size_c(bfi.graal_thread) << endl; // colors on separate planes. 1 if all on same plane
+    cerr << "sizeZ: " << bf_get_size_z(bfi.graal_thread) << endl;
+    cerr << "sizeT: " << bf_get_size_t(bfi.graal_thread) << endl;
+    cerr << "ImageCount: " << bf_get_image_count(bfi.graal_thread) << endl; // number of planes in series
+    cerr << "isRGB: " << (int)bf_is_rgb(bfi.graal_thread) << endl;          // multiple colors per openbytes plane
+    cerr << "isInterleaved: " << (int)bf_is_interleaved(bfi.graal_thread) << endl;
+    cerr << "isInterleaved: " << (int)bf_is_interleaved(bfi.graal_thread) << endl;
 #endif
 
     fprintf(stderr, "continue info: parsing file in bioformatsimage.cc\n");
@@ -184,7 +184,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     // iipsrv takes 1 or 3 only. we cant set this to 4 for internal use, iip will access that as well
     channels = 3;
-    channels_internal = bf_get_rgb_channel_count(gi.graal_thread);
+    channels_internal = bf_get_rgb_channel_count(bfi.graal_thread);
     if (channels_internal != 3 && channels_internal != 4)
     {
         if (channels_internal > 0)
@@ -195,22 +195,22 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         }
         else
         {
-            const char *err = bf_get_error(gi.graal_thread);
+            const char *err = bf_get_error(bfi.graal_thread);
             fprintf(stderr, "branch2\n");
             logfile << "Error while getting channel count: " << err << endl;
             throw file_error("Error while getting channel count: " + std::string(err));
         }
     }
 
-    if (bf_get_effective_size_c(gi.graal_thread) != 1)
+    if (bf_get_effective_size_c(bfi.graal_thread) != 1)
     {
-        fprintf(stderr, "branch3.5 %d\n", bf_get_effective_size_c(gi.graal_thread));
+        fprintf(stderr, "branch3.5 %d\n", bf_get_effective_size_c(bfi.graal_thread));
         // TODO: find an example. To implement, call openBytes three times perhaps.
         // Or maybe this is when we have a RGB plus a grayscale channel?
         logfile << "Unimplemented: currently noninterleaved works if we have them on the same plane" << endl;
     }
 
-    if (bf_is_indexed_color(gi.graal_thread) && !bf_is_false_color(gi.graal_thread))
+    if (bf_is_indexed_color(bfi.graal_thread) && !bf_is_false_color(bfi.graal_thread))
     {
         /*To implement this, get8BitLookupTable() or get16BitLookupTable()
         and then read from there. in theory, this might change between series/resolutions.
@@ -224,23 +224,23 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
         throw file_error("Unimplemented: False color image");
     }
 
-    if (bf_get_dimension_order(gi.graal_thread) && bf_get_dimension_order(gi.graal_thread)[2] != 'C')
+    if (bf_get_dimension_order(bfi.graal_thread) && bf_get_dimension_order(bfi.graal_thread)[2] != 'C')
     {
         fprintf(stderr, "branch6\n");
 
-        logfile << "Unimplemented: unfamiliar dimension order " << bf_get_dimension_order(gi.graal_thread) << endl;
-        throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bf_get_dimension_order(gi.graal_thread)));
+        logfile << "Unimplemented: unfamiliar dimension order " << bf_get_dimension_order(bfi.graal_thread) << endl;
+        throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bf_get_dimension_order(bfi.graal_thread)));
     }
 
     // bf_get_bytes_per_pixel actually gives bits per channel per pixel, so don't divide by channels
-    int bytespc_internal = bf_get_bytes_per_pixel(gi.graal_thread);
+    int bytespc_internal = bf_get_bytes_per_pixel(bfi.graal_thread);
     bpc = 8;
     colourspace = sRGB;
 
     /*
           if ((bpp % channels) != 0) {
         // How can this be handled? Should be very rare.
-        throw file_error("Unimplemented: bad remainder when diving bits per pixel among channels. bf_get_bits_per_pixel(gi.graal_thread): " + std::to_string(bf_get_bits_per_pixel(gi.graal_thread)) + " channels: " + std::to_string(channels));
+        throw file_error("Unimplemented: bad remainder when diving bits per pixel among channels. bf_get_bits_per_pixel(bfi.graal_thread): " + std::to_string(bf_get_bits_per_pixel(bfi.graal_thread)) + " channels: " + std::to_string(channels));
     }
     */
 
@@ -248,7 +248,7 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
     {
         fprintf(stderr, "branch8\n");
 
-        const char *err = bf_get_error(gi.graal_thread);
+        const char *err = bf_get_error(bfi.graal_thread);
         logfile << "Error while getting bits per pixel: " << err << endl;
         throw file_error("Error while getting bits per pixel: " + std::string(err));
     }
@@ -268,10 +268,10 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
     bioformats_widths.clear();
     bioformats_heights.clear();
 
-    int bioformats_levels = bf_get_resolution_count(gi.graal_thread);
+    int bioformats_levels = bf_get_resolution_count(bfi.graal_thread);
     if (bioformats_levels <= 0)
     {
-        const char *err = bf_get_error(gi.graal_thread);
+        const char *err = bf_get_error(bfi.graal_thread);
         logfile << "ERROR: encountered error: " << err << " while getting level count" << endl;
         throw file_error("ERROR: encountered error: " + std::string(err) + " while getting level count");
     }
@@ -284,9 +284,9 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
     int ww, hh;
     for (int i = 0; i < bioformats_levels; i++)
     {
-        bf_set_current_resolution(gi.graal_thread, i);
-        ww = bf_get_size_x(gi.graal_thread);
-        hh = bf_get_size_y(gi.graal_thread);
+        bf_set_current_resolution(bfi.graal_thread, i);
+        ww = bf_get_size_x(bfi.graal_thread);
+        hh = bf_get_size_y(bfi.graal_thread);
 
 #ifdef DEBUG_VERBOSE
         fprintf(stderr, "resolution %d has x=%d y=%d", i, ww, hh);
@@ -414,11 +414,11 @@ void BioFormatsImage::closeImage()
     Timer timer;
     timer.start();
 #endif
-    fprintf(stderr, "Calling bf_close in BioFormatsImage::closeImage: is the following 1: %d\n", !!gi.graal_thread);
-    if (gi.graal_thread)
+    fprintf(stderr, "Calling bf_close in BioFormatsImage::closeImage: is the following 1: %d\n", !!bfi.graal_thread);
+    if (bfi.graal_thread)
     {
         fprintf(stderr, "Called bf_close in BioFormatsImage::closeImage\n");
-        bf_close(gi.graal_thread, 0);
+        bf_close(bfi.graal_thread, 0);
     }
 
 #ifdef DEBUG_OSI
@@ -470,9 +470,9 @@ RawTilePtr BioFormatsImage::getTile(int seq, int ang, unsigned int iipres, int l
     /*
         int64_t layer_width = 0;
         int64_t layer_height = 0;
-        bf_set_current_resolution(gi.graal_thread, osi_level);
-        layer_width = bf_get_size_x(gi.graal_thread);
-        layer_height = bf_get_size_y(gi.graal_thread);
+        bf_set_current_resolution(bfi.graal_thread, osi_level);
+        layer_width = bf_get_size_x(bfi.graal_thread);
+        layer_height = bf_get_size_y(bfi.graal_thread);
 
     #ifdef DEBUG_VERBOSE
         fprintf(stderr, "layer: %d layer_width: %d layer_height: %d", layers, layer_width, layer_height);
@@ -574,7 +574,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     timer.start();
 #endif
 
-    /*if (!gi.graal_thread)
+    /*if (!bfi.graal_thread)
     {
         // TODO: should we check if file really opened here?
         // currently, we're checking if graal initialized only
@@ -640,9 +640,9 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     int allocate_length = rt->dataLength;
 
-    if (!bf_set_current_resolution(gi.graal_thread, bestLayer))
+    if (!bf_set_current_resolution(bfi.graal_thread, bestLayer))
     {
-        auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bf_get_resolution_count(gi.graal_thread) - 1));
+        auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bf_get_resolution_count(bfi.graal_thread) - 1));
         logfile << s;
         throw file_error(s);
     }
@@ -650,7 +650,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // We currently don't assume that this is the same among all resolutions
     // Is it?
     char should_reduce_channels_from_4to3 = 0;
-    int channels = bf_get_rgb_channel_count(gi.graal_thread);
+    int channels = bf_get_rgb_channel_count(bfi.graal_thread);
     if (channels != 3 && channels != 4)
     {
         throw file_error("Channels not 3 or 4: " + std::to_string(channels));
@@ -664,11 +664,11 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // These must be called after bf_set_current_resolution
     // It's sometimes different between resolutions
 
-    int bytespc_internal = bf_get_bytes_per_pixel(gi.graal_thread);
-    int should_interleave = !bf_is_interleaved(gi.graal_thread);
+    int bytespc_internal = bf_get_bytes_per_pixel(bfi.graal_thread);
+    int should_interleave = !bf_is_interleaved(bfi.graal_thread);
 
     // https://github.com/ome/bioformats/blob/metadata54/components/formats-api/src/loci/formats/FormatTools.java#L76
-    int pixel_type = bf_get_pixel_type(gi.graal_thread);
+    int pixel_type = bf_get_pixel_type(bfi.graal_thread);
 
     int should_remove_sign = 1;
     // added float and double, because they are handled specially
@@ -704,15 +704,15 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 #ifdef DEBUG_VERBOSE
     cerr << "Parsing details FOR TILE" << endl;
     cerr << "Optimal: " << tile_width << " " << tile_height << endl;
-    cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(gi.graal_thread) << endl; // Number of colors returned with each openbytes call
-    cerr << "sizeC: " << bf_get_size_c(gi.graal_thread) << endl;
-    cerr << "effectiveSizeC: " << bf_get_effective_size_c(gi.graal_thread) << endl; // colors on separate planes. 1 if all on same plane
-    cerr << "sizeZ: " << bf_get_size_z(gi.graal_thread) << endl;
-    cerr << "sizeT: " << bf_get_size_t(gi.graal_thread) << endl;
-    cerr << "ImageCount: " << bf_get_image_count(gi.graal_thread) << endl; // number of planes in series
-    cerr << "isRGB: " << (int)bf_is_rgb(gi.graal_thread) << endl;          // multiple colors per openbytes plane
-    cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
-    cerr << "isInterleaved: " << (int)bf_is_interleaved(gi.graal_thread) << endl;
+    cerr << "rgbChannelCount: " << bf_get_rgb_channel_count(bfi.graal_thread) << endl; // Number of colors returned with each openbytes call
+    cerr << "sizeC: " << bf_get_size_c(bfi.graal_thread) << endl;
+    cerr << "effectiveSizeC: " << bf_get_effective_size_c(bfi.graal_thread) << endl; // colors on separate planes. 1 if all on same plane
+    cerr << "sizeZ: " << bf_get_size_z(bfi.graal_thread) << endl;
+    cerr << "sizeT: " << bf_get_size_t(bfi.graal_thread) << endl;
+    cerr << "ImageCount: " << bf_get_image_count(bfi.graal_thread) << endl; // number of planes in series
+    cerr << "isRGB: " << (int)bf_is_rgb(bfi.graal_thread) << endl;          // multiple colors per openbytes plane
+    cerr << "isInterleaved: " << (int)bf_is_interleaved(bfi.graal_thread) << endl;
+    cerr << "isInterleaved: " << (int)bf_is_interleaved(bfi.graal_thread) << endl;
 #endif
 
     // READ FROM file
@@ -726,7 +726,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     cerr << "bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
     cerr << "downsample in level " << bioformats_downsample_in_level[osi_level] << endl;
 
-    cerr << "this layer has resolution x=" << bf_get_size_x(gi.graal_thread) << " y=" << bf_get_size_y(gi.graal_thread) << endl;
+    cerr << "this layer has resolution x=" << bf_get_size_x(bfi.graal_thread) << " y=" << bf_get_size_y(bfi.graal_thread) << endl;
 #endif
 
     if (!rt->data)
@@ -735,7 +735,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     /*char *test = (char*) "/images/pngtest1.png";
     cerr << "but, instead, callin bfinternal_deleteme\n" << test << endl;
 
-    if (bfinternal_deleteme(gi.graal_thread, test) < 0)
+    if (bfinternal_deleteme(bfi.graal_thread, test) < 0)
     {
         cerr << "couldn't simulate - check path?\n";
     }
@@ -746,15 +746,15 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     // https://stackoverflow.com/questions/31657511/chrono-the-difference-between-two-points-in-time-in-milliseconds
     auto start = std::chrono::high_resolution_clock::now();
-    int bytes_received = bf_open_bytes(gi.graal_thread, tx0, ty0, tw, th);
+    int bytes_received = bf_open_bytes(bfi.graal_thread, tx0, ty0, tw, th);
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = finish - start;
     milliseconds += elapsed.count();
     cerr << "Milliseconds: " << milliseconds << endl;
     if (bytes_received < 0)
     {
-        cerr << "bf_open_bytes got an error! expected this many bytes: " << (channels_internal * bytespc_internal * tw * th) << " but got " << bf_get_error(gi.graal_thread);
-        const char *error = bf_get_error(gi.graal_thread);
+        cerr << "bf_open_bytes got an error! expected this many bytes: " << (channels_internal * bytespc_internal * tw * th) << " but got " << bf_get_error(bfi.graal_thread);
+        const char *error = bf_get_error(bfi.graal_thread);
         logfile << "ERROR: encountered error: " << error << " while reading region exact at  " << tx0 << "x" << ty0 << " dim " << tw << "x" << th << " with BioFormats: " << error << endl;
         throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
     }
@@ -817,7 +817,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // the data's endianness depends on platform, otherwise
     // on file format, so from bf_is_little_endian
     int pick_byte;
-    unsigned char *buf = (unsigned char *)gi.receive_buffer;
+    unsigned char *buf = (unsigned char *)bfi.receive_buffer;
 
 // The common case for float and double branches, change later otherwise
 #if !defined(__BYTE_ORDER) || __BYTE_ORDER == __LITTLE_ENDIAN
@@ -828,8 +828,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     if (should_convert_from_float)
     {
-        cerr << "endianness of file is little: " << (int)bf_is_little_endian(gi.graal_thread) << endl;
-        if (bf_is_little_endian(gi.graal_thread) != pick_byte)
+        cerr << "endianness of file is little: " << (int)bf_is_little_endian(bfi.graal_thread) << endl;
+        if (bf_is_little_endian(bfi.graal_thread) != pick_byte)
         {
             cerr << "swapping\n";
             unsigned int *buf_as_int = (unsigned int *)buf;
@@ -849,7 +849,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
     else if (should_convert_from_double)
     {
-        if (bf_is_little_endian(gi.graal_thread) != pick_byte)
+        if (bf_is_little_endian(bfi.graal_thread) != pick_byte)
         {
             unsigned long int *buf_as_long_int = (unsigned long int *)buf;
             for (int i = 0; i < pixels * channels_internal; i++)
@@ -870,7 +870,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // int cases
     if (bytespc_internal != 1)
     {
-        pick_byte = bf_is_little_endian(gi.graal_thread);
+        pick_byte = bf_is_little_endian(bfi.graal_thread);
 
         int coefficient = bytespc_internal;
         int offset = pick_byte ? (coefficient - 1) : 0;
@@ -897,9 +897,9 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     if (should_interleave)
     {
-        char *red = gi.receive_buffer;
-        char *green = &gi.receive_buffer[pixels];
-        char *blue = &gi.receive_buffer[2 * pixels];
+        char *red = bfi.receive_buffer;
+        char *green = &bfi.receive_buffer[pixels];
+        char *blue = &bfi.receive_buffer[2 * pixels];
 
         for (int i = 0; i < pixels; i++)
         {
@@ -922,14 +922,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
             {
                 // This can be optimized I think with uint64 operations?
                 // Depends on compiler
-                data_out[3 * i] = gi.receive_buffer[4 * i];
-                data_out[3 * i + 1] = gi.receive_buffer[4 * i + 1];
-                data_out[3 * i + 2] = gi.receive_buffer[4 * i + 2];
+                data_out[3 * i] = bfi.receive_buffer[4 * i];
+                data_out[3 * i + 1] = bfi.receive_buffer[4 * i + 1];
+                data_out[3 * i + 2] = bfi.receive_buffer[4 * i + 2];
             }
         }
         else
         {
-            memcpy(rt->data, gi.receive_buffer, bytes_received);
+            memcpy(rt->data, bfi.receive_buffer, bytes_received);
         }
     }
 
