@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <graal_isolate.h>
-#include "Isolate.h"
+#include "BioFormatsInstance.h"
 #include <libbfbridge.h>
 #include <stdio.h>
 
