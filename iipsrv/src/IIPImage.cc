@@ -146,7 +146,7 @@ void IIPImage::testImageType() throw(file_error)
      format = UNSUPPORTED;
     }
 
-    BioFormatsImage::free(std::move(gi));
+    BioFormatsManager::free(std::move(gi));
   }
   else{
 
