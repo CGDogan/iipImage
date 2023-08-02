@@ -41,7 +41,7 @@
 #include <limits>
 
 #include "openslide.h"
-#include "IsolateManager.h"
+#include "BioFormatsManager.h"
 
 using namespace std;
 

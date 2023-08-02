@@ -1,9 +1,9 @@
 /*
- * File:   IsolateManager.h
+ * File:   BioFormatsManager.h
  */
 
-#ifndef ISOLATEMANAGER_H
-#define ISOLATEMANAGER_H
+#ifndef BIOFORMATSMANAGER_H
+#define BIOFORMATSMANAGER_H
 
 #include <vector>
 #include <graal_isolate.h>
@@ -11,20 +11,20 @@
 #include <libbfbridge.h>
 #include <stdio.h>
 
-class IsolateManager
+class BioFormatsManager
 {
 private:
-    static std::vector<Isolate> free_list;
+    static std::vector<BioFormatsInstance> free_list;
 
 public:
     // call me with std::move
-    static void free(Isolate graal_isolate)
+    static void free(BioFormatsInstance graal_isolate)
     {
         free_list.push_back(std::move(graal_isolate));
         bf_close(free_list.back().graal_thread, 0);
     }
 
-    static Isolate get_new()
+    static BioFormatsInstance get_new()
     {
         if (free_list.size() == 0)
         {
@@ -44,7 +44,7 @@ public:
             fprintf(stderr, "Expect crash1\n");
         }
 
-        Isolate gi = std::move(free_list.back());
+        BioFormatsInstance gi = std::move(free_list.back());
         fprintf(stderr, "getnew mid\n");
 
         if (free_list.size() == 0)
@@ -60,4 +60,4 @@ public:
     }
 };
 
-#endif /* ISOLATEMANAGER_H */
+#endif /* BIOFORMATSMANAGER_H */

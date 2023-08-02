@@ -43,7 +43,7 @@ iipsrv_fcgi_SOURCES = \
 			Tokenizer.h \
 			IIPResponse.h \
 			IIPResponse.cc \
-			IsolateManager.cc \
+			BioFormatsManager.cc \
 			View.h \
 			View.cc \
 			Transforms.h \

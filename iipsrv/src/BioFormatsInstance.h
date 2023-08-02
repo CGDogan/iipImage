@@ -1,9 +1,9 @@
 /*
- * File:   Isolate.h
+ * File:   BioFormatsInstance.h
  */
 
-#ifndef ISOLATE_H
-#define ISOLATE_H
+#ifndef BIOFORMATSINSTANCE_H
+#define BIOFORMATSINSTANCE_H
 
 #include <vector>
 #include <string>
@@ -11,13 +11,13 @@
 #include <libbfbridge.h>
 #include <stdio.h>
 
-class Isolate
+class BioFormatsInstance
 {
 public:
     graal_isolatethread_t *graal_thread = NULL;
     char *receive_buffer = NULL;
 
-    Isolate()
+    BioFormatsInstance()
     {
         graal_isolate_t *graal_isolate;
         fprintf(stderr, "dddBioFormatsImage.h3: Creating isolate\n");
@@ -62,22 +62,22 @@ public:
     // The alternative is reference counting
     // https://ps.uci.edu/~cyu/p231C/LectureNotes/lecture13:referenceCounting/lecture13.pdf
     // count, in an int*, the number of copies and deallocate when reach 0
-    Isolate(const Isolate &) = delete;
-    /*Isolate(Isolate &&) = default;*/
-    Isolate(Isolate &&other)
+    BioFormatsInstance(const BioFormatsInstance &) = delete;
+    /*BioFormatsInstance(BioFormatsInstance &&) = default;*/
+    BioFormatsInstance(BioFormatsInstance &&other)
     {
         graal_thread = other.graal_thread;
         receive_buffer = other.receive_buffer;
         other.graal_thread = NULL;
     }
-     Isolate & operator=(const Isolate &) = delete;
-    /*Isolate &operator=(Isolate &&) = default;*/
+     BioFormatsInstance & operator=(const BioFormatsInstance &) = delete;
+    /*BioFormatsInstance &operator=(BioFormatsInstance &&) = default;*/
     // We cant use these two default ones because std::move still keeps
     // the previous object so it calls the destructor
     // Our isolate destructor frees if graal thread null.
     // therefore movings of default is not enough, it should set null for previous,
     // so that the new one will have a non-destroyed graal.
-     Isolate &operator=(Isolate && other)
+     BioFormatsInstance &operator=(BioFormatsInstance && other)
      {
         graal_thread = other.graal_thread;
         receive_buffer = other.receive_buffer;
@@ -85,7 +85,7 @@ public:
         return *this;
      }
 
-    ~Isolate()
+    ~BioFormatsInstance()
     {
         if (graal_thread)
         {
@@ -96,4 +96,4 @@ public:
     }
 };
 
-#endif /* ISOLATE_H */
+#endif /* BIOFORMATSINSTANCE_H */
