@@ -124,21 +124,21 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
 
 
-    BioFormatsInstance gi = BioFormatsManager::get_new();
-    fprintf(stderr, "got1 %p\n", &gi);
+    BioFormatsInstance bfi = BioFormatsManager::get_new();
+    fprintf(stderr, "got1 %p\n", &bfi);
 
-    fprintf(stderr, "got2 %p\n", gi.graal_thread);
-    fprintf(stderr, "got3 %d\n", *(int*)gi.graal_thread);
+    fprintf(stderr, "got2 %p\n", bfi.graal_thread);
+    fprintf(stderr, "got3 %d\n", *(int*)bfi.graal_thread);
 
       int code;
-    if ((code = bf_is_compatible(gi.graal_thread, (char *) path.c_str())) == 1) {
+    if ((code = bf_is_compatible(bfi.graal_thread, (char *) path.c_str())) == 1) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
 
       format = BIOFORMATS;
     } else {
       fprintf(stderr, "It is not bf compatible. iipimage.cc %d\n", code);
       if (code < 0) {
-      fprintf(stderr, "%s\n", bf_get_error(gi.graal_thread));
+      fprintf(stderr, "%s\n", bf_get_error(bfi.graal_thread));
       }
     // const char * vendor = openslide_detect_vendor( path.c_str() );
     // if ( vendor != NULL )
@@ -146,7 +146,7 @@ void IIPImage::testImageType() throw(file_error)
      format = UNSUPPORTED;
     }
 
-    BioFormatsManager::free(std::move(gi));
+    BioFormatsManager::free(std::move(bfi));
   }
   else{
 
