@@ -21,7 +21,7 @@ public:
     static void free(BioFormatsInstance graal_isolate)
     {
         free_list.push_back(std::move(graal_isolate));
-        bf_close(free_list.back().graal_thread, 0);
+        free_list.back().refresh();
     }
 
     static BioFormatsInstance get_new()

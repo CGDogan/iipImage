@@ -94,6 +94,11 @@ public:
             graal_tear_down_isolate(graal_thread);
         }
     }
+
+    // changed ownership
+    void refresh() {
+        bf_close(graal_thread, 0);
+    }
 };
 
 #endif /* BIOFORMATSINSTANCE_H */
