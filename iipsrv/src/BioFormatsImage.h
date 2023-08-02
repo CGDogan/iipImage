@@ -9,7 +9,7 @@
 #define BIOFORMATSIMAGE_H
 
 #include "IIPImage.h"
-#include "IsolateManager.h"
+#include "BioFormatsManager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
