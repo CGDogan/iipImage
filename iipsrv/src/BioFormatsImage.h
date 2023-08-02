@@ -1,5 +1,5 @@
 /*
- * File:   BioFormats.h
+ * File:   BioFormatsImage.h
  * Based on OpenSlideImage.h
  *
  *
