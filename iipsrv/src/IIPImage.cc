@@ -124,7 +124,7 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
 
 
-    Isolate gi = IsolateManager::get_new();
+    BioFormatsInstance gi = BioFormatsManager::get_new();
     fprintf(stderr, "got1 %p\n", &gi);
 
     fprintf(stderr, "got2 %p\n", gi.graal_thread);
@@ -146,7 +146,7 @@ void IIPImage::testImageType() throw(file_error)
      format = UNSUPPORTED;
     }
 
-    IsolateManager::free(std::move(gi));
+    BioFormatsImage::free(std::move(gi));
   }
   else{
 
