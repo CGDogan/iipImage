@@ -134,7 +134,7 @@ void IIPImage::testImageType() throw(file_error)
     } else {
       fprintf(stderr, "It is not bf compatible. iipimage.cc %d\n", code);
       if (code < 0) {
-      fprintf(stderr, "%s\n", vfi.bf_get_error());
+      fprintf(stderr, "%s\n", bfi.bf_get_error());
       }
     // const char * vendor = openslide_detect_vendor( path.c_str() );
     // if ( vendor != NULL )
