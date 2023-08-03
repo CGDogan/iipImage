@@ -185,7 +185,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 #define BFBRIDGE_STRINGVALUE(s) BFBRIDGE_STRINGARG(s)
 
     std::string cp = BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH);
-    if (cp.back() != "/")
+    if (cp.back() != '/')
     {
       cp += "/";
     }
