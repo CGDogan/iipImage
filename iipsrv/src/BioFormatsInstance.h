@@ -310,6 +310,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     fprintf(stderr, "calling refresh\n");
     jmethodID close = env->GetStaticMethodID(bfbridge, "BFClose", "()I");
     env->CallStaticVoidMethod(bfbridge, close);
+    fprintf(stderr, "called refresh\n");
   }
 
   std::string bf_get_error()
