@@ -165,6 +165,7 @@ public:
 
     BioFormatsInstance()
     {
+      fprintf(stderr, "initializing\n");
         // https://docs.oracle.com/en/java/javase/20/docs/specs/jni/invocation.html
         JavaVMInitArgs vm_args;
         vm_args.version = JNI_VERSION_20;
@@ -195,6 +196,10 @@ public:
         if (code < 0)
         {
           fprintf(stderr, "couldn't create jvm with code %d on https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes\n", code);
+          throw "jvm failed";
+        }
+        if (!env) {
+          fprintf(stderr, "null env in initialization\n");
           throw "jvm failed";
         }
         bfbridge = env->FindClass("org/camicroscope/BFBridge");
