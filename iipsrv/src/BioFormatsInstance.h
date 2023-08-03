@@ -196,6 +196,7 @@ public:
             fprintf(stderr, "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n", options[0].optionString);
             if (env->ExceptionCheck() == 1) {
               fprintf(stderr, "exception\n");
+              env->ExceptionDescribe();
             } else
             fprintf(stderr, "no exception\n");
 
