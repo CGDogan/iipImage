@@ -309,6 +309,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   {
     fprintf(stderr, "calling refresh\n");
     jmethodID close = env->GetStaticMethodID(bfbridge, "BFClose", "()I");
+    fprintf(stderr, "mid called refresh\n");
     env->CallStaticVoidMethod(bfbridge, close);
     fprintf(stderr, "called refresh\n");
   }
@@ -324,9 +325,12 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   int bf_is_compatible(std::string filepath)
   {
-    fprintf(stderr, "goingbf_is_compatible-10 \n");
-    bfbridge = env->FindClass("org/camicroscope/BFBridge");
+    fprintf(stderr, "goingbf_is_compatible-1 %p ", (void *)bfbridge);
+    //bfbridge = env->FindClass("org/camicroscope/BFBridge");
     fprintf(stderr, "goingbf_is_compatible0 %p ", (void *)bfbridge);
+    bfbridge = env->FindClass("org/camicroscope/BFBridge");
+    fprintf(stderr, "goingbf_is_compatible0.5 %p ", (void *)bfbridge);
+
     jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
     fprintf(stderr, "goingbf_is_compatible1");
     int len = filepath.length();
