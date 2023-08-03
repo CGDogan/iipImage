@@ -196,7 +196,8 @@ public:
           throw "Could not read dir";
         }
         struct dirent * cp_dirent;
-        while ((dirent = readdir(cp_dir)) != NULL) {
+        while ((cp_dirent = readdir(cp_dir)) != NULL)
+        {
           path_arg += ":" + std::string(dirent->d_name);
         }
         closedir(cp_dir);
