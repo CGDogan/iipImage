@@ -331,7 +331,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   int bf_is_compatible(std::string filepath)
   {
-    fprintf("calling is compatible\n");
+    fprintf(stderr, "calling is compatible\n");
     bfbridge = env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
     int len = filepath.length();
