@@ -168,13 +168,14 @@ public:
         // https://docs.oracle.com/en/java/javase/20/docs/specs/jni/invocation.html
         JavaVMInitArgs vm_args;
         vm_args.version = JNI_VERSION_20;
-        JavaVMOption *options = new JavaVMOption[1];
+        JavaVMOption *options = new JavaVMOption[2];
 
 #ifndef BFBRIDGE_CLASSPATH
 #error Please define BFBRIDGE_CLASSPATH to the path with compiled classes and dependency jars. Example: gcc -DBFBRIDGE_CLASSPATH=/usr/lib/java
 #endif
 
 // https://stackoverflow.com/a/2411008
+// define with compiler's -D flag
 #define BFBRIDGE_STRINGARG(s) #s
 #define BFBRIDGE_STRINGVALUE(s) BFBRIDGE_STRINGARG(s)
 
@@ -186,10 +187,16 @@ public:
         options[0].optionString = path_arg;
         options[1].optionString = optimize1;
         //options[2].optionString = optimize2;
+        //options[3].optionString = "-verbose:jni";
         vm_args.options = options;
         vm_args.nOptions = 2; // 3
         vm_args.ignoreUnrecognized = false;
-        JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
+        int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
+        if (code < 0)
+        {
+          fprintf(stderr, "couldn't create jvm with code %d on https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes\n", code);
+          throw "jvm failed";
+        }
         bfbridge = env->FindClass("org.camicroscope.BFBridge");
         if (!bfbridge)
         {
