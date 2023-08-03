@@ -169,10 +169,17 @@ public:
         JavaVMInitArgs vm_args;
         vm_args.version = JNI_VERSION_20;
         JavaVMOption *options = new JavaVMOption[1];
-        char path_arg[] = "-Djava.class.path=/usr/lib/java";
+
+    #ifndef BFBRIDGE_CLASSPATH
+#error Please define BFBRIDGE_CLASSPATH to the path with compiled classes and dependency jars. Example: gcc -DBFBRIDGE_CLASSPATH=/usr/lib/java
+#endif
+        char path_arg[] = "-Djava.class.path=" BFBRIDGE_CLASSPATH ":" BFBRIDGE_CLASSPATH "/*";
+        fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg);
+        char server_arg[] = "-server"; // optimize
         options[0].optionString = path_arg;
+        options[1].optionString = server_arg;
         vm_args.options = options;
-        vm_args.nOptions = 1;
+        vm_args.nOptions = 2;
         vm_args.ignoreUnrecognized = false;
         JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
         bfbridge = env->FindClass("org.camicroscope.BFBridge");
