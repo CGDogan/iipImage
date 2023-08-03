@@ -125,20 +125,16 @@ void IIPImage::testImageType() throw(file_error)
 
 
     BioFormatsInstance bfi = BioFormatsManager::get_new();
-    fprintf(stderr, "got1 %p\n", &bfi);
-
-    fprintf(stderr, "got2 %p\n", bfi.graal_thread);
-    fprintf(stderr, "got3 %d\n", *(int*)bfi.graal_thread);
 
       int code;
-    if ((code = bf_is_compatible(bfi.graal_thread, (char *) path.c_str())) == 1) {
+    if ((code = bfi.bf_is_compatible(path)) == 1) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
 
       format = BIOFORMATS;
     } else {
       fprintf(stderr, "It is not bf compatible. iipimage.cc %d\n", code);
       if (code < 0) {
-      fprintf(stderr, "%s\n", bf_get_error(bfi.graal_thread));
+      fprintf(stderr, "%s\n", vfi.bf_get_error());
       }
     // const char * vendor = openslide_detect_vendor( path.c_str() );
     // if ( vendor != NULL )
