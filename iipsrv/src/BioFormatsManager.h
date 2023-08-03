@@ -6,9 +6,7 @@
 #define BIOFORMATSMANAGER_H
 
 #include <vector>
-#include <graal_isolate.h>
 #include "BioFormatsInstance.h"
-#include <libbfbridge.h>
 #include <stdio.h>
 
 class BioFormatsManager
