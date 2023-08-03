@@ -7,7 +7,7 @@ INCLUDES =		@INCLUDES@ @LIBFCGI_INCLUDES@ @JPEG_INCLUDES@ @TIFF_INCLUDES@
 LIBS =			@LIBS@ @LIBFCGI_LIBS@ @DL_LIBS@ @JPEG_LIBS@ @TIFF_LIBS@ -lm -lopenslide -lopenjp2 -ljvm -L$(JAVA_HOME)/lib/server -Wl,-rpath $(JAVA_HOME)/lib/server
 AM_LDFLAGS =		@LIBFCGI_LDFLAGS@
 # jni-md.h should also be included hence the platform paths, see link in https://stackoverflow.com/a/37029528
-AM_CPPFLAGS = -I/usr/local/include/openslide -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(JAVA_HOME)/include/darwin -I$(JAVA_HOME)/include/windows -DBFBRIDGE_CLASSPATH=/usr/lib/java -std=c++17
+AM_CPPFLAGS = -I/usr/local/include/openslide -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(JAVA_HOME)/include/darwin -I$(JAVA_HOME)/include/windows -DBFBRIDGE_CLASSPATH=/usr/lib/java
 
 iipsrv_fcgi_LDADD = Main.o
 

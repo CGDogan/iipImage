@@ -12,6 +12,9 @@
 #include <filesystem>
 #include <jni.h>
 
+// TODO: use its equivalent on Windows
+#include <dirent.h>
+
 /*
 Memory management
 helpful webpages https://stackoverflow.com/questions/2093112
@@ -187,11 +190,16 @@ public:
         // For some reason unlike the -cp arg, .../* does not work
         // so we need to list every jar file
         // https://en.cppreference.com/w/cpp/filesystem/directory_iterator
-        const std::filesystem::path cp_path{cp};
-        for (auto const &dir_entry : std::filesystem::directory_iterator{cp_path})
-        {
-          cerr << dir_entry.path() << '\n';
+        DIR* cp_dir = opendir(cp.c_str());
+        if (!cp_dir) {
+          fprintf(stderr, "could not read classpath dir %s\n", cp.c_str());
+          throw "Could not read dir";
         }
+        struct dirent * cp_dirent;
+        while ((dirent = readdir(cp_dir)) != NULL) {
+          path_arg += ":" + std::string(dirent->d_name);
+        }
+        closedir(cp_dir);
 
         /*char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":"  "/*:" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/formats-api-6.13.0.jar";*/
         fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg.c_str());
