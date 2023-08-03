@@ -174,9 +174,11 @@ public:
 #error Please define BFBRIDGE_CLASSPATH to the path with compiled classes and dependency jars. Example: gcc -DBFBRIDGE_CLASSPATH=/usr/lib/java
 #endif
 
+// https://stackoverflow.com/a/2411008
 #define BFBRIDGE_STRINGARG(s) #s
+#define BFBRIDGE_STRINGVALUE(s) BFBRIDGE_STRINGARG(s)
 
-        char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGARG(BFBRIDGE_CLASSPATH) ":" BFBRIDGE_STRINGARG(BFBRIDGE_CLASSPATH) "/*";
+        char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/*";
         fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg);
         char server_arg[] = "-server"; // optimize
         options[0].optionString = path_arg;
