@@ -414,8 +414,7 @@ void BioFormatsImage::closeImage()
     Timer timer;
     timer.start();
 #endif
-    fprintf(stderr, "Calling bfi.bf_close in BioFormatsImage::closeImage: is the following 1: %d\n", !!);
-    if ()
+    if (bfi.jvm)
     {
         fprintf(stderr, "Called bfi.bf_close in BioFormatsImage::closeImage\n");
         bfi.bf_close();
