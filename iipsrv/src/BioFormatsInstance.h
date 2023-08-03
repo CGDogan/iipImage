@@ -9,6 +9,7 @@
 #include <string>
 #include <cstring>
 #include <cstdio>
+#include <filesystem>
 #include <jni.h>
 
 /*
@@ -183,6 +184,14 @@ public:
         std::string cp = BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH);
         std::string path_arg = "-Djava.class.path=" + cp + "/*:" + cp;
 
+        // For some reason unlike the -cp arg, .../* does not work
+        // so we need to list every jar file
+        // https://en.cppreference.com/w/cpp/filesystem/directory_iterator
+        for (auto const &dir_entry : std::filesystem::directory_iterator{sandbox})
+        {
+          cerr << dir_entry.path() << '\n';
+        }
+
         /*char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":"  "/*:" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/formats-api-6.13.0.jar";*/
         fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg.c_str());
         // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
@@ -208,7 +217,7 @@ public:
         bfbridge = env->FindClass("org/camicroscope/BFBridge");
         if (!bfbridge)
         {
-            fprintf(stderr, "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n", options[0].optionString);
+            fprintf(stderr, "org.camicroscope.BFBridge (or a dependency of it) could not be found; is the jar in %s ?\n", options[0].optionString);
             if (env->ExceptionCheck() == 1) {
               fprintf(stderr, "exception\n");
               env->ExceptionDescribe();
