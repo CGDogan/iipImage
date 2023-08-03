@@ -170,10 +170,13 @@ public:
         vm_args.version = JNI_VERSION_20;
         JavaVMOption *options = new JavaVMOption[1];
 
-    #ifndef BFBRIDGE_CLASSPATH
+#ifndef BFBRIDGE_CLASSPATH
 #error Please define BFBRIDGE_CLASSPATH to the path with compiled classes and dependency jars. Example: gcc -DBFBRIDGE_CLASSPATH=/usr/lib/java
 #endif
-        char path_arg[] = "-Djava.class.path=" BFBRIDGE_CLASSPATH ":" BFBRIDGE_CLASSPATH "/*";
+
+#define BFBRIDGE_STRINGARG(s) #s
+
+        char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGARG(BFBRIDGE_CLASSPATH) ":" BFBRIDGE_STRINGARG(BFBRIDGE_CLASSPATH) "/*";
         fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg);
         char server_arg[] = "-server"; // optimize
         options[0].optionString = path_arg;
@@ -410,11 +413,12 @@ public:
     }
 
     // Returns char* to communication_buffer that will later be overwritten
-    char* bf_get_dimension_order()
+    char *bf_get_dimension_order()
     {
         jmethodID BFGetDimensionOrder = env->GetStaticMethodID(bfbridge, "BFGetDimensionOrder", "()I");
         int len = env->CallStaticIntMethod(bfbridge, BFGetDimensionOrder);
-        if (len < 0) {
+        if (len < 0)
+        {
             return NULL;
         }
         // We know that for this function len can never be close to
