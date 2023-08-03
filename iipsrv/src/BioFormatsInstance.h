@@ -401,10 +401,18 @@ public:
         return env->CallStaticIntMethod(bfbridge, BFIsIndexedColor);
     }
 
-    int bf_get_dimension_order()
+    // Returns char* to communication_buffer that will later be overwritten
+    char* bf_get_dimension_order()
     {
         jmethodID BFGetDimensionOrder = env->GetStaticMethodID(bfbridge, "BFGetDimensionOrder", "()I");
-        return env->CallStaticIntMethod(bfbridge, BFGetDimensionOrder);
+        int len = env->CallStaticIntMethod(bfbridge, BFGetDimensionOrder);
+        if (len < 0) {
+            return NULL;
+        }
+        // We know that for this function len can never be close to
+        // communication_buffer_length, so no writing past it
+        communication_buffer[len] = 0;
+        return communication_buffer;
     }
 
     int bf_is_order_certain()
