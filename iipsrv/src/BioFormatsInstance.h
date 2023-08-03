@@ -231,8 +231,8 @@ static int BFToolsGenerateSubresolutions(int, int, int);
       fprintf(stderr, "null env in initialization\n");
       throw "jvm failed";
     }
-    bfbridge = env->FindClass("org/camicroscope/BFBridge");
-    if (!bfbridge)
+    jclass bfbridge_local = env->FindClass("org/camicroscope/BFBridge");
+    if (!bfbridge_local)
     {
       fprintf(stderr, "org.camicroscope.BFBridge (or a dependency of it) could not be found; is the jar in %s ?\n", options[0].optionString);
       if (env->ExceptionCheck() == 1)
@@ -246,6 +246,10 @@ static int BFToolsGenerateSubresolutions(int, int, int);
       throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + std::string(options[0].optionString);
     }
     delete[] options;
+
+    bfbridge = (jclass)env->NewGlobalRef(bfbridge_local);
+    env->DeleteLocalRef(bfbridge_local);
+
     // Allow 2048*2048 four channels of 16 bits
     communication_buffer = new char[communication_buffer_len];
     jobject buffer = env->NewDirectByteBuffer(communication_buffer, communication_buffer_len);
@@ -297,7 +301,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     if (jvm)
     {
       // Not needed: destroy vm already
-      // env->DeleteLocalRef(bfbridge);
+      // env->DeleteGlobalRef(bfbridge);
       // ...
       jvm->DestroyJavaVM();
       delete[] communication_buffer;
@@ -328,7 +332,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     fprintf(stderr, "goingbf_is_compatible-1 %p ", (void *)bfbridge);
     //bfbridge = env->FindClass("org/camicroscope/BFBridge");
     fprintf(stderr, "goingbf_is_compatible0 %p ", (void *)bfbridge);
-    bfbridge = env->FindClass("org/camicroscope/BFBridge");
+    //bfbridge = env->FindClass("org/camicroscope/BFBridge");
     fprintf(stderr, "goingbf_is_compatible0.5 %p ", (void *)bfbridge);
 
     jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
