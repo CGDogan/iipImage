@@ -6,7 +6,8 @@ noinst_PROGRAMS =	iipsrv.fcgi
 INCLUDES =		@INCLUDES@ @LIBFCGI_INCLUDES@ @JPEG_INCLUDES@ @TIFF_INCLUDES@
 LIBS =			@LIBS@ @LIBFCGI_LIBS@ @DL_LIBS@ @JPEG_LIBS@ @TIFF_LIBS@ -lm -lopenslide -lopenjp2
 AM_LDFLAGS =		@LIBFCGI_LDFLAGS@
-AM_CPPFLAGS = -I/usr/local/include/openslide -I$(JAVA_HOME)/include
+# jni-md.h should also be included, see link in https://stackoverflow.com/a/37029528
+AM_CPPFLAGS = -I/usr/local/include/openslide -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux I$(JAVA_HOME)/include/darwin -I$(JAVA_HOME)/include/linux I$(JAVA_HOME)/include/windows
 
 iipsrv_fcgi_LDADD = Main.o
 
