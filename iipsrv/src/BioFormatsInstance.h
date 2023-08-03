@@ -27,6 +27,8 @@ For simplicity don't use jstring but use our common communication_buffer
 class BioFormatsInstance
 {
 public:
+    const int communication_buffer_len = 33554432;
+
     // TODO make some of these private
     JavaVM *jvm;
     JNIEnv *env;
@@ -173,16 +175,18 @@ public:
         vm_args.ignoreUnrecognized = false;
         JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
         bfbridge = env->FindClass("org.camicroscope.BFBridge");
-        if (!bfbridge) {
+        if (!bfbridge)
+        {
             fprintf(stderr, "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n", options[0].optionString);
             throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + std::string(options[0].optionString);
         }
         delete[] options;
         // Allow 2048*2048 four channels of 16 bits
-        communication_buffer = new char[33554432];
-        jobject buffer = env->NewDirectByteBuffer(communication_buffer, 33554432);
-        if (!buffer) {
-            fprintf(stderr, "Couldn't allocate 33554432: too little RAM or JVM JNI doesn't support native memory access?");
+        communication_buffer = new char[communication_buffer_len];
+        jobject buffer = env->NewDirectByteBuffer(communication_buffer, communication_buffer_len);
+        if (!buffer)
+        {
+            fprintf(stderr, "Couldn't allocate %d: too little RAM or JVM JNI doesn't support native memory access?", communication_buffer_len);
             throw "Allocation failed";
         }
         jmethodID bufferSetter = env->GetStaticMethodID(bfbridge, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
@@ -225,7 +229,7 @@ public:
     {
         if (jvm)
         {
-            // Not needed: destroy vm already 
+            // Not needed: destroy vm already
             // env->DeleteLocalRef(bfbridge);
             // ...
             jvm->DestroyJavaVM();
@@ -240,7 +244,8 @@ public:
         env->CallStaticVoidMethod(bfbridge, close, 0);
     }
 
-    std::string bf_get_error() {
+    std::string bf_get_error()
+    {
         jmethodID BFGetErrorLength = env->GetStaticMethodID(bfbridge, "BFGetErrorLength", "()I");
         int len = env->CallStaticIntMethod(bfbridge, BFGetErrorLength);
         std::string err;

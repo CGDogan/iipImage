@@ -253,7 +253,7 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
         throw file_error("Error while getting bits per pixel: " + std::string(err));
     }
 
-#define too_big (tile_width * tile_height * bytespc_internal * bfi.bf_get_rgb_channel_count() > bfi.bftools_get_communication_buffer_size())
+#define too_big (tile_width * tile_height * bytespc_internal * bfi.bf_get_rgb_channel_count() > bfi.communication_buffer_len)
     while (too_big)
     {
         tile_height >>= 1;
