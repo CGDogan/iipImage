@@ -248,7 +248,8 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     delete[] options;
 
     bfbridge = (jclass)env->NewGlobalRef(bfbridge_local);
-    env->DeleteLocalRef(bfbridge_local);
+    printf(stderr, "bfbridge %p\n", bfbridge);
+    //env->DeleteLocalRef(bfbridge_local);
 
     // Allow 2048*2048 four channels of 16 bits
     communication_buffer = new char[communication_buffer_len];
@@ -329,14 +330,14 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   int bf_is_compatible(std::string filepath)
   {
-    fprintf(stderr, "goingbf_is_compatible-1 %p ", (void *)bfbridge);
+    fprintf(stderr, "goingbf_is_compatible-1 %p\n ", (void *)bfbridge);
     //bfbridge = env->FindClass("org/camicroscope/BFBridge");
-    fprintf(stderr, "goingbf_is_compatible0 %p ", (void *)bfbridge);
+    fprintf(stderr, "goingbf_is_compatible0 %p\n ", (void *)bfbridge);
     //bfbridge = env->FindClass("org/camicroscope/BFBridge");
-    fprintf(stderr, "goingbf_is_compatible0.5 %p ", (void *)bfbridge);
+    fprintf(stderr, "goingbf_is_compatible0.5 %pcalling static method id\n ", (void *)bfbridge);
 
     jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
-    fprintf(stderr, "goingbf_is_compatible1");
+    fprintf(stderr, "goingbf_is_compatible1 called static method id\n");
     int len = filepath.length();
     memcpy(communication_buffer, filepath.c_str(), len);
     fprintf(stderr, "goingbf_is_compatible2");
