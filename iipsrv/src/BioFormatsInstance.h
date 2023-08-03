@@ -171,8 +171,12 @@ public:
         vm_args.nOptions = 1;
         vm_args.ignoreUnrecognized = false;
         JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
-        delete[] options;
         bfbridge = env->FindClass("org.camicroscope.BFBridge");
+        if (!bfbridge) {
+            fprintf(stderr, "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n", options[0].optionString);
+            throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + std::to_string(options[0].optionString);
+        }
+        delete[] options;
         // Allow 2048*2048 four channels of 16 bits
         communication_buffer = new char[33554432];
         jobject buffer = env->NewDirectByteBuffer(communication_buffer, 33554432);
