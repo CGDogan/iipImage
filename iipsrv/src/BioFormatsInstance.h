@@ -180,12 +180,15 @@ public:
 #define BFBRIDGE_STRINGARG(s) #s
 #define BFBRIDGE_STRINGVALUE(s) BFBRIDGE_STRINGARG(s)
 
-        char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/*:" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/formats-api-6.13.0.jar";
-        fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg);
+        std::string cp = BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH);
+        std::string path_arg = "-Djava.class.path=" + cp + "/*:" + cp;
+
+        /*char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":"  "/*:" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/formats-api-6.13.0.jar";*/
+        fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg.c_str());
         // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
         char optimize1[] = "-XX:+UseParallelGC";
         //char optimize2[] = "-XX:+UseLargePages"; Not compatible with our linux distro
-        options[0].optionString = path_arg;
+        options[0].optionString = path_arg.c_str();
         options[1].optionString = optimize1;
         //options[2].optionString = optimize2;
         //options[3].optionString = "-verbose:jni";
