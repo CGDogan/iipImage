@@ -312,6 +312,18 @@ public:
         return env->CallStaticIntMethod(bfbridge, BFGetSizeZ);
     }
 
+    int bf_get_size_c()
+    {
+        jmethodID BFGetSizeC = env->GetStaticMethodID(bfbridge, "BFGetSizeC", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetSizeC);
+    }
+
+    int bf_get_size_t()
+    {
+        jmethodID BFGetSizeT = env->GetStaticMethodID(bfbridge, "BFGetSizeT", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetSizeT);
+    }
+
     int bf_get_effective_size_c()
     {
         jmethodID BFGetEffectiveSizeC = env->GetStaticMethodID(bfbridge, "BFGetEffectiveSizeC", "()I");
