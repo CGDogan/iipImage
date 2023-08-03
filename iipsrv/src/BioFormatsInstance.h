@@ -284,7 +284,9 @@ public:
 
     int bf_is_compatible(std::string filepath)
     {
-        fprintf(stderr, "goingbf_is_compatible0");
+        fprintf(stderr, "goingbf_is_compatible-10 \n");
+        bfbridge = env->FindClass("org/camicroscope/BFBridge");
+        fprintf(stderr, "goingbf_is_compatible0 %p ", (void*)bfbridge);
         jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
         fprintf(stderr, "goingbf_is_compatible1");
         int len = filepath.length();
