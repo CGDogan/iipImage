@@ -188,7 +188,7 @@ public:
         // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
         char optimize1[] = "-XX:+UseParallelGC";
         //char optimize2[] = "-XX:+UseLargePages"; Not compatible with our linux distro
-        options[0].optionString = path_arg.c_str();
+        options[0].optionString = (char*) path_arg.c_str();
         options[1].optionString = optimize1;
         //options[2].optionString = optimize2;
         //options[3].optionString = "-verbose:jni";
