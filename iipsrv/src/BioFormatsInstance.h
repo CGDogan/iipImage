@@ -333,7 +333,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     fprintf(stderr, "goingbf_is_compatible-1 %p\n ", (void *)bfbridge);
     //bfbridge = env->FindClass("org/camicroscope/BFBridge");
     fprintf(stderr, "goingbf_is_compatible0 %p\n ", (void *)bfbridge);
-    //bfbridge = env->FindClass("org/camicroscope/BFBridge");
+    bfbridge = env->FindClass("org/camicroscope/BFBridge");
     fprintf(stderr, "goingbf_is_compatible0.5 %pcalling static method id\n ", (void *)bfbridge);
 
     jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
