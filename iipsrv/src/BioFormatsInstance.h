@@ -166,7 +166,8 @@ public:
         JavaVMInitArgs vm_args;
         vm_args.version = JNI_VERSION_20;
         JavaVMOption *options = new JavaVMOption[1];
-        options[0].optionString = "-Djava.class.path=/usr/lib/java";
+        char path_arg[] = "-Djava.class.path=/usr/lib/java";
+        options[0].optionString = path_arg;
         vm_args.options = options;
         vm_args.nOptions = 1;
         vm_args.ignoreUnrecognized = false;
@@ -290,7 +291,7 @@ public:
     int bf_get_series_count()
     {
         jmethodID BFGetSeriesCount = env->GetStaticMethodID(bfbridge, "BFGetSeriesCount", "()I");
-        return env->CallStaticIntMethod(bfbridge, BFGetSeriesCount, ser);
+        return env->CallStaticIntMethod(bfbridge, BFGetSeriesCount);
     }
 
     int bf_get_size_x()
@@ -302,7 +303,7 @@ public:
     int bf_get_size_y()
     {
         jmethodID BFGetSizeY = env->GetStaticMethodID(bfbridge, "BFGetSizeY", "()I");
-        return env->CallStaticIntMethod(bfbridge, BFGetSizeX);
+        return env->CallStaticIntMethod(bfbridge, BFGetSizeY);
     }
 
     int bf_get_size_z()
