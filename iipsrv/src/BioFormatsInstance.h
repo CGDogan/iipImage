@@ -187,7 +187,8 @@ public:
         // For some reason unlike the -cp arg, .../* does not work
         // so we need to list every jar file
         // https://en.cppreference.com/w/cpp/filesystem/directory_iterator
-        for (auto const &dir_entry : std::filesystem::directory_iterator{sandbox})
+        const std::filesystem::path cp_path{cp};
+        for (auto const &dir_entry : std::filesystem::directory_iterator{cp_path})
         {
           cerr << dir_entry.path() << '\n';
         }
