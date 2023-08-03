@@ -102,7 +102,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 #ifdef DEBUG_OSI
     logfile << "BioFormatsImage :: loadImageInfo()" << endl;
 
-    if (!)
+    if (!gi.jvm)
     {
         logfile << "Graal_thread not initialized" << endl;
         throw file_error("Graal_thread not initialized");
@@ -573,7 +573,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     timer.start();
 #endif
 
-    /*if (!)
+    /*if (!gi.jvm)
     {
         // TODO: should we check if file really opened here?
         // currently, we're checking if graal initialized only
