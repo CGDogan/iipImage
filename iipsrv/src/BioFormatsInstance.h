@@ -7,7 +7,8 @@
 
 #include <vector>
 #include <string>
-#include <stdio.h>
+#include <cstdio>
+#include <cstdio>
 #include <jni.h>
 
 /*
