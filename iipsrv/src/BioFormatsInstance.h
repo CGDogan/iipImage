@@ -284,6 +284,7 @@ public:
 
     int bf_is_compatible(std::string filepath)
     {
+        fprintf(stderr, "goingbf_is_compatible0");
         jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
         fprintf(stderr, "goingbf_is_compatible1");
         int len = filepath.length();
