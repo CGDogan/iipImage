@@ -333,15 +333,17 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     fprintf(stderr, "goingbf_is_compatible-1 %p\n ", (void *)bfbridge);
     //bfbridge = env->FindClass("org/camicroscope/BFBridge");
     fprintf(stderr, "goingbf_is_compatible0 %p\n ", (void *)bfbridge);
-    bfbridge = env->FindClass("org/camicroscope/BFBridge");
+    jclass bfbridge2 = env->FindClass("org/camicroscope/BFBridge");
     fprintf(stderr, "goingbf_is_compatible0.5 %pcalling static method id\n ", (void *)bfbridge);
 
-    jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
+    jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge2, "BFIsCompatible", "(I)I");
     fprintf(stderr, "goingbf_is_compatible1 called static method id\n");
     int len = filepath.length();
     memcpy(communication_buffer, filepath.c_str(), len);
     fprintf(stderr, "goingbf_is_compatible2");
-    return env->CallStaticIntMethod(bfbridge, BFIsCompatible, len);
+    int x = env->CallStaticIntMethod(bfbridge, BFIsCompatible, len);
+    fprintf(stderr, "goingbf_is_compatible3");
+    return x;
   }
 
   int bf_open(std::string filepath)
