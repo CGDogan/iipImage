@@ -7,97 +7,394 @@
 
 #include <vector>
 #include <string>
-#include <graal_isolate.h>
-#include <libbfbridge.h>
 #include <stdio.h>
+#include <jni.h>
+
+/*
+Memory management
+helpful webpages https://stackoverflow.com/questions/2093112
+https://stackoverflow.com/questions/10617735
+Especially https://stackoverflow.com/a/13940735
+Receiving objects gives us local references, which would normally be freed
+when we return from the current function, but we don't return to Java,
+C++ is our main code, so for us there's no difference between local references
+and global references. Global references are the ones that won't be freed
+when returning.
+
+For simplicity don't use jstring but use our common communication_buffer
+*/
 
 class BioFormatsInstance
 {
 public:
-    graal_isolatethread_t *graal_thread = NULL;
-    char *receive_buffer = NULL;
+    // TODO make some of these private
+    JavaVM *jvm;
+    JNIEnv *env;
+    char *communication_buffer;
+
+    // javap (-s) (-p) org.camicroscope.BFBridge
+    /*
+  static void BFSetCommunicationBuffer(java.nio.ByteBuffer);
+    descriptor: (Ljava/nio/ByteBuffer;)V
+  static void BFReset();
+    descriptor: ()V
+  static int BFGetErrorLength();
+    descriptor: ()I
+  static int BFIsCompatible(int);
+    descriptor: (I)I
+  static int BFOpen(int);
+    descriptor: (I)I
+  static int BFIsSingleFile(int);
+    descriptor: (I)I
+  static int BFGetUsedFiles();
+    descriptor: ()I
+  static int BFGetCurrentFile();
+    descriptor: ()I
+  static int BFClose();
+    descriptor: ()I
+  static int BFGetResolutionCount();
+    descriptor: ()I
+  static int BFSetCurrentResolution(int);
+    descriptor: (I)I
+  static int BFSetSeries(int);
+    descriptor: (I)I
+  static int BFGetSeriesCount();
+    descriptor: ()I
+  static int BFGetSizeX();
+    descriptor: ()I
+  static int BFGetSizeY();
+    descriptor: ()I
+  static int BFGetSizeZ();
+    descriptor: ()I
+  static int BFGetSizeT();
+    descriptor: ()I
+  static int BFGetSizeC();
+    descriptor: ()I
+  static int BFGetEffectiveSizeC();
+    descriptor: ()I
+  static int BFGetOptimalTileWidth();
+    descriptor: ()I
+  static int BFGetOptimalTİleHeight();
+    descriptor: ()I
+  static int BFGetFormat();
+    descriptor: ()I
+  static int BFGetPixelType();
+    descriptor: ()I
+  static int BFGetBitsPerPixel();
+    descriptor: ()I
+  static int BFGetBytesPerPixel();
+    descriptor: ()I
+  static int BFGetRGBChannelCount();
+    descriptor: ()I
+  static int BFGetImageCount();
+    descriptor: ()I
+  static int BFIsRGB();
+    descriptor: ()I
+  static int BFIsInterleaved();
+    descriptor: ()I
+  static int BFIsLittleEndian();
+    descriptor: ()I
+  static int BFIsFalseColor();
+    descriptor: ()I
+  static int BFIsIndexedColor();
+    descriptor: ()I
+  static int BFGetDimensionOrder();
+    descriptor: ()I
+  static int BFIsOrderCertain();
+    descriptor: ()I
+  static int BFOpenBytes(int, int, int, int);
+    descriptor: (IIII)I
+  static double BFGetMPPX();
+    descriptor: ()D
+  static double BFGetMPPY();
+    descriptor: ()D
+  static double BFGetMPPZ();
+    descriptor: ()D
+  static int BFIsAnyFileOpen();
+    descriptor: ()I
+  static int BFToolsShouldGenerate();
+    descriptor: ()I
+  static int BFToolsGenerateSubresolutions(int, int, int);
+    descriptor: (III)I
+*/
+    jclass bfbridge;
+    /*jmethodID BFSetCommunicationBuffer;
+    jmethodID BFReset;
+    jmethodID BFGetErrorLength;
+    jmethodID BFIsCompatible;
+    jmethodID BFOpen;
+    jmethodID BFIsSingleFile;
+    jmethodID BFGetUsedFiles;
+    jmethodID BFGetCurrentFile;
+    jmethodID BFClose;
+    jmethodID BFGetResolutionCount;
+    jmethodID BFSetCurrentResolution;
+    jmethodID BFSetSeries;
+    jmethodID BFGetSeriesCount;
+    jmethodID BFGetSizeX;
+    jmethodID BFGetSizeY;
+    jmethodID BFGetSizeZ;
+    jmethodID BFGetSizeT;
+    jmethodID BFGetSizeC;
+    jmethodID BFGetEffectiveSizeC;
+    jmethodID BFGetOptimalTileWidth;
+    jmethodID BFGetOptimalTİleHeight;
+    jmethodID BFGetFormat;
+    jmethodID BFGetPixelType;
+    jmethodID BFGetBitsPerPixel;
+    jmethodID BFGetBytesPerPixel;
+    jmethodID BFGetRGBChannelCount;
+    jmethodID BFGetImageCount;
+    jmethodID BFIsRGB;
+    jmethodID BFIsInterleaved;
+    jmethodID BFIsLittleEndian;
+    jmethodID BFIsFalseColor;
+    jmethodID BFIsIndexedColor;
+    jmethodID BFGetDimensionOrder;
+    jmethodID BFIsOrderCertain;
+    jmethodID BFOpenBytes;
+    jmethodID BFGetMPPX; // double
+    jmethodID BFGetMPPY; // double
+    jmethodID BFGetMPPZ; // double
+    jmethodID BFIsAnyFileOpen;
+    jmethodID BFToolsShouldGenerate;
+    jmethodID BFToolsGenerateSubresolutions;*/
 
     BioFormatsInstance()
     {
-        graal_isolate_t *graal_isolate;
-        fprintf(stderr, "dddBioFormatsImage.h3: Creating isolate\n");
-        int code = graal_create_isolate(NULL, &graal_isolate, &graal_thread);
-        fprintf(stderr, "dddBioFormatsImage.h3: Created isolate. should be 0: %d\n", code);
-        if (code != 0)
-        {
-            fprintf(stderr, "dddBioFormatsImage.h3: ERROR But with error!\n");
-            throw "graal_create_isolate: " + code;
+        // https://docs.oracle.com/en/java/javase/20/docs/specs/jni/invocation.html
+        JavaVMInitArgs vm_args;
+        vm_args.version = JNI_VERSION_20;
+        JavaVMOption *options = new JavaVMOption[1];
+        options[0].optionString = "-Djava.class.path=/usr/lib/java";
+        vm_args.options = options;
+        vm_args.nOptions = 1;
+        vm_args.ignoreUnrecognized = false;
+        JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
+        delete[] options;
+        bfbridge = env->FindClass("org.camicroscope.BFBridge");
+        // Allow 2048*2048 four channels of 16 bits
+        communication_buffer = new char[33554432];
+        jobject buffer = env->NewDirectByteBuffer(communication_buffer, 33554432);
+        if (!buffer) {
+            fprintf(stderr, "Couldn't allocate 33554432: too little RAM or JVM JNI doesn't support native memory access?");
+            throw "Allocation failed";
         }
-        fprintf(stderr, "getting receive buffer\n");
-
-        receive_buffer = bf_get_communication_buffer(graal_thread);
-        fprintf(stderr, "got.\n");
-
-        if (bf_test(graal_thread) < 0)
-        {
-            fprintf(stderr, "isolate initialization got fatal error %s", bf_get_error(graal_thread));
-            throw "isolate initialization got fatal error" + std::string(bf_get_error(graal_thread));
-        }
-        fprintf(stderr, "bf_test complete.\n");
-
-        // Do last part of bf_test
-        for (int i = 0; i < 10; i++)
-        {
-            if (receive_buffer[i] != i) {
-                fprintf(stderr, "system's graal implementation requires querying from error buffer every time instead of using the same buffer. unimplemented: IIPSrv doesn't have this mode implemented. Please call bf_get_communication_buffer to update the pointer before every read from receive_buffer\n");
-                throw "See the note in Isolate.h about unimplemented";
-            }
-        }
-        fprintf(stderr, "buffer check complete.\n");
-
-        bf_initialize(graal_thread);
-        fprintf(stderr, "initialized.\n");
+        jmethodID bufferSetter = env->GetStaticMethodID(bfbridge, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
+        env->CallStaticVoidMethod(bfbridge, bufferSetter, buffer);
+        env->DeleteLocalRef(buffer);
     }
 
     // If we allow copy, the previous one might be destroyed then it'll call
-    // graal_tear_down_isolate but while sharing a pointer with the new one
+    // destroy VM but while sharing a pointer with the new one
     // so the new one will be broken as well, so use std::move
     // https://www.codementor.io/@sandesh87/the-rule-of-five-in-c-1pdgpzb04f
     // https://en.cppreference.com/w/cpp/language/rule_of_three
     // The alternative is reference counting
     // https://ps.uci.edu/~cyu/p231C/LectureNotes/lecture13:referenceCounting/lecture13.pdf
+    // Or the simplest way would be to use a pointer to BioFormatsInstance and never use it directly. Pointers are easier to move manually
     // count, in an int*, the number of copies and deallocate when reach 0
     BioFormatsInstance(const BioFormatsInstance &) = delete;
     /*BioFormatsInstance(BioFormatsInstance &&) = default;*/
     BioFormatsInstance(BioFormatsInstance &&other)
     {
-        graal_thread = other.graal_thread;
-        receive_buffer = other.receive_buffer;
-        other.graal_thread = NULL;
+        jvm = other.jvm;
+        communication_buffer = other.communication_buffer;
+        other.jvm = NULL;
     }
-     BioFormatsInstance & operator=(const BioFormatsInstance &) = delete;
+    BioFormatsInstance &operator=(const BioFormatsInstance &) = delete;
     /*BioFormatsInstance &operator=(BioFormatsInstance &&) = default;*/
     // We cant use these two default ones because std::move still keeps
-    // the previous object so it calls the destructor
-    // Our isolate destructor frees if graal thread null.
-    // therefore movings of default is not enough, it should set null for previous,
-    // so that the new one will have a non-destroyed graal.
-     BioFormatsInstance &operator=(BioFormatsInstance && other)
-     {
-        graal_thread = other.graal_thread;
-        receive_buffer = other.receive_buffer;
-        other.graal_thread = NULL;
+    // the previous object so it calls the destructor.
+    // the previous one cannot call destructor now; set its jvm pointer to null
+    // so that it can't break the new class.
+    BioFormatsInstance &operator=(BioFormatsInstance &&other)
+    {
+        jvm = other.jvm;
+        communication_buffer = other.communication_buffer;
+        other.jvm = NULL;
         return *this;
-     }
+    }
 
     ~BioFormatsInstance()
     {
-        if (graal_thread)
+        if (jvm)
         {
-            bf_reset(graal_thread);
-            // TODO: do tear me down
-            graal_tear_down_isolate(graal_thread);
+            // Not needed: destroy vm already 
+            // env->DeleteLocalRef(bfbridge);
+            // ...
+            jvm->DestroyJavaVM();
+            delete[] communication_buffer;
         }
     }
 
     // changed ownership
-    void refresh() {
-        bf_close(graal_thread, 0);
+    void refresh()
+    {
+        jmethodID close = env->GetStaticMethodID(bfbridge, "BFClose", "()I");
+        env->CallStaticVoidMethod(bfbridge, close, 0);
+    }
+
+    std::string bf_get_error() {
+        jmethodID BFGetErrorLength = env->GetStaticMethodID(bfbridge, "BFGetErrorLength", "()I");
+        int len = env->CallStaticIntMethod(bfbridge, BFGetErrorLength);
+        std::string err;
+        err.assign(communication_buffer, len);
+        return err;
+    }
+
+    int bf_is_compatible(std::string filepath)
+    {
+        jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
+        int len = filepath.length();
+        memcpy(communication_buffer, filepath.c_str(), len);
+        return env->CallStaticIntMethod(bfbridge, BFIsCompatible, len);
+    }
+
+    int bf_open(std::string filepath)
+    {
+        jmethodID BFOpen = env->GetStaticMethodID(bfbridge, "BFOpen", "(I)I");
+        int len = filepath.length();
+        memcpy(communication_buffer, filepath.c_str(), len);
+        return env->CallStaticIntMethod(bfbridge, BFOpen, len);
+    }
+
+    int bf_close()
+    {
+        jmethodID BFClose = env->GetStaticMethodID(bfbridge, "BFClose", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFClose);
+    }
+
+    int bf_get_resolution_count()
+    {
+        jmethodID BFGetResolutionCount = env->GetStaticMethodID(bfbridge, "BFGetResolutionCount", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetResolutionCount);
+    }
+
+    int bf_set_current_resolution(int res)
+    {
+        jmethodID BFSetResolutionCount = env->GetStaticMethodID(bfbridge, "BFSetResolutionCount", "(I)I");
+        return env->CallStaticIntMethod(bfbridge, BFSetResolutionCount, res);
+    }
+
+    int bf_set_series(int ser)
+    {
+        jmethodID BFSetSeries = env->GetStaticMethodID(bfbridge, "BFSetSeries", "(I)I");
+        return env->CallStaticIntMethod(bfbridge, BFSetSeries, ser);
+    }
+
+    int bf_get_series_count()
+    {
+        jmethodID BFGetSeriesCount = env->GetStaticMethodID(bfbridge, "BFGetSeriesCount", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetSeriesCount, ser);
+    }
+
+    int bf_get_size_x()
+    {
+        jmethodID BFGetSizeX = env->GetStaticMethodID(bfbridge, "BFGetSizeX", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetSizeX);
+    }
+
+    int bf_get_size_y()
+    {
+        jmethodID BFGetSizeY = env->GetStaticMethodID(bfbridge, "BFGetSizeY", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetSizeX);
+    }
+
+    int bf_get_size_z()
+    {
+        jmethodID BFGetSizeZ = env->GetStaticMethodID(bfbridge, "BFGetSizeZ", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetSizeZ);
+    }
+
+    int bf_get_effective_size_c()
+    {
+        jmethodID BFGetEffectiveSizeC = env->GetStaticMethodID(bfbridge, "BFGetEffectiveSizeC", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetEffectiveSizeC);
+    }
+
+    int bf_get_optimal_tile_width()
+    {
+        jmethodID BFGetOptimalTileWidth = env->GetStaticMethodID(bfbridge, "BFGetOptimalTileWidth", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetOptimalTileWidth);
+    }
+
+    int bf_get_optimal_tile_height()
+    {
+        jmethodID BFGetOptimalTileHeight = env->GetStaticMethodID(bfbridge, "BFGetOptimalTileHeight", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetOptimalTileHeight);
+    }
+
+    int bf_get_pixel_type()
+    {
+        jmethodID BFGetPixelType = env->GetStaticMethodID(bfbridge, "BFGetPixelType", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetPixelType);
+    }
+
+    int bf_get_bytes_per_pixel()
+    {
+        jmethodID BFGetBytesPerPixel = env->GetStaticMethodID(bfbridge, "BFGetBytesPerPixel", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetBytesPerPixel);
+    }
+
+    int bf_get_rgb_channel_count()
+    {
+        jmethodID BFGetRGBChannelCount = env->GetStaticMethodID(bfbridge, "BFGetRGBChannelCount", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetRGBChannelCount);
+    }
+
+    int bf_get_image_count()
+    {
+        jmethodID BFGetImageCount = env->GetStaticMethodID(bfbridge, "BFGetImageCount", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetImageCount);
+    }
+
+    int bf_is_rgb()
+    {
+        jmethodID BFIsRGB = env->GetStaticMethodID(bfbridge, "BFIsRGB", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFIsRGB);
+    }
+
+    int bf_is_interleaved()
+    {
+        jmethodID BFIsInterleaved = env->GetStaticMethodID(bfbridge, "BFIsInterleaved", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFIsInterleaved);
+    }
+
+    int bf_is_little_endian()
+    {
+        jmethodID BFIsLittleEndian = env->GetStaticMethodID(bfbridge, "BFIsLittleEndian", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFIsLittleEndian);
+    }
+
+    int bf_is_false_color()
+    {
+        jmethodID BFIsFalseColor = env->GetStaticMethodID(bfbridge, "BFIsFalseColor", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFIsFalseColor);
+    }
+
+    int bf_is_indexed_color()
+    {
+        jmethodID BFIsIndexedColor = env->GetStaticMethodID(bfbridge, "BFIsIndexedColor", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFIsIndexedColor);
+    }
+
+    int bf_get_dimension_order()
+    {
+        jmethodID BFGetDimensionOrder = env->GetStaticMethodID(bfbridge, "BFGetDimensionOrder", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFGetDimensionOrder);
+    }
+
+    int bf_is_order_certain()
+    {
+        jmethodID BFIsOrderCertain = env->GetStaticMethodID(bfbridge, "BFIsOrderCertain", "()I");
+        return env->CallStaticIntMethod(bfbridge, BFIsOrderCertain);
+    }
+
+    int bf_open_bytes(int x, int y, int w, int h)
+    {
+        jmethodID BFOpenBytes = env->GetStaticMethodID(bfbridge, "BFOpenBytes", "(IIII)I");
+        return env->CallStaticIntMethod(bfbridge, BFOpenBytes, x, y, w, h);
     }
 };
 
