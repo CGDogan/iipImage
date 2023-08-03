@@ -179,8 +179,8 @@ public:
 #define BFBRIDGE_STRINGARG(s) #s
 #define BFBRIDGE_STRINGVALUE(s) BFBRIDGE_STRINGARG(s)
 
-        char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/BfBridge.jar"; //"-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/*";
-            fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg);
+        char path_arg[] =/* "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/BfBridge.jar"; */"-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/*";
+        fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg);
         // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
         char optimize1[] = "-XX:+UseParallelGC";
         //char optimize2[] = "-XX:+UseLargePages"; Not compatible with our linux distro
@@ -197,7 +197,7 @@ public:
           fprintf(stderr, "couldn't create jvm with code %d on https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes\n", code);
           throw "jvm failed";
         }
-        bfbridge = env->FindClass("org.camicroscope.BFBridge");
+        bfbridge = env->FindClass("org/camicroscope/BFBridge");
         if (!bfbridge)
         {
             fprintf(stderr, "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n", options[0].optionString);
