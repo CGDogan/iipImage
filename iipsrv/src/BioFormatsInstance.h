@@ -198,7 +198,7 @@ public:
         struct dirent * cp_dirent;
         while ((cp_dirent = readdir(cp_dir)) != NULL)
         {
-          path_arg += ":" + std::string(dirent->d_name);
+          path_arg += ":" + std::string(cp_dirent->d_name);
         }
         closedir(cp_dir);
 
