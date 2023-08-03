@@ -248,7 +248,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     delete[] options;
 
     bfbridge = (jclass)env->NewGlobalRef(bfbridge_local);
-    fprintf(stderr, "bfbridge %p\n", bfbridge);
+    printf(stderr, "bfbridge %p\n", bfbridge);
     //env->DeleteLocalRef(bfbridge_local);
 
     // Allow 2048*2048 four channels of 16 bits
