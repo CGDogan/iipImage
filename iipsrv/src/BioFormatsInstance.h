@@ -307,8 +307,9 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   // changed ownership
   void refresh()
   {
+    fprintf(stderr, "calling refresh\n");
     jmethodID close = env->GetStaticMethodID(bfbridge, "BFClose", "()I");
-    env->CallStaticVoidMethod(bfbridge, close, 0);
+    env->CallStaticVoidMethod(bfbridge, close);
   }
 
   std::string bf_get_error()
