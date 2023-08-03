@@ -285,8 +285,10 @@ public:
     int bf_is_compatible(std::string filepath)
     {
         jmethodID BFIsCompatible = env->GetStaticMethodID(bfbridge, "BFIsCompatible", "(I)I");
+        fprintf(stderr, "goingbf_is_compatible1");
         int len = filepath.length();
         memcpy(communication_buffer, filepath.c_str(), len);
+        fprintf(stderr, "goingbf_is_compatible2");
         return env->CallStaticIntMethod(bfbridge, BFIsCompatible, len);
     }
 
