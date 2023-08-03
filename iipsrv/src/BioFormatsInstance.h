@@ -242,6 +242,7 @@ public:
     BioFormatsInstance(BioFormatsInstance &&other)
     {
         jvm = other.jvm;
+        env = other.env;
         communication_buffer = other.communication_buffer;
         other.jvm = NULL;
     }
@@ -254,6 +255,7 @@ public:
     BioFormatsInstance &operator=(BioFormatsInstance &&other)
     {
         jvm = other.jvm;
+        env = other.env;
         communication_buffer = other.communication_buffer;
         other.jvm = NULL;
         return *this;
