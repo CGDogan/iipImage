@@ -20,9 +20,6 @@
 
 #include "Cache.h"
 
-#include <libbfbridge.h>
-#include <graal_isolate.h>
-
 #define throw(a)
 
 class BioFormatsImage : public IIPImage
