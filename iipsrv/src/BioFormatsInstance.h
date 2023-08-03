@@ -180,21 +180,25 @@ public:
 
         char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/*";
         fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg);
-        // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#standard-options-for-java
-
+        // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
         char optimize1[] = "-XX:+UseParallelGC";
-        char optimize2[] = "-XX:+UseLargePages";
+        //char optimize2[] = "-XX:+UseLargePages"; Not compatible with our linux distro
         options[0].optionString = path_arg;
         options[1].optionString = optimize1;
-        options[2].optionString = optimize2;
+        //options[2].optionString = optimize2;
         vm_args.options = options;
-        vm_args.nOptions = 3;
+        vm_args.nOptions = 2; // 3
         vm_args.ignoreUnrecognized = false;
         JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
         bfbridge = env->FindClass("org.camicroscope.BFBridge");
         if (!bfbridge)
         {
             fprintf(stderr, "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n", options[0].optionString);
+            if (env->ExceptionCheck() == 1) {
+              fprintf(stderr, "exception\n");
+            } else
+            fprintf(stderr, "no exception\n");
+
             throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + std::string(options[0].optionString);
         }
         delete[] options;
