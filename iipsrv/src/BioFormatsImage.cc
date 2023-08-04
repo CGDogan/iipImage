@@ -272,7 +272,7 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
     bioformats_heights.clear();
 
     int bioformats_levels = bfi.bf_get_resolution_count();
-    fprintf(stderr, "continue info170: parsing file in bioformatsimage.cc\n");
+    fprintf(stderr, "continue info170: parsing file in bioformatsimage.cc %d\n", bioformats_levels);
 
     if (bioformats_levels <= 0)
     {
@@ -289,6 +289,7 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
     int ww, hh;
     for (int i = 0; i < bioformats_levels; i++)
     {
+        fprintf(stderr, "continue info185: parsing file in bioformatsimage.cc\n");
         bfi.bf_set_current_resolution(i);
         fprintf(stderr, "continue info190: parsing file in bioformatsimage.cc\n");
 
