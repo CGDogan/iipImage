@@ -137,7 +137,10 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     }
     fprintf(stderr, "classloading almost done\n");
     jmethodID bufferSetter = jvm->env->GetMethodID((jclass) bfbridge, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
+    fprintf(stderr, "classloading almost2 done %p\n", bufferSetter);
     jvm->env->CallVoidMethod(bfbridge, bufferSetter, buffer);
+    fprintf(stderr, "classloading almost3 done\n");
+
     jvm->env->DeleteLocalRef(buffer);
     fprintf(stderr, "classloading hopefully done\n");
   }
