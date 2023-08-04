@@ -102,11 +102,6 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 #ifdef DEBUG_OSI
     logfile << "BioFormatsImage :: loadImageInfo()" << endl;
 
-    if (!bfi.jvm)
-    {
-        logfile << "Graal_thread not initialized" << endl;
-        throw file_error("Graal_thread not initialized");
-    }
 #endif
 
     int w = 0, h = 0;
@@ -424,11 +419,9 @@ void BioFormatsImage::closeImage()
     Timer timer;
     timer.start();
 #endif
-    if (bfi.jvm)
-    {
-        fprintf(stderr, "Called bfi.bf_close in BioFormatsImage::closeImage\n");
-        bfi.bf_close();
-    }
+
+    fprintf(stderr, "Called bfi.bf_close in BioFormatsImage::closeImage\n");
+    bfi.bf_close();
 
 #ifdef DEBUG_OSI
     logfile
