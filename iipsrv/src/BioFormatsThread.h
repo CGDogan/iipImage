@@ -9,7 +9,7 @@
 #include <string>
 
 #ifdef _WIN32
-#error BioFormatsThread.h uses dirent.h for listing directory contents, we don't have Windows equivalent code yet
+#error BioFormatsThread.h uses dirent.h for listing directory contents, we do not have equivalent Windows code yet
 #endif
 #include <dirent.h>
 
@@ -98,6 +98,6 @@ public:
     {
         jvm->DestroyJavaVM();
     }
-}
+};
 
 #endif /* BIOFORMATSTHREAD_H */
