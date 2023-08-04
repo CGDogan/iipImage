@@ -209,6 +209,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         // Or maybe this is when we have a RGB plus a grayscale channel?
         logfile << "Unimplemented: currently noninterleaved works if we have them on the same plane" << endl;
     }
+    fprintf(stderr, "continue info50: parsing file in bioformatsimage.cc\n");
 
     if (bfi.bf_is_indexed_color() && !bfi.bf_is_false_color())
     {
@@ -243,6 +244,7 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
         throw file_error("Unimplemented: bad remainder when diving bits per pixel among channels. bfi.bf_get_bits_per_pixel(): " + std::to_string(bfi.bf_get_bits_per_pixel()) + " channels: " + std::to_string(channels));
     }
     */
+    fprintf(stderr, "continue info100: parsing file in bioformatsimage.cc\n");
 
     if (bytespc_internal <= 0)
     {
