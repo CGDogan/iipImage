@@ -22,8 +22,8 @@ Especially https://stackoverflow.com/a/13940735
 Receiving objects gives us local references, which would normally be freed
 when we return from the current function, but we don't return to Java,
 C++ is our main code, so for us there's no difference between local references
-and global references. Global references are the ones that won't be freed
-when returning. Nevertheless use global references for stylistic correctness.
+and global references. Global references are normally the ones that won't be freed
+on return. Nevertheless use global references for stylistic correctness.
 
 For simplicity don't use jstring but use our common communication_buffer
 */
@@ -62,7 +62,7 @@ public:
     }
     fprintf(stderr, "classloading almost done %d should be 0\n", (int)jvm->env->ExceptionCheck());
     /*
-    How we would do without precaching methods:
+    How we would do if we hadn't been caching methods beforehand: This way:
     jmethodID BFSetCommunicationBuffer =
       jvm->env->GetMethodID(jvm->bfbridge_base, "BFSetCommunicationBuffer",
       "(Ljava/nio/ByteBuffer;)V"
@@ -128,16 +128,13 @@ public:
   void refresh()
   {
     fprintf(stderr, "calling refresh\n");
-    jmethodID BFClose = jvm->env->GetMethodID(jvm->bfbridge_base, "BFClose", "()I");
-    fprintf(stderr, "mid called refresh\n");
-    jvm->env->CallVoidMethod(bfbridge, BFClose);
+    jvm->env->CallVoidMethod(bfbridge, jvm->BFClose);
     fprintf(stderr, "called refresh\n");
   }
 
   std::string bf_get_error()
   {
-    jmethodID BFGetErrorLength = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetErrorLength", "()I");
-    int len = jvm->env->CallIntMethod(bfbridge, BFGetErrorLength);
+    int len = jvm->env->CallIntMethod(bfbridge, jvm->BFGetErrorLength);
     std::string err;
     err.assign(communication_buffer, len);
     return err;
@@ -146,160 +143,133 @@ public:
   int bf_is_compatible(std::string filepath)
   {
     fprintf(stderr, "calling is compatible %s\n", filepath.c_str());
-    jmethodID BFIsCompatible = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsCompatible", "(I)I");
     int len = filepath.length();
     memcpy(communication_buffer, filepath.c_str(), len);
     fprintf(stderr, "called is compatible\n");
-    return jvm->env->CallIntMethod(bfbridge, BFIsCompatible, len);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFIsCompatible, len);
   }
 
   int bf_open(std::string filepath)
   {
-
-    jmethodID BFOpen = jvm->env->GetMethodID(jvm->bfbridge_base, "BFOpen", "(I)I");
     int len = filepath.length();
     memcpy(communication_buffer, filepath.c_str(), len);
-    return jvm->env->CallIntMethod(bfbridge, BFOpen, len);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFOpen, len);
   }
 
   int bf_close()
   {
-
-    jmethodID BFClose = jvm->env->GetMethodID(jvm->bfbridge_base, "BFClose", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFClose);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFClose);
   }
 
   int bf_get_resolution_count()
   {
-    jmethodID BFGetResolutionCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetResolutionCount", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetResolutionCount);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetResolutionCount);
   }
 
   int bf_set_current_resolution(int res)
   {
-    jmethodID BFSetResolutionCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFSetCurrentResolution", "(I)I");
-    return jvm->env->CallIntMethod(bfbridge, BFSetResolutionCount, res);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFSetResolutionCount, res);
   }
 
   int bf_set_series(int ser)
   {
-    jmethodID BFSetSeries = jvm->env->GetMethodID(jvm->bfbridge_base, "BFSetSeries", "(I)I");
-    return jvm->env->CallIntMethod(bfbridge, BFSetSeries, ser);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFSetSeries, ser);
   }
 
   int bf_get_series_count()
   {
-    jmethodID BFGetSeriesCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSeriesCount", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetSeriesCount);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetSeriesCount);
   }
 
   int bf_get_size_x()
   {
-    jmethodID BFGetSizeX = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeX", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetSizeX);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetSizeX);
   }
 
   int bf_get_size_y()
   {
-    jmethodID BFGetSizeY = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeY", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetSizeY);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetSizeY);
   }
 
   int bf_get_size_z()
   {
-    jmethodID BFGetSizeZ = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeZ", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetSizeZ);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetSizeZ);
   }
 
   int bf_get_size_c()
   {
-    jmethodID BFGetSizeC = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeC", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetSizeC);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetSizeC);
   }
 
   int bf_get_size_t()
   {
-    jmethodID BFGetSizeT = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeT", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetSizeT);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetSizeT);
   }
 
   int bf_get_effective_size_c()
   {
-    jmethodID BFGetEffectiveSizeC = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetEffectiveSizeC", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetEffectiveSizeC);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetEffectiveSizeC);
   }
 
   int bf_get_optimal_tile_width()
   {
-    jmethodID BFGetOptimalTileWidth = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetOptimalTileWidth", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetOptimalTileWidth);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetOptimalTileWidth);
   }
 
   int bf_get_optimal_tile_height()
   {
-    jmethodID BFGetOptimalTileHeight = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetOptimalTileHeight", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetOptimalTileHeight);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetOptimalTileHeight);
   }
 
   int bf_get_pixel_type()
   {
-    jmethodID BFGetPixelType = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetPixelType", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetPixelType);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetPixelType);
   }
 
   int bf_get_bytes_per_pixel()
   {
-    jmethodID BFGetBytesPerPixel = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetBytesPerPixel", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetBytesPerPixel);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetBytesPerPixel);
   }
 
   int bf_get_rgb_channel_count()
   {
-    jmethodID BFGetRGBChannelCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetRGBChannelCount", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetRGBChannelCount);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetRGBChannelCount);
   }
 
   int bf_get_image_count()
   {
-    jmethodID BFGetImageCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetImageCount", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFGetImageCount);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFGetImageCount);
   }
 
   int bf_is_rgb()
   {
-    jmethodID BFIsRGB = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsRGB", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFIsRGB);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFIsRGB);
   }
 
   int bf_is_interleaved()
   {
-    jmethodID BFIsInterleaved = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsInterleaved", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFIsInterleaved);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFIsInterleaved);
   }
 
   int bf_is_little_endian()
   {
-    jmethodID BFIsLittleEndian = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsLittleEndian", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFIsLittleEndian);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFIsLittleEndian);
   }
 
   int bf_is_false_color()
   {
-    jmethodID BFIsFalseColor = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsFalseColor", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFIsFalseColor);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFIsFalseColor);
   }
 
   int bf_is_indexed_color()
   {
-    jmethodID BFIsIndexedColor = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsIndexedColor", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFIsIndexedColor);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFIsIndexedColor);
   }
 
   // Returns char* to communication_buffer that will later be overwritten
   char *bf_get_dimension_order()
   {
-    jmethodID BFGetDimensionOrder = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetDimensionOrder", "()I");
-    int len = jvm->env->CallIntMethod(bfbridge, BFGetDimensionOrder);
+    int len = jvm->env->CallIntMethod(bfbridge, jvm->BFGetDimensionOrder);
     if (len < 0)
     {
       return NULL;
@@ -312,14 +282,12 @@ public:
 
   int bf_is_order_certain()
   {
-    jmethodID BFIsOrderCertain = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsOrderCertain", "()I");
-    return jvm->env->CallIntMethod(bfbridge, BFIsOrderCertain);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFIsOrderCertain);
   }
 
   int bf_open_bytes(int x, int y, int w, int h)
   {
-    jmethodID BFOpenBytes = jvm->env->GetMethodID(jvm->bfbridge_base, "BFOpenBytes", "(IIII)I");
-    return jvm->env->CallIntMethod(bfbridge, BFOpenBytes, x, y, w, h);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFOpenBytes, x, y, w, h);
   }
 };
 
