@@ -102,7 +102,7 @@ public:
                 env->ExceptionDescribe();
             }
 
-            throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + cp.c_str();
+            throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + cp;
         }
 
         constructor = env->GetMethodID(bfbridge_base, "<init>", "()V");
