@@ -34,7 +34,7 @@ class BioFormatsInstance
 {
 public:
   static std::unique_ptr<BioFormatsThread> jvm;
-  char *communication_buffer;
+  static char *communication_buffer;
 
   // javap (-s) (-p) org.camicroscope.BFBridge
   /*
@@ -213,7 +213,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   {
     // jvm = other.jvm;
     // jvm->env = other.jvm->env;
-    communication_buffer = other.communication_buffer;
+    //communication_buffer = other.communication_buffer;
     // other.jvm = NULL;
   }
   BioFormatsInstance &operator=(const BioFormatsInstance &) = delete;
@@ -226,7 +226,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   {
     /*jvm = other.jvm;
     jvm->env = other.jvm->env;*/
-    communication_buffer = other.communication_buffer;
+    //communication_buffer = other.communication_buffer;
     // other.jvm = NULL;
     return *this;
   }
