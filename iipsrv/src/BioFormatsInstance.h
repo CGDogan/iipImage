@@ -178,7 +178,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
         else
           fprintf(stderr, "no exception\n");
 
-        throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + std::string(options[0].optionString);
+        throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + jvm->cp;
       }
 
       bfbridge = (jclass)env->NewGlobalRef(bfbridge_local);
