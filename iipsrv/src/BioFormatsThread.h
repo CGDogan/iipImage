@@ -23,7 +23,12 @@ class BioFormatsThread
 public:
     JavaVM *jvm;
     JNIEnv *env;
+
+    // Call FindClass just once and store it there
+    // additional calls invalidate this pointer
     jclass bfbridge_base;
+
+
     jmethodID constructor;
 
     BioFormatsThread()
