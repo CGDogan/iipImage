@@ -199,6 +199,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   void refresh()
   {
     fprintf(stderr, "calling refresh\n");
+    bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID close = jvm->env->GetMethodID(bfbridge_base, "BFClose", "()I");
     fprintf(stderr, "mid called refresh\n");
     jvm->env->CallVoidMethod(bfbridge, close);
