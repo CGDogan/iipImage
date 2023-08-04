@@ -72,7 +72,6 @@ public:
         }
         closedir(cp_dir);
 
-        /*char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":"  "/*:" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/formats-api-6.13.0.jar";*/
         fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg.c_str());
         // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
         char optimize1[] = "-XX:+UseParallelGC";
@@ -105,12 +104,17 @@ public:
             throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + cp;
         }
 
+        // We have a class instance, but we need to get method ids
+        // from the base class. Do this for the constructor function.
         constructor = env->GetMethodID(bfbridge_base, "<init>", "()V");
         if (!constructor)
         {
             fprintf(stderr, "couldn't find constructor for BFBridge\n");
             throw "couldn't find constructor for BFBridge\n";
         }
+
+        // Now do the same but in the shorthand form
+        #define prepare_
     }
 
     // iipsrv uses BioFormatsXXX on one thread and copying

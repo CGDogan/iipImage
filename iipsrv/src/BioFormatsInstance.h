@@ -179,7 +179,6 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   void refresh()
   {
     fprintf(stderr, "calling refresh\n");
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID close = jvm->env->GetMethodID(jvm->bfbridge_base, "BFClose", "()I");
     fprintf(stderr, "mid called refresh\n");
     jvm->env->CallVoidMethod(bfbridge, close);
@@ -188,7 +187,6 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   std::string bf_get_error()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetErrorLength = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetErrorLength", "()I");
     int len = jvm->env->CallIntMethod(bfbridge, BFGetErrorLength);
     std::string err;
@@ -199,7 +197,6 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   int bf_is_compatible(std::string filepath)
   {
     fprintf(stderr, "calling is compatible %s\n", filepath.c_str());
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFIsCompatible = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsCompatible", "(I)I");
     int len = filepath.length();
     memcpy(communication_buffer, filepath.c_str(), len);
@@ -209,7 +206,6 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   int bf_open(std::string filepath)
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
 
     jmethodID BFOpen = jvm->env->GetMethodID(jvm->bfbridge_base, "BFOpen", "(I)I");
     int len = filepath.length();
@@ -219,7 +215,6 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   int bf_close()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
 
     jmethodID BFClose = jvm->env->GetMethodID(jvm->bfbridge_base, "BFClose", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFClose);
@@ -227,147 +222,126 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   int bf_get_resolution_count()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetResolutionCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetResolutionCount", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetResolutionCount);
   }
 
   int bf_set_current_resolution(int res)
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFSetResolutionCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFSetCurrentResolution", "(I)I");
     return jvm->env->CallIntMethod(bfbridge, BFSetResolutionCount, res);
   }
 
   int bf_set_series(int ser)
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFSetSeries = jvm->env->GetMethodID(jvm->bfbridge_base, "BFSetSeries", "(I)I");
     return jvm->env->CallIntMethod(bfbridge, BFSetSeries, ser);
   }
 
   int bf_get_series_count()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetSeriesCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSeriesCount", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetSeriesCount);
   }
 
   int bf_get_size_x()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetSizeX = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeX", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetSizeX);
   }
 
   int bf_get_size_y()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetSizeY = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeY", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetSizeY);
   }
 
   int bf_get_size_z()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetSizeZ = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeZ", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetSizeZ);
   }
 
   int bf_get_size_c()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetSizeC = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeC", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetSizeC);
   }
 
   int bf_get_size_t()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetSizeT = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetSizeT", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetSizeT);
   }
 
   int bf_get_effective_size_c()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetEffectiveSizeC = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetEffectiveSizeC", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetEffectiveSizeC);
   }
 
   int bf_get_optimal_tile_width()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetOptimalTileWidth = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetOptimalTileWidth", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetOptimalTileWidth);
   }
 
   int bf_get_optimal_tile_height()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetOptimalTileHeight = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetOptimalTileHeight", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetOptimalTileHeight);
   }
 
   int bf_get_pixel_type()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetPixelType = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetPixelType", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetPixelType);
   }
 
   int bf_get_bytes_per_pixel()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetBytesPerPixel = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetBytesPerPixel", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetBytesPerPixel);
   }
 
   int bf_get_rgb_channel_count()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetRGBChannelCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetRGBChannelCount", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetRGBChannelCount);
   }
 
   int bf_get_image_count()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetImageCount = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetImageCount", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFGetImageCount);
   }
 
   int bf_is_rgb()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFIsRGB = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsRGB", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFIsRGB);
   }
 
   int bf_is_interleaved()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFIsInterleaved = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsInterleaved", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFIsInterleaved);
   }
 
   int bf_is_little_endian()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFIsLittleEndian = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsLittleEndian", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFIsLittleEndian);
   }
 
   int bf_is_false_color()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFIsFalseColor = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsFalseColor", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFIsFalseColor);
   }
 
   int bf_is_indexed_color()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFIsIndexedColor = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsIndexedColor", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFIsIndexedColor);
   }
@@ -375,7 +349,6 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   // Returns char* to communication_buffer that will later be overwritten
   char *bf_get_dimension_order()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFGetDimensionOrder = jvm->env->GetMethodID(jvm->bfbridge_base, "BFGetDimensionOrder", "()I");
     int len = jvm->env->CallIntMethod(bfbridge, BFGetDimensionOrder);
     if (len < 0)
@@ -390,14 +363,12 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   int bf_is_order_certain()
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFIsOrderCertain = jvm->env->GetMethodID(jvm->bfbridge_base, "BFIsOrderCertain", "()I");
     return jvm->env->CallIntMethod(bfbridge, BFIsOrderCertain);
   }
 
   int bf_open_bytes(int x, int y, int w, int h)
   {
-    // jvm->bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
     jmethodID BFOpenBytes = jvm->env->GetMethodID(jvm->bfbridge_base, "BFOpenBytes", "(IIII)I");
     return jvm->env->CallIntMethod(bfbridge, BFOpenBytes, x, y, w, h);
   }
