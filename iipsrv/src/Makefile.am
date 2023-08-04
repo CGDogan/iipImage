@@ -34,6 +34,8 @@ iipsrv_fcgi_SOURCES = \
 			OpenSlideImage.cc \
 			BioFormatsImage.h \
 			BioFormatsImage.cc \
+			BioFormatsInstance.h \
+			BioFormatsInstance.cc \
 			JPEGCompressor.h \
 			JPEGCompressor.cc \
 			RawTile.h \
@@ -44,6 +46,7 @@ iipsrv_fcgi_SOURCES = \
 			Tokenizer.h \
 			IIPResponse.h \
 			IIPResponse.cc \
+			BioFormatsManager.h\
 			BioFormatsManager.cc \
 			View.h \
 			View.cc \
