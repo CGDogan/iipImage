@@ -93,19 +93,19 @@ public:
             throw "jvm failed";
         }
 
-        bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
+        bfbridge_base = env->FindClass("org/camicroscope/BFBridge");
         if (!bfbridge_base)
         {
             fprintf(stderr, "org.camicroscope.BFBridge (or a dependency of it) could not be found; is the jar in %s ?\n", cp.c_str());
-            if (jvm->env->ExceptionCheck() == 1)
+            if (env->ExceptionCheck() == 1)
             {
-                jvm->env->ExceptionDescribe();
+                env->ExceptionDescribe();
             }
 
             throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + cp.c_str();
         }
 
-        constructor = jvm->env->GetMethodID(bfbridge_base, "<init>", "()V");
+        constructor = env->GetMethodID(bfbridge_base, "<init>", "()V");
         if (!constructor)
         {
             fprintf(stderr, "couldn't find constructor for BFBridge\n");
