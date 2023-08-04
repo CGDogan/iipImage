@@ -35,8 +35,8 @@ public:
   const int communication_buffer_len = 33554432;
 
   // TODO make some of these private
-  JavaVM *jvm;
-  JNIEnv *env;
+  static JavaVM *jvm;
+  static JNIEnv *env;
   char *communication_buffer;
 
   // javap (-s) (-p) org.camicroscope.BFBridge
@@ -220,6 +220,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     vm_args.options = options;
     vm_args.nOptions = 2; // 3
     vm_args.ignoreUnrecognized = false;
+    if (!jvm) {
     int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
     if (code < 0)
     {
@@ -231,6 +232,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
       fprintf(stderr, "null env in initialization\n");
       throw "jvm failed";
     }
+    
     jclass bfbridge_local = env->FindClass("org/camicroscope/BFBridge");
     if (!bfbridge_local)
     {
@@ -249,7 +251,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
     bfbridge = (jclass)env->NewGlobalRef(bfbridge_local);
     fprintf(stderr, "bfbridge %p\n", bfbridge);
-    //env->DeleteLocalRef(bfbridge_local);
+    env->DeleteLocalRef(bfbridge_local);
 
     // Allow 2048*2048 four channels of 16 bits
     communication_buffer = new char[communication_buffer_len];
@@ -262,6 +264,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     jmethodID bufferSetter = env->GetStaticMethodID(bfbridge, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
     env->CallStaticVoidMethod(bfbridge, bufferSetter, buffer);
     env->DeleteLocalRef(buffer);
+    }
   }
 
   // If we allow copy, the previous one might be destroyed then it'll call
@@ -277,10 +280,10 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   /*BioFormatsInstance(BioFormatsInstance &&) = default;*/
   BioFormatsInstance(BioFormatsInstance &&other)
   {
-    jvm = other.jvm;
-    env = other.env;
+    //jvm = other.jvm;
+    //env = other.env;
     communication_buffer = other.communication_buffer;
-    other.jvm = NULL;
+    //other.jvm = NULL;
   }
   BioFormatsInstance &operator=(const BioFormatsInstance &) = delete;
   /*BioFormatsInstance &operator=(BioFormatsInstance &&) = default;*/
@@ -290,10 +293,10 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   // so that it can't break the new class.
   BioFormatsInstance &operator=(BioFormatsInstance &&other)
   {
-    jvm = other.jvm;
-    env = other.env;
+    /*jvm = other.jvm;
+    env = other.env;*/
     communication_buffer = other.communication_buffer;
-    other.jvm = NULL;
+    //other.jvm = NULL;
     return *this;
   }
 
@@ -304,8 +307,9 @@ static int BFToolsGenerateSubresolutions(int, int, int);
       // Not needed: destroy vm already
       // env->DeleteGlobalRef(bfbridge);
       // ...
-      jvm->DestroyJavaVM();
-      delete[] communication_buffer;
+      // TODO: fix me
+      /*jvm->DestroyJavaVM();
+      delete[] communication_buffer;*/
     }
   }
 
