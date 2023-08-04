@@ -135,9 +135,11 @@ static int BFToolsGenerateSubresolutions(int, int, int);
       fprintf(stderr, "Couldn't allocate %d: too little RAM or JVM JNI doesn't support native memory access?", bfi_communication_buffer_len);
       throw "Allocation failed";
     }
+    fprintf(stderr, "classloading almost done\n");
     jmethodID bufferSetter = jvm->env->GetMethodID((jclass) bfbridge, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
     jvm->env->CallVoidMethod(bfbridge, bufferSetter, buffer);
     jvm->env->DeleteLocalRef(buffer);
+    fprintf(stderr, "classloading hopefully done\n");
   }
 
   // If we allow copy, the previous one might be destroyed then it'll call
