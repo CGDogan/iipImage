@@ -6,7 +6,7 @@
 #define BIOFORMATSTHREAD_H
 
 #include <jni.h>
-#include <BioFormatsInstance.h>
+#include <string>
 
 #ifdef _WIN32
 #error BioFormatsThread.h uses dirent.h for listing directory contents, we don't have Windows equivalent code yet
@@ -18,12 +18,15 @@ JVM/JNI has a requirement that a thread of ours
 can only create 1 JVM. This can be shared among BioFormatsInstances,
 or we can fork() to use new JVMs.
 */
-class BioFormatsThread {
-    friend class BioFormatsInstance;
+class BioFormatsThread
+{
+public:
     JavaVM *jvm;
     JNIEnv *env;
+    std::string cp;
 
-    BioFormatsThread() {
+    BioFormatsThread()
+    {
         fprintf(stderr, "initializing\n");
         // https://docs.oracle.com/en/java/javase/20/docs/specs/jni/invocation.html
         JavaVMInitArgs vm_args;
@@ -39,7 +42,7 @@ class BioFormatsThread {
 #define BFBRIDGE_STRINGARG(s) #s
 #define BFBRIDGE_STRINGVALUE(s) BFBRIDGE_STRINGARG(s)
 
-        std::string cp = BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH);
+        cp = BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH);
         if (cp.back() != '/')
         {
             cp += "/";
@@ -89,9 +92,10 @@ class BioFormatsThread {
     // won't be helpful, but we might construct a new one on a new thread
     BioFormatsThread(const BioFormatsThread &other) = delete;
     // Copy constructor is also not helpful, initialize JVM from scratch
-    BioFormatsThread& operator=(const BioFormatsThread &other) = delete;
+    BioFormatsThread &operator=(const BioFormatsThread &other) = delete;
 
-    ~BioFormatsThread() {
+    ~BioFormatsThread()
+    {
         jvm->DestroyJavaVM();
     }
 }
