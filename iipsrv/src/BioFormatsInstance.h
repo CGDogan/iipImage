@@ -95,30 +95,10 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   jmethodID BFToolsGenerateSubresolutions;*/
 
   jobject bfbridge;
-  jclass bfbridge_base;
 
   BioFormatsInstance()
   {
-    bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
-    if (!bfbridge_base)
-    {
-      fprintf(stderr, "org.camicroscope.BFBridge (or a dependency of it) could not be found; is the jar in %s ?\n", jvm->cp.c_str());
-      if (jvm->env->ExceptionCheck() == 1)
-      {
-        jvm->env->ExceptionDescribe();
-      }
-
-      throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + jvm->cp;
-    }
-
-    jmethodID constructor = jvm->env->GetMethodID(bfbridge_base, "<init>", "()V");
-    if (!constructor)
-    {
-      fprintf(stderr, "couldn't find constructor for BFBridge\n");
-      throw "couldn't find constructor for BFBridge\n";
-    }
-    jobject bfbridge_local = jvm->env->NewObject(bfbridge_base, constructor);
-
+    jobject bfbridge_local = jvm->env->NewObject(bfbridge_base, jvm->constructor);
     // Needs freeing
     bfbridge = (jobject)jvm->env->NewGlobalRef(bfbridge_local);
     jvm->env->DeleteLocalRef(bfbridge_local);

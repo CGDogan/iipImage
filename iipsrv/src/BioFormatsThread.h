@@ -23,7 +23,8 @@ class BioFormatsThread
 public:
     JavaVM *jvm;
     JNIEnv *env;
-    std::string cp;
+    jclass bfbridge_base;
+    jmethodID constructor;
 
     BioFormatsThread()
     {
@@ -42,7 +43,7 @@ public:
 #define BFBRIDGE_STRINGARG(s) #s
 #define BFBRIDGE_STRINGVALUE(s) BFBRIDGE_STRINGARG(s)
 
-        cp = BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH);
+        std::string cp = BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH);
         if (cp.back() != '/')
         {
             cp += "/";
@@ -85,6 +86,25 @@ public:
         {
             fprintf(stderr, "couldn't create jvm with code %d on https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes\n", code);
             throw "jvm failed";
+        }
+
+        bfbridge_base = jvm->env->FindClass("org/camicroscope/BFBridge");
+        if (!bfbridge_base)
+        {
+            fprintf(stderr, "org.camicroscope.BFBridge (or a dependency of it) could not be found; is the jar in %s ?\n", cp.c_str());
+            if (jvm->env->ExceptionCheck() == 1)
+            {
+                jvm->env->ExceptionDescribe();
+            }
+
+            throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + cp.c_str();
+        }
+
+        constructor = jvm->env->GetMethodID(bfbridge_base, "<init>", "()V");
+        if (!constructor)
+        {
+            fprintf(stderr, "couldn't find constructor for BFBridge\n");
+            throw "couldn't find constructor for BFBridge\n";
         }
     }
 
