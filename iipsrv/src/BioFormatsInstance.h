@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <jni.h>
+#include "BioFormatsThread.h"
 
 /*
 Memory management
@@ -168,7 +169,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
       jclass bfbridge_local = env->FindClass("org/camicroscope/BFBridge");
       if (!bfbridge_local)
       {
-        fprintf(stderr, "org.camicroscope.BFBridge (or a dependency of it) could not be found; is the jar in %s ?\n", options[0].optionString);
+        fprintf(stderr, "org.camicroscope.BFBridge (or a dependency of it) could not be found; is the jar in %s ?\n", jvm->cp.c_str());
         if (env->ExceptionCheck() == 1)
         {
           fprintf(stderr, "exception\n");
