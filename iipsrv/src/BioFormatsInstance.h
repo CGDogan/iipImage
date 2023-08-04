@@ -37,80 +37,23 @@ public:
   static std::unique_ptr<BioFormatsThread> jvm;
   char *communication_buffer;
 
-  // use: javap (-s) (-p) org.camicroscope.BFBridge
-  // after "javac -cp ".:jar_files/*" org/camicroscope/BFBridge.java"
-  // in the bfbridge directory to see param descriptors such as:
-  /*
-static void BFSetCommunicationBuffer(java.nio.ByteBuffer);
-  descriptor: (Ljava/nio/ByteBuffer;)V
-static void BFReset();
-  descriptor: ()V
-static int BFGetErrorLength();
-  descriptor: ()I
-...
-  descriptor: ()I
-static int BFToolsGenerateSubresolutions(int, int, int);
-  descriptor: (III)I
-*/
-  /*jmethodID BFSetCommunicationBuffer;
-  jmethodID BFReset;
-  jmethodID BFGetErrorLength;
-  jmethodID BFIsCompatible;
-  jmethodID BFOpen;
-  jmethodID BFIsSingleFile;
-  jmethodID BFGetUsedFiles;
-  jmethodID BFGetCurrentFile;
-  jmethodID BFClose;
-  jmethodID BFGetResolutionCount;
-  jmethodID BFSetCurrentResolution;
-  jmethodID BFSetSeries;
-  jmethodID BFGetSeriesCount;
-  jmethodID BFGetSizeX;
-  jmethodID BFGetSizeY;
-  jmethodID BFGetSizeZ;
-  jmethodID BFGetSizeT;
-  jmethodID BFGetSizeC;
-  jmethodID BFGetEffectiveSizeC;
-  jmethodID BFGetOptimalTileWidth;
-  jmethodID BFGetOptimalTİleHeight;
-  jmethodID BFGetFormat;
-  jmethodID BFGetPixelType;
-  jmethodID BFGetBitsPerPixel;
-  jmethodID BFGetBytesPerPixel;
-  jmethodID BFGetRGBChannelCount;
-  jmethodID BFGetImageCount;
-  jmethodID BFIsRGB;
-  jmethodID BFIsInterleaved;
-  jmethodID BFIsLittleEndian;
-  jmethodID BFIsFalseColor;
-  jmethodID BFIsIndexedColor;
-  jmethodID BFGetDimensionOrder;
-  jmethodID BFIsOrderCertain;
-  jmethodID BFOpenBytes;
-  jmethodID BFGetMPPX; // double
-  jmethodID BFGetMPPY; // double
-  jmethodID BFGetMPPZ; // double
-  jmethodID BFIsAnyFileOpen;
-  jmethodID BFToolsShouldGenerate;
-  jmethodID BFToolsGenerateSubresolutions;*/
-
   jobject bfbridge;
 
   BioFormatsInstance()
   {
     jobject bfbridge_local = jvm->env->NewObject(jvm->bfbridge_base, jvm->constructor);
-    // Needs freeing
+    // Should be freed
     bfbridge = (jobject)jvm->env->NewGlobalRef(bfbridge_local);
     jvm->env->DeleteLocalRef(bfbridge_local);
 
-    // Needs freeing
+    // Should be freed
     communication_buffer = new char[bfi_communication_buffer_len];
     jobject buffer = jvm->env->NewDirectByteBuffer(communication_buffer, bfi_communication_buffer_len);
     if (!buffer)
     {
       // https://stackoverflow.com/questions/32323406/what-happens-if-a-constructor-throws-an-exception
       // Warning: throwing inside a c++ constructor means destructor
-      // might not be called, so lines marked "Needs freeing" above
+      // might not be called, so lines marked "Should be freed" above
       // need to be freed before throwing in a constructor.
       jvm->env->DeleteGlobalRef(bfbridge);
       delete[] communication_buffer;
@@ -118,8 +61,14 @@ static int BFToolsGenerateSubresolutions(int, int, int);
       throw "Allocation failed";
     }
     fprintf(stderr, "classloading almost done %d should be 0\n", (int)jvm->env->ExceptionCheck());
-    /*jmethodID bufferSetter = jvm->env->GetMethodID(jvm->bfbridge_base, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
-    fprintf(stderr, "classloading almost2 done %p\n", bufferSetter);*/
+    /*
+    How we would do without precaching methods:
+    jmethodID BFSetCommunicationBuffer =
+      jvm->env->GetMethodID(jvm->bfbridge_base, "BFSetCommunicationBuffer",
+      "(Ljava/nio/ByteBuffer;)V"
+    );
+    jvm->env->CallVoidMethod(bfbridge, BFSetCommunicationBuffer, buffer);
+    */
     jvm->env->CallVoidMethod(bfbridge, jvm->BFSetCommunicationBuffer, buffer);
     fprintf(stderr, "classloading almost3 done\n");
 
@@ -179,9 +128,9 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   void refresh()
   {
     fprintf(stderr, "calling refresh\n");
-    jmethodID close = jvm->env->GetMethodID(jvm->bfbridge_base, "BFClose", "()I");
+    jmethodID BFClose = jvm->env->GetMethodID(jvm->bfbridge_base, "BFClose", "()I");
     fprintf(stderr, "mid called refresh\n");
-    jvm->env->CallVoidMethod(bfbridge, close);
+    jvm->env->CallVoidMethod(bfbridge, BFClose);
     fprintf(stderr, "called refresh\n");
   }
 

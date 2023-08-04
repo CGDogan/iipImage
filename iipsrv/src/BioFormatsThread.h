@@ -17,6 +17,9 @@
 JVM/JNI has a requirement that a thread of ours
 can only create 1 JVM. This can be shared among BioFormatsInstances,
 or we can fork() to use new JVMs.
+
+Instead we can use multiple BioFormatsInstance in a thread. These
+allow keeping multiple files open. They share a JVM.
 */
 class BioFormatsThread
 {
@@ -31,6 +34,35 @@ public:
 
     jmethodID constructor;
     jmethodID BFSetCommunicationBuffer;
+    jmethodID BFClose;
+    jmethodID BFGetErrorLength;
+    jmethodID BFIsCompatible;
+    jmethodID BFOpen;
+    jmethodID BFClose;
+    jmethodID BFGetResolutionCount;
+    jmethodID BFSetResolutionCount;
+    jmethodID BFSetSeries;
+    jmethodID BFGetSeriesCount;
+    jmethodID BFGetSizeX;
+    jmethodID BFGetSizeY;
+    jmethodID BFGetSizeZ;
+    jmethodID BFGetSizeC;
+    jmethodID BFGetSizeT;
+    jmethodID BFGetEffectiveSizeC;
+    jmethodID BFGetOptimalTileWidth;
+    jmethodID BFGetOptimalTileHeight;
+    jmethodID BFGetPixelType;
+    jmethodID BFGetBytesPerPixel;
+    jmethodID BFGetRGBChannelCount;
+    jmethodID BFGetImageCount;
+    jmethodID BFIsRGB;
+    jmethodID BFIsInterleaved;
+    jmethodID BFIsLittleEndian;
+    jmethodID BFIsFalseColor;
+    jmethodID BFIsIndexedColor;
+    jmethodID BFGetDimensionOrder;
+    jmethodID BFIsOrderCertain;
+    jmethodID BFOpenBytes;
 
     BioFormatsThread()
     {
@@ -116,15 +148,51 @@ public:
 
         // Now do the same but in shorthand form
 
-#define prepare_method_id(name, signature)                            \
-    name = env->GetMethodID(bfbridge_base, #name, signature);         \
+#define prepare_method_id(name, descriptor)                           \
+    name = env->GetMethodID(bfbridge_base, #name, descriptor);        \
     if (!name)                                                        \
     {                                                                 \
         fprintf(stderr, "couldn't find constructor for %s\n", #name); \
         throw "couldn't find constructor for " + std::string(#name);  \
     }
 
+        // To print descriptors to screen
+        // ensure that org/camicroscope folder has BFBridge.class
+        // otherwise, compile in the parent folder of "org" with:
+        // "javac -cp ".:jar_files/*" org/camicroscope/BFBridge.java"
+        // and run: javap (-s) (-p) org.camicroscope.BFBridge
+
         prepare_method_id(BFSetCommunicationBuffer, "(Ljava/nio/ByteBuffer;)V");
+
+        prepare_method_id(BFClose, "()I");
+        prepare_method_id(BFGetErrorLength, "()I");
+        prepare_method_id(BFIsCompatible, "(I)I");
+        prepare_method_id(BFOpen, "(I)I");
+        prepare_method_id(BFClose, "()I");
+        prepare_method_id(BFGetResolutionCount, "()I");
+        prepare_method_id(BFSetResolutionCount, "(I)I");
+        prepare_method_id(BFSetSeries, "(I)I");
+        prepare_method_id(BFGetSeriesCount, "()I");
+        prepare_method_id(BFGetSizeX, "()I");
+        prepare_method_id(BFGetSizeY, "()I");
+        prepare_method_id(BFGetSizeZ, "()I");
+        prepare_method_id(BFGetSizeC, "()I");
+        prepare_method_id(BFGetSizeT, "()I");
+        prepare_method_id(BFGetEffectiveSizeC, "()I");
+        prepare_method_id(BFGetOptimalTileWidth, "()I");
+        prepare_method_id(BFGetOptimalTileHeight, "()I");
+        prepare_method_id(BFGetPixelType, "()I");
+        prepare_method_id(BFGetBytesPerPixel, "()I");
+        prepare_method_id(BFGetRGBChannelCount, "()I");
+        prepare_method_id(BFGetImageCount, "()I");
+        prepare_method_id(BFIsRGB, "()I");
+        prepare_method_id(BFIsInterleaved, "()I");
+        prepare_method_id(BFIsLittleEndian, "()I");
+        prepare_method_id(BFIsFalseColor, "()I");
+        prepare_method_id(BFIsIndexedColor, "()I");
+        prepare_method_id(BFGetDimensionOrder, "()I");
+        prepare_method_id(BFIsOrderCertain, "()I");
+        prepare_method_id(BFOpenBytes, "(IIII)I");
     }
 
     // iipsrv uses BioFormatsXXX on one thread and copying
