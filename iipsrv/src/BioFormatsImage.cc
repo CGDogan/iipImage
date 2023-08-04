@@ -40,13 +40,6 @@ void BioFormatsImage::openImage() throw(file_error)
 #endif
     fprintf(stderr, "ddBioFormatsImage.cc:  continue1 \n");
 
-    if (bfi.jvm == NULL)
-    {
-        logfile << "ERROR: can't open " << filename << " with BioFormats; thread uninitialized" << endl
-                << flush;
-        throw file_error(string("Error opening '" + filename + "' with BioFormats; thread uninitialized"));
-    }
-
     fprintf(stderr, "dddBioFormatsImage.cc entering file\n");
     if (!bfi.bf_open(filename))
     {
@@ -576,13 +569,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     timer.start();
 #endif
 
-    /*if (!bfi.jvm)
-    {
-        // TODO: should we check if file really opened here?
-        // currently, we're checking if graal initialized only
-        // to avoid performance penalty
-        logfile << "bioformats image not yet loaded " << endl;
-    }*/
 #ifdef DEBUG_VERBOSE
     fprintf(stderr, "BioFormatsImage::getNativeTile began;\ngetNativeTile params: tilex: %lu tiley: %lu iipres: %u\n", tilex, tiley, iipres);
 #endif
