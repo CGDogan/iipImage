@@ -1,4 +1,3 @@
-#include <jni.h>
 #include "BioFormatsInstance.h"
 #include "BioFormatsThread.h"
 
