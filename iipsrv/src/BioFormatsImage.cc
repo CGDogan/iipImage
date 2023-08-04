@@ -264,6 +264,7 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
         tile_width >>= 1;
     }
 #undef too_big
+    fprintf(stderr, "continue info150: parsing file in bioformatsimage.cc\n");
 
     // save the openslide dimensions.
     std::vector<int> bioformats_widths, bioformats_heights;
@@ -305,6 +306,7 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
         logfile << "\tlevel " << i << "\t(w,h) = (" << ww << "," << hh << ")\tdownsample=" << tempdownsample << endl;
 #endif
     }
+    fprintf(stderr, "continue info200: parsing file in bioformatsimage.cc\n");
 
     bioformats_widths.push_back(0);
     bioformats_heights.push_back(0);
@@ -407,6 +409,7 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
     // only support bpp of 8 (255 max), and 3 channels
     min.assign(channels, 0.0f);
     max.assign(channels, (float)(1 << bpc) - 1.0f);
+    fprintf(stderr, "continue info500: parsing file in bioformatsimage.cc\n");
 }
 
 /// Overloaded function for closing a TIFF image
