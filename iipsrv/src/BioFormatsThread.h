@@ -33,25 +33,33 @@ public:
     jclass bfbridge_base;
 
     jmethodID constructor;
+
+    // See the comment "To print descriptors to screen ..."
+    // for the javap command and please keep these in order with the output
     jmethodID BFSetCommunicationBuffer;
-    jmethodID BFClose;
+    jmethodID BFReset;
     jmethodID BFGetErrorLength;
     jmethodID BFIsCompatible;
     jmethodID BFOpen;
+    jmethodID BFIsSingleFile;
+    jmethodID BFGetUsedFiles;
+    jmethodID BFGetCurrentFile;
     jmethodID BFClose;
     jmethodID BFGetResolutionCount;
-    jmethodID BFSetResolutionCount;
+    jmethodID BFSetCurrentResolution;
     jmethodID BFSetSeries;
     jmethodID BFGetSeriesCount;
     jmethodID BFGetSizeX;
     jmethodID BFGetSizeY;
     jmethodID BFGetSizeZ;
-    jmethodID BFGetSizeC;
     jmethodID BFGetSizeT;
+    jmethodID BFGetSizeC;
     jmethodID BFGetEffectiveSizeC;
     jmethodID BFGetOptimalTileWidth;
     jmethodID BFGetOptimalTileHeight;
+    jmethodID BFGetFormat;
     jmethodID BFGetPixelType;
+    jmethodID BFGetBitsPerPixel;
     jmethodID BFGetBytesPerPixel;
     jmethodID BFGetRGBChannelCount;
     jmethodID BFGetImageCount;
@@ -63,6 +71,12 @@ public:
     jmethodID BFGetDimensionOrder;
     jmethodID BFIsOrderCertain;
     jmethodID BFOpenBytes;
+    jmethodID BFGetMPPX;
+    jmethodID BFGetMPPY;
+    jmethodID BFGetMPPZ;
+    jmethodID BFIsAnyFileOpen;
+    jmethodID BFToolsShouldGenerate;
+    jmethodID BFToolsGenerateSubresolutions;
 
     BioFormatsThread()
     {
@@ -156,32 +170,36 @@ public:
         throw "couldn't find constructor for " + std::string(#name);  \
     }
 
-        // To print descriptors to screen
+        // To print descriptors (encoded function types) to screen
         // ensure that org/camicroscope folder has BFBridge.class
         // otherwise, compile in the parent folder of "org" with:
         // "javac -cp ".:jar_files/*" org/camicroscope/BFBridge.java"
         // and run: javap (-s) (-p) org.camicroscope.BFBridge
 
         prepare_method_id(BFSetCommunicationBuffer, "(Ljava/nio/ByteBuffer;)V");
-
-        prepare_method_id(BFClose, "()I");
+        prepare_method_id(BFReset, "()V");
         prepare_method_id(BFGetErrorLength, "()I");
         prepare_method_id(BFIsCompatible, "(I)I");
         prepare_method_id(BFOpen, "(I)I");
+        prepare_method_id(BFIsSingleFile, "(I)I");
+        prepare_method_id(BFGetUsedFiles, "()I");
+        prepare_method_id(BFGetCurrentFile, "()I");
         prepare_method_id(BFClose, "()I");
         prepare_method_id(BFGetResolutionCount, "()I");
-        prepare_method_id(BFSetResolutionCount, "(I)I");
+        prepare_method_id(BFSetCurrentResolution, "(I)I");
         prepare_method_id(BFSetSeries, "(I)I");
         prepare_method_id(BFGetSeriesCount, "()I");
         prepare_method_id(BFGetSizeX, "()I");
         prepare_method_id(BFGetSizeY, "()I");
         prepare_method_id(BFGetSizeZ, "()I");
-        prepare_method_id(BFGetSizeC, "()I");
         prepare_method_id(BFGetSizeT, "()I");
+        prepare_method_id(BFGetSizeC, "()I");
         prepare_method_id(BFGetEffectiveSizeC, "()I");
         prepare_method_id(BFGetOptimalTileWidth, "()I");
         prepare_method_id(BFGetOptimalTileHeight, "()I");
+        prepare_method_id(BFGetFormat, "()I");
         prepare_method_id(BFGetPixelType, "()I");
+        prepare_method_id(BFGetBitsPerPixel, "()I");
         prepare_method_id(BFGetBytesPerPixel, "()I");
         prepare_method_id(BFGetRGBChannelCount, "()I");
         prepare_method_id(BFGetImageCount, "()I");
@@ -193,6 +211,12 @@ public:
         prepare_method_id(BFGetDimensionOrder, "()I");
         prepare_method_id(BFIsOrderCertain, "()I");
         prepare_method_id(BFOpenBytes, "(IIII)I");
+        prepare_method_id(BFGetMPPX, "()D");
+        prepare_method_id(BFGetMPPY, "()D");
+        prepare_method_id(BFGetMPPZ, "()D");
+        prepare_method_id(BFIsAnyFileOpen, "()I");
+        prepare_method_id(BFToolsShouldGenerate, "()I");
+        prepare_method_id(BFToolsGenerateSubresolutions, "(III)I");
     }
 
     // iipsrv uses BioFormatsXXX on one thread and copying
