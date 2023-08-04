@@ -28,7 +28,7 @@ when returning.
 For simplicity don't use jstring but use our common communication_buffer
 */
 
-#define communication_buffer_len 33554432
+#define bfi_communication_buffer_len 33554432
 
 class BioFormatsInstance
 {
@@ -186,11 +186,11 @@ static int BFToolsGenerateSubresolutions(int, int, int);
     jvm->env->DeleteLocalRef(bfbridge_local);
 
     // Allow 2048*2048 four channels of 16 bits
-    communication_buffer = new char[communication_buffer_len];
-    jobject buffer = jvm->env->NewDirectByteBuffer(communication_buffer, communication_buffer_len);
+    communication_buffer = new char[bfi_communication_buffer_len];
+    jobject buffer = jvm->env->NewDirectByteBuffer(communication_buffer, bfi_communication_buffer_len);
     if (!buffer)
     {
-      fprintf(stderr, "Couldn't allocate %d: too little RAM or JVM JNI doesn't support native memory access?", communication_buffer_len);
+      fprintf(stderr, "Couldn't allocate %d: too little RAM or JVM JNI doesn't support native memory access?", bfi_communication_buffer_len);
       throw "Allocation failed";
     }
     jmethodID bufferSetter = jvm->env->GetStaticMethodID(bfbridge, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
@@ -452,7 +452,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
       return NULL;
     }
     // We know that for this function len can never be close to
-    // communication_buffer_length, so no writing past it
+    // bfi_communication_buffer_len, so no writing past it
     communication_buffer[len] = 0;
     return communication_buffer;
   }
