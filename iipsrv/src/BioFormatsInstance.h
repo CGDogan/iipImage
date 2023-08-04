@@ -373,7 +373,7 @@ static int BFToolsGenerateSubresolutions(int, int, int);
   int bf_set_current_resolution(int res)
     {
     bfbridge = env->FindClass("org/camicroscope/BFBridge");
-    jmethodID BFSetResolutionCount = env->GetStaticMethodID(bfbridge, "BFSetResolutionCount", "(I)I");
+    jmethodID BFSetResolutionCount = env->GetStaticMethodID(bfbridge, "BFSetCurrentResolution", "(I)I");
     return env->CallStaticIntMethod(bfbridge, BFSetResolutionCount, res);
   }
 
