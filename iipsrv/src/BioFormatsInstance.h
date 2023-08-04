@@ -166,37 +166,36 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   BioFormatsInstance()
   {
-      jclass bfbridge_local = jvm->env->FindClass("org/camicroscope/BFBridge");
-      if (!bfbridge_local)
+    jclass bfbridge_local = jvm->env->FindClass("org/camicroscope/BFBridge");
+    if (!bfbridge_local)
+    {
+      fprintf(stderr, "org.camicroscope.BFBridge (or a dependency of it) could not be found; is the jar in %s ?\n", jvm->cp.c_str());
+      if (jvm->env->ExceptionCheck() == 1)
       {
-        fprintf(stderr, "org.camicroscope.BFBridge (or a dependency of it) could not be found; is the jar in %s ?\n", jvm->cp.c_str());
-        if (jvm->env->ExceptionCheck() == 1)
-        {
-          fprintf(stderr, "exception\n");
-          jvm->env->ExceptionDescribe();
-        }
-        else
-          fprintf(stderr, "no exception\n");
-
-        throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + jvm->cp;
+        fprintf(stderr, "exception\n");
+        jvm->env->ExceptionDescribe();
       }
+      else
+        fprintf(stderr, "no exception\n");
 
-      bfbridge = (jclass)jvm->env->NewGlobalRef(bfbridge_local);
-      fprintf(stderr, "bfbridge %p\n", bfbridge);
-      jvm->env->DeleteLocalRef(bfbridge_local);
-
-      // Allow 2048*2048 four channels of 16 bits
-      communication_buffer = new char[communication_buffer_len];
-      jobject buffer = jvm->env->NewDirectByteBuffer(communication_buffer, communication_buffer_len);
-      if (!buffer)
-      {
-        fprintf(stderr, "Couldn't allocate %d: too little RAM or JVM JNI doesn't support native memory access?", communication_buffer_len);
-        throw "Allocation failed";
-      }
-      jmethodID bufferSetter = jvm->env->GetStaticMethodID(bfbridge, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
-      jvm->env->CallStaticVoidMethod(bfbridge, bufferSetter, buffer);
-      jvm->env->DeleteLocalRef(buffer);
+      throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + jvm->cp;
     }
+
+    bfbridge = (jclass)jvm->env->NewGlobalRef(bfbridge_local);
+    fprintf(stderr, "bfbridge %p\n", bfbridge);
+    jvm->env->DeleteLocalRef(bfbridge_local);
+
+    // Allow 2048*2048 four channels of 16 bits
+    communication_buffer = new char[communication_buffer_len];
+    jobject buffer = jvm->env->NewDirectByteBuffer(communication_buffer, communication_buffer_len);
+    if (!buffer)
+    {
+      fprintf(stderr, "Couldn't allocate %d: too little RAM or JVM JNI doesn't support native memory access?", communication_buffer_len);
+      throw "Allocation failed";
+    }
+    jmethodID bufferSetter = jvm->env->GetStaticMethodID(bfbridge, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
+    jvm->env->CallStaticVoidMethod(bfbridge, bufferSetter, buffer);
+    jvm->env->DeleteLocalRef(buffer);
   }
 
   // If we allow copy, the previous one might be destroyed then it'll call
