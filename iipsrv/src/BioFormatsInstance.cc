@@ -1,5 +1,6 @@
 #include <jni.h>
 #include "BioFormatsInstance.h"
+#include "BioFormatsThread.h"
 
-JavaVM *BioFormatsInstance::jvm = nullptr;
-JNIEnv *BioFormatsInstance::env = nullptr;
+std::unique_ptr<BioFormatsThread> BioFormatsInstance::jvm =
+    std::make_unique<BioFormatsThread>(new BioFormatsThread());

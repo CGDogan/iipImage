@@ -10,10 +10,8 @@
 #include <cstring>
 #include <cstdio>
 #include <filesystem>
+#include <memory>
 #include <jni.h>
-
-// TODO: use its equivalent on Windows
-#include <dirent.h>
 
 /*
 Memory management
@@ -29,14 +27,12 @@ when returning.
 For simplicity don't use jstring but use our common communication_buffer
 */
 
+#define communication_buffer_len 33554432
+
 class BioFormatsInstance
 {
 public:
-  const int communication_buffer_len = 33554432;
-
-  // TODO make some of these private
-  static JavaVM *jvm;
-  static JNIEnv *env;
+  static std::unique_ptr<BioFormatsThread> jvm;
   char *communication_buffer;
 
   // javap (-s) (-p) org.camicroscope.BFBridge
@@ -169,71 +165,6 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
   BioFormatsInstance()
   {
-    fprintf(stderr, "initializing\n");
-    // https://docs.oracle.com/en/java/javase/20/docs/specs/jni/invocation.html
-    JavaVMInitArgs vm_args;
-    vm_args.version = JNI_VERSION_20;
-    JavaVMOption *options = new JavaVMOption[2];
-
-#ifndef BFBRIDGE_CLASSPATH
-#error Please define BFBRIDGE_CLASSPATH to the path with compiled classes and dependency jars. Example: gcc -DBFBRIDGE_CLASSPATH=/usr/lib/java
-#endif
-
-// https://stackoverflow.com/a/2411008
-// define with compiler's -D flag
-#define BFBRIDGE_STRINGARG(s) #s
-#define BFBRIDGE_STRINGVALUE(s) BFBRIDGE_STRINGARG(s)
-
-    std::string cp = BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH);
-    if (cp.back() != '/')
-    {
-      cp += "/";
-    }
-
-    std::string path_arg = "-Djava.class.path=" + cp + "*:" + cp;
-
-    // For some reason unlike the -cp arg, .../* does not work
-    // so we need to list every jar file
-    // https://en.cppreference.com/w/cpp/filesystem/directory_iterator
-    DIR *cp_dir = opendir(cp.c_str());
-    if (!cp_dir)
-    {
-      fprintf(stderr, "could not read classpath dir %s\n", cp.c_str());
-      throw "Could not read dir";
-    }
-    struct dirent *cp_dirent;
-    while ((cp_dirent = readdir(cp_dir)) != NULL)
-    {
-      path_arg += ":" + cp + std::string(cp_dirent->d_name);
-    }
-    closedir(cp_dir);
-
-    /*char path_arg[] = "-Djava.class.path=" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) ":"  "/*:" BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH) "/formats-api-6.13.0.jar";*/
-    fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg.c_str());
-    // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
-    char optimize1[] = "-XX:+UseParallelGC";
-    // char optimize2[] = "-XX:+UseLargePages"; Not compatible with our linux distro
-    options[0].optionString = (char *)path_arg.c_str();
-    options[1].optionString = optimize1;
-    // options[2].optionString = optimize2;
-    // options[3].optionString = "-verbose:jni";
-    vm_args.options = options;
-    vm_args.nOptions = 2; // 3
-    vm_args.ignoreUnrecognized = false;
-    if (!jvm)
-    {
-      int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
-      if (code < 0)
-      {
-        fprintf(stderr, "couldn't create jvm with code %d on https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes\n", code);
-        throw "jvm failed";
-      }
-      if (!env)
-      {
-        fprintf(stderr, "null env in initialization\n");
-        throw "jvm failed";
-      }
-
       jclass bfbridge_local = env->FindClass("org/camicroscope/BFBridge");
       if (!bfbridge_local)
       {
@@ -248,7 +179,6 @@ static int BFToolsGenerateSubresolutions(int, int, int);
 
         throw "org.camicroscope.BFBridge could not be found; is the jar in %s ?\n" + std::string(options[0].optionString);
       }
-      delete[] options;
 
       bfbridge = (jclass)env->NewGlobalRef(bfbridge_local);
       fprintf(stderr, "bfbridge %p\n", bfbridge);
