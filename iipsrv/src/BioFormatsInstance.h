@@ -168,7 +168,7 @@ public:
 
   int bf_set_current_resolution(int res)
   {
-    return jvm->env->CallIntMethod(bfbridge, jvm->BFSetResolutionCount, res);
+    return jvm->env->CallIntMethod(bfbridge, jvm->BFSetCurrentResolution, res);
   }
 
   int bf_set_series(int ser)
