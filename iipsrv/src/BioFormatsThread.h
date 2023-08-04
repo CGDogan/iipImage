@@ -24,12 +24,13 @@ public:
     JavaVM *jvm;
     JNIEnv *env;
 
-    // Call FindClass just once and store it there
-    // additional calls invalidate this pointer
+    // Call FindClass just once and store it there.
+    // It seems that additional calls to FindClass invalidate this pointer
+    // so calling FindClass outside of BioFormatsThread breaks other code.
     jclass bfbridge_base;
 
-
     jmethodID constructor;
+    jmethodID BFSetCommunicationBuffer;
 
     BioFormatsThread()
     {
@@ -113,8 +114,17 @@ public:
             throw "couldn't find constructor for BFBridge\n";
         }
 
-        // Now do the same but in the shorthand form
-        #define prepare_
+        // Now do the same but in shorthand form
+
+#define prepare_method_id(name, signature)                            \
+    name = env->GetMethodID(bfbridge_base, #name, signature);         \
+    if (!name)                                                        \
+    {                                                                 \
+        fprintf(stderr, "couldn't find constructor for %s\n", #name); \
+        throw "couldn't find constructor for " + std::string(#name);  \
+    }
+
+        prepare_method_id(BFSetCommunicationBuffer, "(Ljava/nio/ByteBuffer;)V");
     }
 
     // iipsrv uses BioFormatsXXX on one thread and copying

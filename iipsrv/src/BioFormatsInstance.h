@@ -118,9 +118,9 @@ static int BFToolsGenerateSubresolutions(int, int, int);
       throw "Allocation failed";
     }
     fprintf(stderr, "classloading almost done %d should be 0\n", (int)jvm->env->ExceptionCheck());
-    jmethodID bufferSetter = jvm->env->GetMethodID(jvm->bfbridge_base, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
-    fprintf(stderr, "classloading almost2 done %p\n", bufferSetter);
-    jvm->env->CallVoidMethod(bfbridge, bufferSetter, buffer);
+    /*jmethodID bufferSetter = jvm->env->GetMethodID(jvm->bfbridge_base, "BFSetCommunicationBuffer", "(Ljava/nio/ByteBuffer;)V");
+    fprintf(stderr, "classloading almost2 done %p\n", bufferSetter);*/
+    jvm->env->CallVoidMethod(bfbridge, jvm->BFSetCommunicationBuffer, buffer);
     fprintf(stderr, "classloading almost3 done\n");
 
     jvm->env->DeleteLocalRef(buffer);
