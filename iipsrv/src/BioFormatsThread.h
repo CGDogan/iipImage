@@ -141,7 +141,9 @@ public:
         fprintf(stderr, "passingbfbridge cache dir: %s\n", cachedir);
         if (cachedir && cachedir[0] != '\0')
         {
-            options[vm_args.nOptions++].optionString = (char *)(("-Dbfbridge.cachedir=" + std::string(cachedir)).c_str());
+            std::string cache_arg = "-Dbfbridge.cachedir=" + std::string(cachedir);
+            fprintf(stderr, "cache_arg: %s\n", cache_arg.c_str());
+            options[vm_args.nOptions++].optionString = cache_arg.c_str();
         }
 
         fprintf(stderr, "Printing JVM options:\n");
