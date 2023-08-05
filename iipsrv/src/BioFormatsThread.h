@@ -122,7 +122,7 @@ public:
         struct dirent *cp_dirent;
         while ((cp_dirent = readdir(cp_dir)) != NULL)
         {
-            path_arg += ":" + cp + std::string(cp_dirent->d_name);
+            path_arg += JNI_PATH_SEPARATOR + cp + std::string(cp_dirent->d_name);
         }
         closedir(cp_dir);
 
@@ -138,8 +138,10 @@ public:
         vm_args.ignoreUnrecognized = false;
 
         char *cachedir = getenv("BFBRIDGE_CACHEDIR");
-        if (cachedir && cachedir[0] != '\0') {
-            options[vm_args.nOptions++].optionString = (char *)("-Dbfbridge.cachedir=" + std::string(cachedir)).c_str();
+        fprintf(stderr, "passingbfbridge cache dir: %s\n", cachedir.c_str());
+        if (cachedir && cachedir[0] != '\0')
+        {
+            options[vm_args.nOptions++].optionString = (char *)(("-Dbfbridge.cachedir=" + std::string(cachedir)).c_str());
         }
 
         int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
