@@ -102,9 +102,9 @@ public:
             cp += "/";
         }
 
-        #ifdef WIN32
-        #define JNI_PATH_SEPARATOR ";"
-        #else
+#ifdef WIN32
+#define JNI_PATH_SEPARATOR ";"
+#else
 #define JNI_PATH_SEPARATOR ":"
 #endif
 
@@ -142,6 +142,12 @@ public:
         if (cachedir && cachedir[0] != '\0')
         {
             options[vm_args.nOptions++].optionString = (char *)(("-Dbfbridge.cachedir=" + std::string(cachedir)).c_str());
+        }
+
+        fprintf(stderr, "Printing JVM options:\n");
+        for (int i = 0; i < vm_args.nOptions; i++)
+        {
+            fprintf(stderr, "%s\n", vm_args.options[i].optionString);
         }
 
         int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
