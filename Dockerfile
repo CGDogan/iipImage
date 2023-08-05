@@ -48,8 +48,8 @@ RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log && \
     ln -sf /proc/self/fd/1 /var/log/apache2/other_vhosts_access.log
 
 # cache is optional, for speed in opening files
-RUN mkdir /bioformatscache
-RUN chmod -R +rw /bioformatscache
+RUN mkdir /root/bioformatscache
+RUN chmod -R +rw /root/bioformatscache
 
 # CMD service apache2 start && while true; do sleep 1000; done
 CMD apachectl -D FOREGROUND
