@@ -87,6 +87,8 @@ public:
         vm_args.version = JNI_VERSION_20;
         JavaVMOption *options = new JavaVMOption[3];
 
+        // In our Docker caMicroscpe deployment we pass these using fcgid.conf
+        // and other conf files
         char *cpdir = getenv("BFBRIDGE_CLASSPATH");
         if (!cpdir || cpdir[0] == '\0')
         {
