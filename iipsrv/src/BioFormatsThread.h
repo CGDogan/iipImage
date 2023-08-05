@@ -138,19 +138,22 @@ public:
         vm_args.ignoreUnrecognized = false;
 
         char *cachedir = getenv("BFBRIDGE_CACHEDIR");
+        std::string cache_arg;
         fprintf(stderr, "passingbfbridge cache dir: %s\n", cachedir);
         if (cachedir && cachedir[0] != '\0')
         {
-            std::string cache_arg = "-Dbfbridge.cachedir=" + std::string(cachedir);
-            fprintf(stderr, "cache_arg: %s\n", cache_arg.c_str());
+            // Remember that std::strings whose pointers we use
+            // must be valid until JNI_CreateJavaVM so we can't declare,
+            // std::string cache_arg for example, inside an if branch.
+            cache_arg = "-Dbfbridge.cachedir=" + std::string(cachedir);
             options[vm_args.nOptions++].optionString = (char *)cache_arg.c_str();
         }
 
-        fprintf(stderr, "Printing JVM options:\n");
+        /*fprintf(stderr, "Printing JVM options:\n");
         for (int i = 0; i < vm_args.nOptions; i++)
         {
             fprintf(stderr, "%s\n", vm_args.options[i].optionString);
-        }
+        }*/
 
         int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
         delete[] options;
