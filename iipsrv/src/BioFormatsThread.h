@@ -84,10 +84,10 @@ public:
         // https://docs.oracle.com/en/java/javase/20/docs/specs/jni/invocation.html
         JavaVMInitArgs vm_args;
         vm_args.version = JNI_VERSION_20;
-        JavaVMOption *options = new JavaVMOption[2];
+        JavaVMOption *options = new JavaVMOption[3];
 
 #ifndef BFBRIDGE_CLASSPATH
-#error Please define BFBRIDGE_CLASSPATH to the path with compiled classes and dependency jars. Example: gcc -DBFBRIDGE_CLASSPATH=/usr/lib/java
+#error "Please define BFBRIDGE_CLASSPATH to the path with compiled classes and dependency jars. Example: gcc -DBFBRIDGE_CLASSPATH=/usr/lib/java"
 #endif
 
 // https://stackoverflow.com/a/2411008
@@ -125,11 +125,15 @@ public:
         // char optimize2[] = "-XX:+UseLargePages"; Not compatible with our linux distro
         options[0].optionString = (char *)path_arg.c_str();
         options[1].optionString = optimize1;
-        // options[2].optionString = optimize2;
-        // options[3].optionString = "-verbose:jni";
+        // options[2].optionString = "-verbose:jni";
+        vm_args.nOptions = 2;
         vm_args.options = options;
-        vm_args.nOptions = 2; // 3
         vm_args.ignoreUnrecognized = false;
+
+#ifdef BFBRIDGE_CACHEDIR
+        std::string cachedir = BFBRIDGE_STRINGVALUE(s);
+        options[vm_args.nOptions++].optionString = (char *)("-Dbfbridge.cachedir=" + cachedir).c_str();
+#endif
 
         int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
         delete[] options;
