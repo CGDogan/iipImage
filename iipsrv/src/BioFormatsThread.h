@@ -162,12 +162,12 @@ public:
 
         // Now do the same but in shorthand form
 
-#define prepare_method_id(name, descriptor)                           \
-    name = env->GetMethodID(bfbridge_base, #name, descriptor);        \
-    if (!name)                                                        \
-    {                                                                 \
-        fprintf(stderr, "couldn't find constructor for %s\n", #name); \
-        throw "couldn't find constructor for " + std::string(#name);  \
+#define prepare_method_id(name, descriptor)                         \
+    name = env->GetMethodID(bfbridge_base, #name, descriptor);      \
+    if (!name)                                                      \
+    {                                                               \
+        fprintf(stderr, "couldn't find method id for %s\n", #name); \
+        throw "couldn't find method id for " + std::string(#name);  \
     }
 
         // To print descriptors (encoded function types) to screen
@@ -177,7 +177,6 @@ public:
         // and run: javap (-s) (-p) org.camicroscope.BFBridge
 
         prepare_method_id(BFSetCommunicationBuffer, "(Ljava/nio/ByteBuffer;)V");
-        prepare_method_id(BFReset, "()V");
         prepare_method_id(BFGetErrorLength, "()I");
         prepare_method_id(BFIsCompatible, "(I)I");
         prepare_method_id(BFOpen, "(I)I");
