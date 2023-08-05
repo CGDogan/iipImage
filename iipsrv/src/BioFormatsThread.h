@@ -7,6 +7,7 @@
 
 #include <jni.h>
 #include <string>
+#include <stdlib.h>
 
 #ifdef _WIN32
 #error BioFormatsThread.h uses dirent.h for listing directory contents, we do not have equivalent Windows code yet
@@ -86,22 +87,26 @@ public:
         vm_args.version = JNI_VERSION_20;
         JavaVMOption *options = new JavaVMOption[3];
 
-#ifndef BFBRIDGE_CLASSPATH
-#error "Please define BFBRIDGE_CLASSPATH to the path with compiled classes and dependency jars. Example: gcc -DBFBRIDGE_CLASSPATH=/usr/lib/java"
-#endif
+        char *cpdir = getenv("BFBRIDGE_CLASSPATH");
+        if (!cpdir || cpdir[0] == '\0')
+        {
+            fprintf(stderr, "Please set BFBRIDGE_CLASSPATH to a single directory where jar files can be found.\n");
+            exit(1);
+        }
 
-// https://stackoverflow.com/a/2411008
-// define with compiler's -D flag
-#define BFBRIDGE_STRINGARG(s) #s
-#define BFBRIDGE_STRINGVALUE(s) BFBRIDGE_STRINGARG(s)
-
-        std::string cp = BFBRIDGE_STRINGVALUE(BFBRIDGE_CLASSPATH);
+        std::string cp(cpdir);
         if (cp.back() != '/')
         {
             cp += "/";
         }
 
-        std::string path_arg = "-Djava.class.path=" + cp + "*:" + cp;
+        #ifdef WIN32
+        #define JNI_PATH_SEPARATOR ";"
+        #else
+#define JNI_PATH_SEPARATOR ":"
+#endif
+
+        std::string path_arg = "-Djava.class.path=" + cp + "*" + JNI_PATH_SEPARATOR + cp;
 
         // For some reason unlike the -cp arg, .../* does not work
         // so we need to list every jar file
@@ -130,10 +135,10 @@ public:
         vm_args.options = options;
         vm_args.ignoreUnrecognized = false;
 
-#ifdef BFBRIDGE_CACHEDIR
-        std::string cachedir = BFBRIDGE_STRINGVALUE(s);
-        options[vm_args.nOptions++].optionString = (char *)("-Dbfbridge.cachedir=" + cachedir).c_str();
-#endif
+        char *cachedir = getenv("BFBRIDGE_CACHEDIR");
+        if (cachedir && cachedir[0] != '\0') {
+            options[vm_args.nOptions++].optionString = (char *)("-Dbfbridge.cachedir=" + std::string(cachedir)).c_str();
+        }
 
         int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
         delete[] options;

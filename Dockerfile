@@ -47,6 +47,11 @@ RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log && \
     ln -sf /proc/self/fd/1 /var/log/apache2/error.log && \
     ln -sf /proc/self/fd/1 /var/log/apache2/other_vhosts_access.log
 
+ENV BFBRIDGE_CLASSPATH=/usr/lib/java
+# cache is optional, for speed in opening files
+RUN mkdir /bioformatscache
+ENV BFBRIDGE_CACHEDIR=/bioformatscache
+ENV BFBRIDGE_CLASSPATH=/usr/lib/java
 
 # CMD service apache2 start && while true; do sleep 1000; done
 CMD apachectl -D FOREGROUND
