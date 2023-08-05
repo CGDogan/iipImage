@@ -138,7 +138,7 @@ public:
         vm_args.ignoreUnrecognized = false;
 
         char *cachedir = getenv("BFBRIDGE_CACHEDIR");
-        fprintf(stderr, "passingbfbridge cache dir: %s\n", cachedir.c_str());
+        fprintf(stderr, "passingbfbridge cache dir: %s\n", cachedir);
         if (cachedir && cachedir[0] != '\0')
         {
             options[vm_args.nOptions++].optionString = (char *)(("-Dbfbridge.cachedir=" + std::string(cachedir)).c_str());
