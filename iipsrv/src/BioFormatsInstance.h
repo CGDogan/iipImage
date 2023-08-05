@@ -25,7 +25,17 @@ C++ is our main code, so for us there's no difference between local references
 and global references. Global references are normally the ones that won't be freed
 on return. Nevertheless use global references for stylistic correctness.
 
-For simplicity don't use jstring but use our common communication_buffer
+For simplicity don't use jstring but use our common communication_buffer.
+
+To use this library, do:
+BioFormatsInstance bfi = BioFormatsManager::get_new();
+bfi.bf_open(filename); // or any other methods
+...
+and when you're done:
+BioFormatsManager::free(std::move(bfi));
+
+Or see BioFormatsImage.cc/h for an example of keeping the Java class alive with
+the C++ class
 */
 
 // Allow 2048*2048 four channels of 16 bits
