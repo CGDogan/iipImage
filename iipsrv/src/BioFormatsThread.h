@@ -19,6 +19,10 @@ JVM/JNI has a requirement that a thread of ours
 can only create 1 JVM. This can be shared among BioFormatsInstances,
 or we can fork() to use new JVMs.
 
+If we move to a multithread architecture, we can dedicate one
+thread to JVM and interact through it, or make a new JVM from every thread
+or call DetachCurrentThread then AttachCurrentThread in every thread
+
 Instead we can use multiple BioFormatsInstance in a thread. These
 allow keeping multiple files open. They share a JVM.
 */
@@ -85,7 +89,6 @@ public:
         // https://docs.oracle.com/en/java/javase/20/docs/specs/jni/invocation.html
         JavaVMInitArgs vm_args;
         vm_args.version = JNI_VERSION_20;
-        JavaVMOption *options = new JavaVMOption[3];
 
         // In our Docker caMicroscpe deployment we pass these using fcgid.conf
         // and other conf files
@@ -126,6 +129,9 @@ public:
         }
         closedir(cp_dir);
 
+        // Should be freed
+        JavaVMOption *options = new JavaVMOption[3];
+
         fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg.c_str());
         // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
         char optimize1[] = "-XX:+UseParallelGC";
@@ -155,6 +161,7 @@ public:
             fprintf(stderr, "%s\n", vm_args.options[i].optionString);
         }*/
 
+        // TODO fix memory leak: destroy vm when returning from error
         int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
         delete[] options;
         if (code < 0)
@@ -195,10 +202,10 @@ public:
     }
 
         // To print descriptors (encoded function types) to screen
-        // ensure that org/camicroscope folder has BFBridge.class
+        // ensure that curent dir's org/camicroscope folder has BFBridge.class
         // otherwise, compile in the parent folder of "org" with:
-        // "javac -cp ".:jar_files/*" org/camicroscope/BFBridge.java"
-        // and run: javap (-s) (-p) org.camicroscope.BFBridge
+        // "javac -cp ".:jar_files/*" org/camicroscope/BFBridge.java".
+        // Run: javap -s (-p) org.camicroscope.BFBridge
 
         prepare_method_id(BFSetCommunicationBuffer, "(Ljava/nio/ByteBuffer;)V");
         prepare_method_id(BFGetErrorLength, "()I");

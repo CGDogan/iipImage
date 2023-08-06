@@ -140,6 +140,7 @@ public:
   void refresh()
   {
     fprintf(stderr, "calling refresh\n");
+    // closing current file will help garbage collector do more
     jvm.env->CallVoidMethod(bfbridge, jvm.BFClose);
     fprintf(stderr, "called refresh\n");
   }
