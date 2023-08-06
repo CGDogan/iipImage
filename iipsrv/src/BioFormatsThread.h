@@ -21,7 +21,8 @@ or we can fork() to use new JVMs.
 
 If we move to a multithread architecture, we can dedicate one
 thread to JVM and interact through it, or make a new JVM from every thread
-or call DetachCurrentThread then AttachCurrentThread in every thread
+or call DetachCurrentThread then AttachCurrentThread in every thread.
+Note: Detaching thread invalidates references https://stackoverflow.com/q/47834463
 
 Instead we can use multiple BioFormatsInstance in a thread. These
 allow keeping multiple files open. They share a JVM.
