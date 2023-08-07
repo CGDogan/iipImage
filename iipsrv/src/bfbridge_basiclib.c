@@ -358,12 +358,14 @@ bfbridge_error_t *bfbridge_make_instance(
     return NULL;
 }
 
-void bfbridge_free_instance(bfbridge_instance_t *instance)
+void bfbridge_free_instance(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    (*instance->library->env)->DeleteGlobalRef(instance->library->env, bfbridge);
+    (*library->env)->DeleteGlobalRef(library->env, bfbridge);
 }
 
-char *bfbridge_instance_get_communication_buffer(bfbridge_instance_t *instance, , int *len)
+char *bfbridge_instance_get_communication_buffer(
+    bfbridge_instance_t *instance, int *len)
 {
     if (len) {
         *len = instance->communication_buffer_len;
