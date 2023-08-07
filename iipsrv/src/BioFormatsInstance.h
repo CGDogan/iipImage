@@ -45,11 +45,9 @@ class BioFormatsInstance
 {
 public:
   // std::unique_ptr<BioFormatsThread> or shared ptr would also work
-  static BioFormatsThread jvm;
+  static BioFormatsThread thread;
 
-  char *communication_buffer;
-
-  jobject bfbridge;
+  bfbridge_instance_t bfinstance;
 
   BioFormatsInstance();
 
@@ -60,45 +58,38 @@ public:
   // https://en.cppreference.com/w/cpp/language/rule_of_three
   // The alternative is reference counting
   // https://ps.uci.edu/~cyu/p231C/LectureNotes/lecture13:referenceCounting/lecture13.pdf
-  // Or the simplest way would be to use a pointer to BioFormatsInstance and never use it directly. Pointers are easier to move manually
-  // count, in an int*, the number of copies and deallocate when reach 0
+  // Or the simplest way would be to use a pointer to BioFormatsInstance.
+  // Pointers are easier to move manually and count, in an int*, the number of copies and deallocate when reach 0
 
   // We can't use default ones because we want to avoid leaking classes.
   // jclass must be tracked until its destruction and freed manually.
-  // When we move-construct or move-assign the previous one should be destroyed,
+  // When we move-construct or move-assign the previous references should be destroyed,
   // otherwise the previous one's destructor will free it so the new
   // one will be broken. That's why we can't use defaults instead of Rule of 5.
   // Here we choose to reuse jclasses rather than to destroy
   // and recreate them unnecessarily.
   BioFormatsInstance(const BioFormatsInstance &) = delete;
-  /*BioFormatsInstance(BioFormatsInstance &&) = default;*/
   BioFormatsInstance(BioFormatsInstance &&other)
   {
-    bfbridge = other.bfbridge;
-    communication_buffer = other.communication_buffer;
-    other.bfbridge = nullptr;
-    other.communication_buffer = nullptr;
+    // Copy both the Java instance class and the communication buffer
+    bfinstance = other.bfinstance;
+    other.bfinstance = null;
   }
   BioFormatsInstance &operator=(const BioFormatsInstance &) = delete;
   BioFormatsInstance &operator=(BioFormatsInstance &&other)
   {
-    bfbridge = other.bfbridge;
-    communication_buffer = other.communication_buffer;
-    other.bfbridge = nullptr;
-    other.communication_buffer = nullptr;
+    bfinstance = other.bfinstance;
+    other.bfinstance = null;
     return *this;
   }
 
   ~BioFormatsInstance()
   {
-    if (bfbridge)
-    {
-      jvm.env->DeleteGlobalRef(bfbridge);
-    }
-    if (communication_buffer)
-    {
-      delete[] communication_buffer;
-    }
+    char *communication_buffer =
+      bfbridge_instance_get_communication_buffer(bfinstance, NULL);
+    delete[] communication_buffer;
+
+    bfbridge_free_instance(&bfinstance, &thread.bflibrary);
   }
 
   // changed ownership: user opened new file, etc.
@@ -106,13 +97,14 @@ public:
   {
     fprintf(stderr, "calling refresh\n");
     // closing current file will help garbage collector do more
-    jvm.env->CallVoidMethod(bfbridge, jvm.BFClose);
+    //jvm.env->CallVoidMethod(bfbridge, jvm.BFClose);
+    thread.bflibrary.env->CallVoidMethod(bfinstance.bfbridge, thread.bflibrary.BFClose);
     fprintf(stderr, "called refresh\n");
   }
 
   std::string bf_get_error()
   {
-    int len = jvm.env->CallIntMethod(bfbridge, jvm.BFGetErrorLength);
+    int len = thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetErrorLength);
     std::string err;
     err.assign(communication_buffer, len);
     return err;
@@ -124,130 +116,130 @@ public:
     int len = filepath.length();
     memcpy(communication_buffer, filepath.c_str(), len);
     fprintf(stderr, "called is compatible\n");
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsCompatible, len);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFIsCompatible, len);
   }
 
   int bf_open(std::string filepath)
   {
     int len = filepath.length();
     memcpy(communication_buffer, filepath.c_str(), len);
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFOpen, len);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFOpen, len);
   }
 
   int bf_close()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFClose);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFClose);
   }
 
   int bf_get_resolution_count()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetResolutionCount);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetResolutionCount);
   }
 
   int bf_set_current_resolution(int res)
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFSetCurrentResolution, res);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFSetCurrentResolution, res);
   }
 
   int bf_set_series(int ser)
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFSetSeries, ser);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFSetSeries, ser);
   }
 
   int bf_get_series_count()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSeriesCount);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetSeriesCount);
   }
 
   int bf_get_size_x()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeX);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetSizeX);
   }
 
   int bf_get_size_y()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeY);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetSizeY);
   }
 
   int bf_get_size_z()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeZ);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetSizeZ);
   }
 
   int bf_get_size_c()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeC);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetSizeC);
   }
 
   int bf_get_size_t()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeT);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetSizeT);
   }
 
   int bf_get_effective_size_c()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetEffectiveSizeC);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetEffectiveSizeC);
   }
 
   int bf_get_optimal_tile_width()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetOptimalTileWidth);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetOptimalTileWidth);
   }
 
   int bf_get_optimal_tile_height()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetOptimalTileHeight);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetOptimalTileHeight);
   }
 
   int bf_get_pixel_type()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetPixelType);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetPixelType);
   }
 
   int bf_get_bytes_per_pixel()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetBytesPerPixel);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetBytesPerPixel);
   }
 
   int bf_get_rgb_channel_count()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetRGBChannelCount);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetRGBChannelCount);
   }
 
   int bf_get_image_count()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetImageCount);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetImageCount);
   }
 
   int bf_is_rgb()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsRGB);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFIsRGB);
   }
 
   int bf_is_interleaved()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsInterleaved);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFIsInterleaved);
   }
 
   int bf_is_little_endian()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsLittleEndian);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFIsLittleEndian);
   }
 
   int bf_is_false_color()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsFalseColor);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFIsFalseColor);
   }
 
   int bf_is_indexed_color()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsIndexedColor);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFIsIndexedColor);
   }
 
   // Returns char* to communication_buffer that will later be overwritten
   char *bf_get_dimension_order()
   {
-    int len = jvm.env->CallIntMethod(bfbridge, jvm.BFGetDimensionOrder);
+    int len = thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetDimensionOrder);
     if (len < 0)
     {
       return NULL;
@@ -260,12 +252,12 @@ public:
 
   int bf_is_order_certain()
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsOrderCertain);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFIsOrderCertain);
   }
 
   int bf_open_bytes(int x, int y, int w, int h)
   {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFOpenBytes, x, y, w, h);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFOpenBytes, x, y, w, h);
   }
 };
 
