@@ -60,7 +60,7 @@ static void append_to_string(bfbridge_basiclib_string_t *bbs, char *s)
         bbs->str = (char *)realloc(bbs->str, bbs->alloc_len + 1);
     }
     strcat(bbs->str, s);
-    bbs->len += strlen(s);
+    bbs->len += s_len;
 }
 
 // description: optional string to be appended to end of operation
@@ -131,8 +131,7 @@ bfbridge_error_t *bfbridge_make_library(
     closedir(cp_dir);
 #endif
 
-    // Should be freed: path_arg, options
-    JavaVMOption *options = (JavaVMOption *)malloc(3 * sizeof(JavaVMOption));
+    JavaVMOption options[3];
 
     fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg.c_str());
     // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
@@ -147,7 +146,7 @@ bfbridge_error_t *bfbridge_make_library(
     vm_args.options = options;
     vm_args.ignoreUnrecognized = 0;
 
-    // Should be freed: path_arg, options, cache_arg
+    // Should be freed: path_arg, cache_arg
     bfbridge_basiclib_string_t *cache_arg = allocate_string("-Dbfbridge.cachedir=");
 
     fprintf(stderr, "passingbfbridge cache dir: %s\n", cachedir);
@@ -161,9 +160,8 @@ bfbridge_error_t *bfbridge_make_library(
     JavaVM *jvm;
     JNIEnv *env;
 
-    // Should be freed: path_arg, options, cache_arg, jvm
+    // Should be freed: path_arg, cache_arg, jvm
     int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
-    free(options);
     free_string(cache_arg);
 
     // Should be freed: path_arg, jvm
