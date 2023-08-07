@@ -5,6 +5,10 @@
  * Also see: BioFormatsThread.h in github.com/camicroscope/iipImage
  */
 
+// Optionally define: BFBRIDGE_INLINE (makes it a header-only library)
+// Optionally define: BFBRIDGE_INLINE_EXTRA (not recommended)
+// Optionally define: BFBRIDGE_KNOW_BUFFER_LEN
+
 #ifndef BFBRIDGE_BASICLIB_H
 #define BFBRIDGE_BASICLIB_H
 
@@ -14,6 +18,18 @@
 extern "C" {
 #endif
 
+#ifdef BFBRIDGE_INLINE_EXTRA
+#define BFBRIDGE_INLINE
+#define BFBRIDGE_INLINE_ME_EXTRA static inline
+#elif defined(BFBRIDGE_INLINE)
+#define BFBRIDGE_INLINE_ME_EXTRA static
+#else
+#define BFBRIDGE_INLINE_ME_EXTRA
+#endif
+
+// As an example, inlining solves the issue that
+// passing struct ptrs requires dereference https://stackoverflow.com/a/552250
+// so without inline, we would need to pass instance pointers by value
 #ifdef BFBRIDGE_INLINE
 #define BFBRIDGE_INLINE_ME static inline
 #else
@@ -105,7 +121,7 @@ typedef struct bfbridge_library
 // On failure, sets dest to NULL and returns error
 // cpdir: a string to a single directory containing jar files (and maybe classes)
 // cachedir: NULL or the directory path to store file caches for faster opening
-BFBRIDGE_INLINE_ME bfbridge_error_t *bfbridge_make_library(
+BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_library(
     bfbridge_library_t **dest,
     char *cpdir,
     char *cachedir);
@@ -119,7 +135,9 @@ typedef struct bfbridge_instance
 {
     jobject bfbridge;
     char *communication_buffer;
+#ifndef BFBRIDGE_KNOW_BUFFER_LEN
     int communication_buffer_len;
+#endif
 } bfbridge_instance_t;
 
 // On success, returns NULL and sets dest
@@ -133,7 +151,7 @@ typedef struct bfbridge_instance
 // This will be used for two-way communication.
 // Suggested length is 33 MB (33554432) to allow
 // 2048 by 2048 four channels of 16 bit
-BFBRIDGE_INLINE_ME bfbridge_error_t *bfbridge_make_instance(
+BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_instance(
     bfbridge_instance_t **dest,
     bfbridge_library_t *library,
     char *communication_buffer,
