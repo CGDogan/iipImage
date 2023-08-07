@@ -79,9 +79,8 @@ static bfbridge_error_t *make_error(int code, char *operation, char *description
 
 // JVM restriction: Allows only one JVM alive per thread
 bfbridge_error_t *bfbridge_make_library(
-    bfbridge_library_t **dest, char *cpdir, char *cachedir)
+    bfbridge_library_t *dest, char *cpdir, char *cachedir)
 {
-    *dest = NULL;
     if (cpdir == NULL || cpdir[0] == '\0')
     {
         return make_error(BFBRIDGE_INVALID_CLASSPATH, "bfbridge_make_library: no classpath supplied", NULL);
@@ -194,27 +193,23 @@ bfbridge_error_t *bfbridge_make_library(
 
     free_string(path_arg);
 
-    // Should be freed: jvm, out_lib
-    bfbridge_library *out_lib = (bfbridge_library *)malloc(sizeof(bfbridge_library));
-    out_lib->jvm = jvm;
-    out_lib->env = env;
-    out_lib->bfbridge_base = bfbridge_base;
+    dest->jvm = jvm;
+    dest->env = env;
+    dest->bfbridge_base = bfbridge_base;
 
-    out_lib->constructor = (*env)->GetMethodID(env, bfbridge_base, "<init>", "()V");
-    if (!out_lib->constructor)
+    dest->constructor = (*env)->GetMethodID(env, bfbridge_base, "<init>", "()V");
+    if (!dest->constructor)
     {
-        free(out_lib);
         jvm->DestroyJavaVM();
         return make_error(BFBRIDGE_METHOD_NOT_FOUND, "Could not find BFBridge constructor", NULL);
     }
 
     // Now do the same for methods but in shorthand form
 #define prepare_method_id(name, descriptor)                         \
-    out_lib->name =                                                 \
+    dest->name =                                                    \
         (*env)->GetMethodID(env, bfbridge_base, #name, descriptor); \
-    if (!out_lib->name)                                             \
+    if (!dest->name)                                                \
     {                                                               \
-        free(out_lib);                                              \
         jvm->DestroyJavaVM();                                       \
         return make_error(                                          \
             BFBRIDGE_METHOD_NOT_FOUND,                              \
@@ -269,7 +264,6 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFToolsShouldGenerate, "()I");
     prepare_method_id(BFToolsGenerateSubresolutions, "(III)I");
 
-    *dest = out_lib;
     return NULL;
 }
 
@@ -278,17 +272,14 @@ void bfbridge_free_library(bfbridge_library_t *lib)
     (*(lib->env))->DestroyJavaVM(env);
     // Now, there's no need to free bfbridge_base
     // DetachCurrentThread would also free this reference
-    free(lib);
 }
 
 bfbridge_error_t *bfbridge_make_instance(
-    bfbridge_instance_t **dest,
+    bfbridge_instance_t *dest,
     bfbridge_library_t *library,
     char *communication_buffer,
     int communication_buffer_len)
 {
-    *dest = NULL;
-
     if (communication_buffer == NULL || communication_buffer_len < 0)
     {
         return make_error(
@@ -349,7 +340,6 @@ bfbridge_error_t *bfbridge_make_instance(
     (*env)->CallVoidMethod(env, bfbridge, library->BFSetCommunicationBuffer, buffer);
 
     (*env)->DeleteLocalRef(env, buffer);
-    *dest = (bfbridge_instance_t *)malloc(sizeof(bfbridge_instance_t));
     dest->bfbridge = bfbridge;
     dest->communication_buffer = communication_buffer;
 #ifndef BFBRIDGE_KNOW_BUFFER_LEN
@@ -368,7 +358,8 @@ char *bfbridge_instance_get_communication_buffer(
     bfbridge_instance_t *instance, int *len)
 {
 #ifndef BFBRIDGE_KNOW_BUFFER_LEN
-    if (len) {
+    if (len)
+    {
         *len = instance->communication_buffer_len;
     }
 #endif

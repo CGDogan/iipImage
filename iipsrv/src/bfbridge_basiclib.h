@@ -120,15 +120,16 @@ typedef struct bfbridge_library
     jmethodID BFToolsGenerateSubresolutions;
 } bfbridge_library_t;
 
-// On success, returns NULL and sets dest
-// On failure, sets dest to NULL and returns error
+// On success, returns NULL and fills *dest
+// On failure, returns error, and it may have modified *dest
 // cpdir: a string to a single directory containing jar files (and maybe classes)
 // cachedir: NULL or the directory path to store file caches for faster opening
 BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_library(
-    bfbridge_library_t **dest,
+    bfbridge_library_t *dest,
     char *cpdir,
     char *cachedir);
 
+// Does not free the library struct but its contents
 BFBRIDGE_INLINE_ME void bfbridge_free_library(bfbridge_library_t *);
 
 // Almost all functions that need a bfbridge_instance_t must be passed
@@ -143,11 +144,11 @@ typedef struct bfbridge_instance
 #endif
 } bfbridge_instance_t;
 
-// On success, returns NULL and sets dest
-// On failure, sets dest to NULL and returns error
+// On success, returns NULL and fills *dest
+// On failure, returns error, and it may have modified *dest
 // library: the library that was allocated for this thread with bfbridge_make_library
 // (you may otherwise DetachCurrentThread then AttachCurrentThread)
-// Please allocate a char* from heap and pass it and its length.
+// communication_buffer: Please allocate a char* from heap and pass it and its length.
 // You should keep the pointer (or call bfbridge_instance_get_communication_buffer)
 // and free it about the same time as bfbridge_free_instance or reuse it.
 // communication_buffer:
@@ -157,7 +158,7 @@ typedef struct bfbridge_instance
 // communication_buffer_len: You should pass this correctly
 // even if you define BFBRIDGE_KNOW_BUFFER_LEN
 BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_instance(
-    bfbridge_instance_t **dest,
+    bfbridge_instance_t *dest,
     bfbridge_library_t *library,
     char *communication_buffer,
     int communication_buffer_len);
@@ -165,6 +166,7 @@ BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_instance(
 // bfbridge_free_instance mustnt't be called after bfbridge_free_library
 // bfbridge_free_library removes the need to call bfbridge_free_instance.
 // This function does not free communication_buffer, you should free it
+// It also does not free the instance struct but its contents only.
 BFBRIDGE_INLINE_ME void bfbridge_free_instance(
     bfbridge_instance_t *, bfbridge_library_t *library);
 
