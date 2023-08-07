@@ -87,7 +87,7 @@ static bfbridge_error_t *make_error(
 {
     bfbridge_error_t *error = (bfbridge_error_t *)malloc(sizeof(bfbridge_error_t));
     error->code = code;
-    bfbridge_basiclib_string_t desc = allocate_string(operation);
+    bfbridge_basiclib_string_t *desc = allocate_string(operation);
     if (description)
     {
         append_to_string(desc, description);
