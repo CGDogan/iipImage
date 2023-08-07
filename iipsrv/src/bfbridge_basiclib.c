@@ -51,9 +51,10 @@ static bfbridge_basiclib_string_t *allocate_string(char *initial)
         (bfbridge_basiclib_string_t *)
             malloc(sizeof(bfbridge_basiclib_string_t));
     bbs->alloc_len = 2 * initial_len;
-    bbs->str = (char *)malloc(bbs->alloclen * sizeof(char) + 1);
+    bbs->str = (char *)malloc(bbs->alloc_len * sizeof(char) + 1);
     bbs->len = initial_len;
     strcpy(bbs->str, initial);
+    return bbs;
 }
 
 static void free_string(bfbridge_basiclib_string *bbs)
@@ -79,7 +80,10 @@ static void append_to_string(bfbridge_basiclib_string_t *bbs, char *s)
 }
 
 // description: optional string to be appended to end of operation
-static bfbridge_error_t *make_error(int code, char *operation, char *description)
+static bfbridge_error_t *make_error(
+    bfbridge_error_code_t code,
+    char *operation,
+    char *description)
 {
     bfbridge_error_t *error = (bfbridge_error_t *)malloc(sizeof(bfbridge_error_t));
     error->code = code;
