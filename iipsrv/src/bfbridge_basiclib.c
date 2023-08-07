@@ -1,6 +1,6 @@
 // TODO: To be moved to decoders directory
 
-// TODO: Example use. Mention that
+// TODO: Add example use. Mention that
 /*bfbridge_make_library will either return success
 or won't require any free, except for the user-allocated struct
 
@@ -14,8 +14,6 @@ Free can be called for both the library and the instance
 because the makers set to null if going to fail
 so you can call free regardless of whether the makers failed
 */
-
-// TODO consider returning, instead of bfbridge_error_t*, return bfbridge_error_t?
 
 // If inlining but erroneously still compiling .c, make it empty
 #if !(defined(BFBRIDGE_INLINE) && !defined(BFBRIDGE_HEADER))
@@ -33,6 +31,17 @@ so you can call free regardless of whether the makers failed
 #define BFBRIDGE_PATH_SEPARATOR '/'
 #endif
 
+// Define BFENVA - BF ENV Access
+// In a single-header mode of operation, we need to be able to
+// call JNI in its both modes
+// C++: env->JNIMethodABC..(x,y,z)
+// C: (*env)->JNIMethodABC..(env, x,y,z)
+#ifdef __cplusplus
+#define BFENVA(env, method_name, ...) (env)->method_name(__VA_ARGS__)
+#else
+#define BFENVA(env, method_name, ...) (*(env))->method_name((env), __VA_ARGS__)
+#endif
+
 void bfbridge_free_error(bfbridge_error_t *error)
 {
     free(error->description);
@@ -46,7 +55,7 @@ typedef struct bfbridge_basiclib_string
     int alloc_len;
 } bfbridge_basiclib_string_t;
 
-static bfbridge_basiclib_string_t *allocate_string(char *initial)
+static bfbridge_basiclib_string_t *allocate_string(const char *initial)
 {
     int initial_len = strlen(initial);
     bfbridge_basiclib_string_t *bbs =
@@ -65,7 +74,7 @@ static void free_string(bfbridge_basiclib_string *bbs)
     free(bbs);
 }
 
-static void append_to_string(bfbridge_basiclib_string_t *bbs, char *s)
+static void append_to_string(bfbridge_basiclib_string_t *bbs, const char *s)
 {
     int s_len = strlen(s);
     int required_len = s_len + bbs->len;
@@ -84,8 +93,8 @@ static void append_to_string(bfbridge_basiclib_string_t *bbs, char *s)
 // description: optional string to be appended to end of operation
 static bfbridge_error_t *make_error(
     bfbridge_error_code_t code,
-    char *operation,
-    char *description)
+    const char *operation,
+    const char *description)
 {
     bfbridge_error_t *error = (bfbridge_error_t *)malloc(sizeof(bfbridge_error_t));
     error->code = code;
@@ -591,5 +600,12 @@ int bf_open_bytes(int x, int y, int w, int h)
 {
     return jvm.env->CallIntMethod(bfbridge, jvm.BFOpenBytes, x, y, w, h);
 }*/
+
+#undef BFENV
+#undef BFINSTC
+
+#ifdef __cplusplus
+#undef BFENVA
+#endif
 
 #endif // !(defined(BFBRIDGE_INLINE) && !defined(BFBRIDGE_HEADER))
