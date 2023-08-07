@@ -15,6 +15,8 @@ because the makers set to null if going to fail
 so you can call free regardless of whether the makers failed
 */
 
+// TODO consider returning, instead of bfbridge_error_t*, return bfbridge_error_t?
+
 // If inlining but erroneously still compiling .c, make it empty
 #if !(defined(BFBRIDGE_INLINE) && !defined(BFBRIDGE_HEADER))
 
@@ -101,7 +103,7 @@ bfbridge_error_t *bfbridge_make_library(
     bfbridge_library_t *dest, char *cpdir, char *cachedir)
 {
     // Ease of freeing
-    *dest->env = NULL;
+    dest->env = NULL;
 
     if (cpdir == NULL || cpdir[0] == '\0')
     {
@@ -154,11 +156,11 @@ bfbridge_error_t *bfbridge_make_library(
 
     JavaVMOption options[3];
 
-    fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg.c_str());
+    fprintf(stderr, "Java classpath (BFBRIDGE_CLASSPATH): %s\n", path_arg->str);
     // https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html#performance-tuning-examples
     char optimize1[] = "-XX:+UseParallelGC";
     // char optimize2[] = "-XX:+UseLargePages"; Not compatible with our linux distro
-    options[0].optionString = path_arg;
+    options[0].optionString = path_arg->str;
     options[1].optionString = optimize1;
     // options[2].optionString = "-verbose:jni";
     JavaVMInitArgs vm_args;
@@ -190,7 +192,7 @@ bfbridge_error_t *bfbridge_make_library(
     if (code < 0)
     {
         free_string(path_arg);
-        return make_error(code, "JNI_CreateJavaVM failed, please see https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes for error code description", NULL);
+        return make_error((bfbridge_error_code_t) code, "JNI_CreateJavaVM failed, please see https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes for error code description", NULL);
     }
 
     jclass bfbridge_base = (*env)->FindClass(env, "org/camicroscope/BFBridge");
