@@ -8,9 +8,9 @@
 #include <jni.h>
 #include <string>
 #include <stdlib.h>
-/*#define BFBRIDGE_INLINE
+#define BFBRIDGE_INLINE
 #define BFBRIDGE_KNOW_BUFFER_LEN
-#include "bfbridge_basiclib.h"*/
+#include "bfbridge_basiclib.h"
 
 /*
 JVM/JNI has a requirement that a thread of ours
@@ -28,59 +28,7 @@ allow keeping multiple files open. They share a JVM.
 class BioFormatsThread
 {
 public:
-    JavaVM *jvm;
-    JNIEnv *env;
-
-    // Call FindClass just once and store it there.
-    // It seems that additional calls to FindClass invalidate this pointer
-    // so calling FindClass outside of BioFormatsThread breaks other code.
-    jclass bfbridge_base;
-
-    jmethodID constructor;
-
-    // See the comment "To print descriptors to screen ..."
-    // for the javap command and please keep these in order with the output
-    jmethodID BFSetCommunicationBuffer;
-    jmethodID BFReset;
-    jmethodID BFGetErrorLength;
-    jmethodID BFIsCompatible;
-    jmethodID BFOpen;
-    jmethodID BFIsSingleFile;
-    jmethodID BFGetUsedFiles;
-    jmethodID BFGetCurrentFile;
-    jmethodID BFClose;
-    jmethodID BFGetResolutionCount;
-    jmethodID BFSetCurrentResolution;
-    jmethodID BFSetSeries;
-    jmethodID BFGetSeriesCount;
-    jmethodID BFGetSizeX;
-    jmethodID BFGetSizeY;
-    jmethodID BFGetSizeZ;
-    jmethodID BFGetSizeT;
-    jmethodID BFGetSizeC;
-    jmethodID BFGetEffectiveSizeC;
-    jmethodID BFGetOptimalTileWidth;
-    jmethodID BFGetOptimalTileHeight;
-    jmethodID BFGetFormat;
-    jmethodID BFGetPixelType;
-    jmethodID BFGetBitsPerPixel;
-    jmethodID BFGetBytesPerPixel;
-    jmethodID BFGetRGBChannelCount;
-    jmethodID BFGetImageCount;
-    jmethodID BFIsRGB;
-    jmethodID BFIsInterleaved;
-    jmethodID BFIsLittleEndian;
-    jmethodID BFIsFalseColor;
-    jmethodID BFIsIndexedColor;
-    jmethodID BFGetDimensionOrder;
-    jmethodID BFIsOrderCertain;
-    jmethodID BFOpenBytes;
-    jmethodID BFGetMPPX;
-    jmethodID BFGetMPPY;
-    jmethodID BFGetMPPZ;
-    jmethodID BFIsAnyFileOpen;
-    jmethodID BFToolsShouldGenerate;
-    jmethodID BFToolsGenerateSubresolutions;
+    bfbridge_library_t bflibrary;
 
     BioFormatsThread();
 
@@ -92,7 +40,7 @@ public:
 
     ~BioFormatsThread()
     {
-        jvm->DestroyJavaVM();
+        bfbridge_free_library(&bflibrary);
     }
 };
 
