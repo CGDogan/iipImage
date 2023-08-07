@@ -393,15 +393,46 @@ char *bfbridge_instance_get_communication_buffer(
     return instance->communication_buffer;
 }
 
-/*
+// Methods
+// Please keep in order with bfbridge_library_t members
 
-char *bf_get_error(bfbridge_instance_t *instance)
+// Shorthand for JavaENV:
+#define BFENV (*library->env)
+// Instance class:
+#define BFINSTC (*instance->bfbridge)
+
+// BFSetCommunicationBuffer is used internally
+
+// Return a C string with the last error
+// This should only be called when the last bf_* method returned an error code
+// May otherwise return undisplayable characters
+char *bf_get_error_convenience(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    int len = jvm.env->CallIntMethod(bfbridge, jvm.BFGetErrorLength);
-    std::string err;
-    err.assign(communication_buffer, len);
-    return err;
+    int len = BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
+    char *buffer = bfbridge_instance_get_communication_buffer(instance, NULL);
+    // The case of overflow is handled on Java side
+    buffer[len] = '\0';
+    return buffer;
 }
+
+// bf_get_error: fills the communication buffer with an error message
+// returns: the number of bytes to read
+int bf_get_error(bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
+}
+
+/*int bf_is_compatible(std::string filepath)
+{
+    fprintf(stderr, "calling is compatible %s\n", filepath.c_str());
+    int len = filepath.length();
+    memcpy(communication_buffer, filepath.c_str(), len);
+    fprintf(stderr, "called is compatible\n");
+    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsCompatible, len);
+}*/
+
+/*
 
 int bf_is_compatible(std::string filepath)
 {
