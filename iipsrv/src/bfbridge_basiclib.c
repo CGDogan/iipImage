@@ -299,7 +299,7 @@ bfbridge_error_t *bfbridge_make_instance(
     JNIEnv *env = library->env;
 
     jobject bfbridge_local =
-        (*env)->NewObject(env, jvm.bfbridge_base, jvm.constructor);
+        (*env)->NewObject(env, library->bfbridge_base, library->constructor);
     // Should be freed: bfbridge
     jobject bfbridge = (jobject)((*env)->NewGlobalRef(env, bfbridge_local));
     (*env)->DeleteLocalRef(env, bfbridge_local);
@@ -350,10 +350,11 @@ bfbridge_error_t *bfbridge_make_instance(
 
     (*env)->DeleteLocalRef(env, buffer);
     *dest = (bfbridge_instance_t *)malloc(sizeof(bfbridge_instance_t));
-    dest->library = library;
     dest->bfbridge = bfbridge;
     dest->communication_buffer = communication_buffer;
+#ifndef BFBRIDGE_KNOW_BUFFER_LEN
     dest->communication_buffer_len = communication_buffer_len;
+#endif
     return NULL;
 }
 
