@@ -367,9 +367,11 @@ void bfbridge_free_instance(
 char *bfbridge_instance_get_communication_buffer(
     bfbridge_instance_t *instance, int *len)
 {
+#ifndef BFBRIDGE_KNOW_BUFFER_LEN
     if (len) {
         *len = instance->communication_buffer_len;
     }
+#endif
     return instance->communication_buffer;
 }
 
