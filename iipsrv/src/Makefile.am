@@ -36,6 +36,8 @@ iipsrv_fcgi_SOURCES = \
 			BioFormatsImage.cc \
 			BioFormatsInstance.h \
 			BioFormatsInstance.cc \
+			BioFormatsThread.h \
+			BioFormatsThread.cc \
 			JPEGCompressor.h \
 			JPEGCompressor.cc \
 			RawTile.h \
