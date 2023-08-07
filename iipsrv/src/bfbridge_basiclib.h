@@ -154,6 +154,8 @@ typedef struct bfbridge_instance
 // This will be used for two-way communication.
 // Suggested length is 33 MB (33554432) to allow
 // 2048 by 2048 four channels of 16 bit
+// communication_buffer_len: You should pass this correctly
+// even if you define BFBRIDGE_KNOW_BUFFER_LEN
 BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_instance(
     bfbridge_instance_t **dest,
     bfbridge_library_t *library,
