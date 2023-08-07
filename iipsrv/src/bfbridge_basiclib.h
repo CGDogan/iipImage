@@ -74,6 +74,9 @@ typedef struct bfbridge_library
 
     jmethodID constructor;
 
+    // Please keep this list in order with javap output
+    // See the comment "To print descriptors (encoded function types) ..."
+    // for the javap command
     jmethodID BFSetCommunicationBuffer;
     jmethodID BFReset;
     jmethodID BFGetErrorLength;
