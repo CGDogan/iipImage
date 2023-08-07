@@ -1,5 +1,20 @@
 // TODO: To be moved to decoders directory
 
+// TODO: Example use. Mention that
+/*bfbridge_make_library will either return success
+or won't require any free, except for the user-allocated struct
+
+make_instance will either return success or fail while setting
+communication buffer so one can free that easily and
+allow you to call free_instance even if unsuccessful (write under heading
+maybe: "failure guarantees")
+
+Ease of freeing:
+Free can be called for both the library and the instance
+because the makers set to null if going to fail
+so you can call free regardless of whether the makers failed
+*/
+
 // If inlining but erroneously still compiling .c, make it empty
 #if !(defined(BFBRIDGE_INLINE) && !defined(BFBRIDGE_HEADER))
 
@@ -16,7 +31,7 @@
 #define BFBRIDGE_PATH_SEPARATOR '/'
 #endif
 
-void bfbridge_free_error(bfbridge_error_t *error)
+    void bfbridge_free_error(bfbridge_error_t *error)
 {
     free(error->description);
     free(error);
@@ -81,6 +96,9 @@ static bfbridge_error_t *make_error(int code, char *operation, char *description
 bfbridge_error_t *bfbridge_make_library(
     bfbridge_library_t *dest, char *cpdir, char *cachedir)
 {
+    // Ease of freeing
+    *dest->env = NULL;
+
     if (cpdir == NULL || cpdir[0] == '\0')
     {
         return make_error(BFBRIDGE_INVALID_CLASSPATH, "bfbridge_make_library: no classpath supplied", NULL);
@@ -269,8 +287,11 @@ bfbridge_error_t *bfbridge_make_library(
 
 void bfbridge_free_library(bfbridge_library_t *lib)
 {
-    (*(lib->env))->DestroyJavaVM(env);
-    // Now, there's no need to free bfbridge_base
+    // Ease of freeing
+    if (lib->env) {
+        (*(lib->env))->DestroyJavaVM(env);
+    }
+    // Now, after DestroyJavaVM, there's no need to free bfbridge_base
     // DetachCurrentThread would also free this reference
 }
 
@@ -280,6 +301,13 @@ bfbridge_error_t *bfbridge_make_instance(
     char *communication_buffer,
     int communication_buffer_len)
 {
+    // Ease of freeing
+    dest->bfbridge = NULL;
+    dest->communication_buffer = communication_buffer;
+#ifndef BFBRIDGE_KNOW_BUFFER_LEN
+    dest->communication_buffer_len = communication_buffer_len;
+#endif
+
     if (communication_buffer == NULL || communication_buffer_len < 0)
     {
         return make_error(
@@ -341,17 +369,16 @@ bfbridge_error_t *bfbridge_make_instance(
 
     (*env)->DeleteLocalRef(env, buffer);
     dest->bfbridge = bfbridge;
-    dest->communication_buffer = communication_buffer;
-#ifndef BFBRIDGE_KNOW_BUFFER_LEN
-    dest->communication_buffer_len = communication_buffer_len;
-#endif
     return NULL;
 }
 
 void bfbridge_free_instance(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    (*library->env)->DeleteGlobalRef(library->env, bfbridge);
+    // Ease of freeing
+    if (instance->bfbridge) {
+        (*library->env)->DeleteGlobalRef(library->env, bfbridge);
+    }
 }
 
 char *bfbridge_instance_get_communication_buffer(

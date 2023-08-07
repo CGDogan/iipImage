@@ -146,6 +146,8 @@ typedef struct bfbridge_instance
 
 // On success, returns NULL and fills *dest
 // On failure, returns error, and it may have modified *dest
+// (But on failure, it will still have set the communication_buffer
+// and the communication_buffer_len, to help you free it)
 // library: the library that was allocated for this thread with bfbridge_make_library
 // (you may otherwise DetachCurrentThread then AttachCurrentThread)
 // communication_buffer: Please allocate a char* from heap and pass it and its length.
