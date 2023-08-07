@@ -31,7 +31,7 @@ so you can call free regardless of whether the makers failed
 #define BFBRIDGE_PATH_SEPARATOR '/'
 #endif
 
-    void bfbridge_free_error(bfbridge_error_t *error)
+void bfbridge_free_error(bfbridge_error_t *error)
 {
     free(error->description);
     free(error);
@@ -232,7 +232,7 @@ bfbridge_error_t *bfbridge_make_library(
         return make_error(                                          \
             BFBRIDGE_METHOD_NOT_FOUND,                              \
             "Could not find BFBridge method ",                      \
-            #name " with expected descriptor " #decriptor);         \
+            #name " with expected descriptor " decriptor);          \
     }
 
     // To print descriptors (encoded function types) to screen
@@ -288,7 +288,8 @@ bfbridge_error_t *bfbridge_make_library(
 void bfbridge_free_library(bfbridge_library_t *lib)
 {
     // Ease of freeing
-    if (lib->env) {
+    if (lib->env)
+    {
         (*(lib->env))->DestroyJavaVM(env);
     }
     // Now, after DestroyJavaVM, there's no need to free bfbridge_base
@@ -376,7 +377,8 @@ void bfbridge_free_instance(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
     // Ease of freeing
-    if (instance->bfbridge) {
+    if (instance->bfbridge)
+    {
         (*library->env)->DeleteGlobalRef(library->env, bfbridge);
     }
 }
