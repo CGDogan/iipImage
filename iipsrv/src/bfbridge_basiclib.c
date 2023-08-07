@@ -279,6 +279,7 @@ void bfbridge_free_library(bfbridge_library_t *lib)
 {
     (*(lib->env))->DestroyJavaVM(env);
     // Now, there's no need to free bfbridge_base
+    // DetachCurrentThread would also free this reference
     free(lib);
 }
 
