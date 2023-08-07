@@ -78,7 +78,6 @@ typedef struct bfbridge_library
     // See the comment "To print descriptors (encoded function types) ..."
     // for the javap command
     jmethodID BFSetCommunicationBuffer;
-    jmethodID BFReset;
     jmethodID BFGetErrorLength;
     jmethodID BFIsCompatible;
     jmethodID BFOpen;
