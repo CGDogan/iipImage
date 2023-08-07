@@ -112,9 +112,11 @@ BFBRIDGE_INLINE_ME bfbridge_error_t *bfbridge_make_library(
 
 BFBRIDGE_INLINE_ME void bfbridge_free_library(bfbridge_library_t *);
 
+// Almost all functions that need a bfbridge_instance_t must be passed
+// the instance's related bfbridge_library_t and not any other bfbridge_library_t
+
 typedef struct bfbridge_instance
 {
-    bfbridge_library_t *library;
     jobject bfbridge;
     char *communication_buffer;
     int communication_buffer_len;
@@ -140,10 +142,11 @@ BFBRIDGE_INLINE_ME bfbridge_error_t *bfbridge_make_instance(
 // bfbridge_free_instance mustnt't be called after bfbridge_free_library
 // bfbridge_free_library removes the need to call bfbridge_free_instance.
 // This function does not free communication_buffer, you should free it
-BFBRIDGE_INLINE_ME void bfbridge_free_instance(bfbridge_instance_t *);
+BFBRIDGE_INLINE_ME void bfbridge_free_instance(
+    bfbridge_instance_t *, bfbridge_library_t *library);
 
 // returns the communication buffer
-// sets *len if len is not NULL to the buffer length
+// sets *len, if the len ptr is not NULL, to the buffer length
 // Usecases:
 // - call next to bfbridge_free_instance to free the buffer
 // - some of our library functions would like to return a byte array
