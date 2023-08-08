@@ -257,7 +257,7 @@ bfbridge_error_t *bfbridge_make_library(
         return make_error(                                          \
             BFBRIDGE_METHOD_NOT_FOUND,                              \
             "Could not find BFBridge method ",                      \
-            #name " with expected descriptor " /*decriptor*/);          \
+            #name " with expected descriptor " decriptor);          \
     }
 
     // To print descriptors (encoded function types) to screen
@@ -320,7 +320,9 @@ void bfbridge_move_library(bfbridge_library_t *dest, bfbridge_library_t *lib)
     {
         *dest = *lib;
         lib->jvm = NULL;
-    } else {
+    }
+    else
+    {
         dest->jvm = NULL;
     }
 }
@@ -468,13 +470,13 @@ char *bfbridge_instance_get_communication_buffer(
 #define BFINSTC (instance->bfbridge)
 
 // Call easily
-//#define BFFUNC(method_name, ...) BFENVA(BFENV, method_name, BFINSTC, __VA_ARGS__)
+// #define BFFUNC(method_name, ...) BFENVA(BFENV, method_name, BFINSTC, __VA_ARGS__)
 // Even more easily:
-//#define BFFUNC(caller, method, ...) \
+// #define BFFUNC(caller, method, ...) \
 //BFENVA(BFENV, caller, BFINSTC, library->method, __VA_ARGS__)
 // Super easily:
 #define BFFUNC(method, type, ...) \
- BFENVA(BFENV, Call##type##Method, BFINSTC, library->method, __VA_ARGS__)
+    BFENVA(BFENV, Call##type##Method, BFINSTC, library->method, __VA_ARGS__)
 // Use the second one, void one, for no args as __VA_ARGS__ requires at least one
 #define BFFUNCV(method, type) \
     BFENVA(BFENV, Call##type##Method, BFINSTC, library->method)
@@ -500,7 +502,7 @@ char *bf_get_error_convenience(
 // returns: the number of bytes to read
 int bf_get_error(bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    //return BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
+    // return BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
     return BFFUNCV(BFGetErrorLength, Int);
 }
 
