@@ -128,7 +128,7 @@ void IIPImage::testImageType() throw(file_error)
 
       int code;
       fprintf(stderr, "starting checks\n");
-    if ((code = bfi.bf_is_compatible(path)) == 1) {
+    if ((code = bfi.is_compatible(path)) == 1) {
       fprintf(stderr, "It is bf compatible! iipimage.cc\n");
 
       format = BIOFORMATS;
