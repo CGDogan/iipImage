@@ -336,6 +336,7 @@ BFBRIDGE_INLINE_ME int bf_is_false_color(
 BFBRIDGE_INLINE_ME int bf_get_8_bit_lookup_table(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
+// Big endian
 BFBRIDGE_INLINE_ME int bf_get_16_bit_lookup_table(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
