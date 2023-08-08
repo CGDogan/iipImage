@@ -313,6 +313,18 @@ bfbridge_error_t *bfbridge_make_library(
     return NULL;
 }
 
+void bfbridge_move_library(bfbridge_library_t *dest, bfbridge_library_t *lib)
+{
+    // Ease of freeing
+    if (lib->jvm)
+    {
+        *dest = *lib;
+        lib->jvm = NULL;
+    } else {
+        dest->jvm = NULL;
+    }
+}
+
 void bfbridge_free_library(bfbridge_library_t *lib)
 {
     // Ease of freeing
@@ -406,6 +418,23 @@ bfbridge_error_t *bfbridge_make_instance(
     // Ease of freeing: keep null until we can return without error
     dest->bfbridge = bfbridge;
     return NULL;
+}
+
+// Copies while making the freeing of the previous a noop
+// Dest: doesn't need to be initialized but allocated
+// This function would benefit from restrict but if we inline, not necessary
+void bfbridge_move_instance(bfbridge_instance_t *dest, bfbridge_instance_t *lib)
+{
+    // Ease of freeing
+    if (lib->bfbridge)
+    {
+        *dest = *lib;
+        lib->bfbridge = NULL;
+    }
+    else
+    {
+        dest->bfbridge = NULL;
+    }
 }
 
 void bfbridge_free_instance(
