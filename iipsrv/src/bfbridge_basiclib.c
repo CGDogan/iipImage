@@ -275,10 +275,10 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFGetUsedFiles, "()I");
     prepare_method_id(BFGetCurrentFile, "()I");
     prepare_method_id(BFClose, "()I");
-    prepare_method_id(BFGetResolutionCount, "()I");
-    prepare_method_id(BFSetCurrentResolution, "(I)I");
     prepare_method_id(BFGetSeriesCount, "()I");
     prepare_method_id(BFSetCurrentSeries, "(I)I");
+    prepare_method_id(BFGetResolutionCount, "()I");
+    prepare_method_id(BFSetCurrentResolution, "(I)I");
     prepare_method_id(BFGetSizeX, "()I");
     prepare_method_id(BFGetSizeY, "()I");
     prepare_method_id(BFGetSizeC, "()I");
@@ -554,19 +554,6 @@ int bf_close(
     return BFFUNCV(BFClose, Int);
 }
 
-int bf_get_resolution_count(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
-{
-    return BFFUNCV(BFGetResolutionCount, Int);
-}
-
-int bf_set_current_resolution(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
-    int res)
-{
-    return BFFUNC(BFSetCurrentResolution, Int, res);
-}
-
 int bf_get_series_count(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
@@ -578,6 +565,19 @@ int bf_set_current_series(
     int ser)
 {
     return BFFUNC(BFSetCurrentSeries, Int, ser);
+}
+
+int bf_get_resolution_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGetResolutionCount, Int);
+}
+
+int bf_set_current_resolution(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int res)
+{
+    return BFFUNC(BFSetCurrentResolution, Int, res);
 }
 
 int bf_get_size_x(
