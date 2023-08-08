@@ -43,6 +43,7 @@ extern "C" {
 
 typedef enum bfbridge_error_code
 {
+    // Library initialization:
     BFBRIDGE_INVALID_CLASSPATH,
     BFBRIDGE_CLASS_NOT_FOUND,
     BFBRIDGE_METHOD_NOT_FOUND,
@@ -54,7 +55,7 @@ typedef enum bfbridge_error_code
     BFBRIDGE_JNI_EEXIST = JNI_EEXIST,
     BFBRIDGE_JNI_EINVAL = JNI_EINVAL,
 
-    // Instance initialization only:
+    // Instance initialization:
     BFBRIDGE_INVALID_COMMUNICATON_BUFFER,
     BFBRIDGE_OUT_OF_MEMORY_ERROR,
     BFBRIDGE_JVM_LACKS_BYTE_BUFFERS,
@@ -82,7 +83,12 @@ typedef struct bfbridge_library
 
     // Please keep this list in order with javap output
     // See the comment "To print descriptors (encoded function types) ..."
-    // for the javap command
+    // for the javap command.
+    // To add a new method:
+    // 1) Modify bfbridge_library_t
+    // 2) Modify bfbridge_basiclib.h to add prototype
+    // 3) Modify bfbridge_basiclib.c to add descriptor
+    // 4) Modify bfbridge_basiclib.c to add function body
     jmethodID BFSetCommunicationBuffer;
     jmethodID BFGetErrorLength;
     jmethodID BFIsCompatible;
