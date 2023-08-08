@@ -104,7 +104,7 @@ public:
   {
     fprintf(stderr, "calling refresh\n");
     // Here is an example of calling a method manually without the C wrapper
-    thread.bflibrary.env->CallVoidMethod(&bfinstance, &thread.bflibrary.BFClose);
+    thread.bflibrary.env->CallVoidMethod(bfinstance.bfbridge, thread.bflibrary);
     fprintf(stderr, "called refresh\n");
   }
 
@@ -113,7 +113,7 @@ public:
   {
     std::string err;
     char *buffer = communication_buffer();
-    err.assign(communication_buffer,
+    err.assign(communication_buffer(),
                bf_get_error_length(&bfinstance, &thread.bflibrary));
     return err;
   }
