@@ -84,7 +84,7 @@ public:
   ~BioFormatsInstance()
   {
     char *communication_buffer =
-      bfbridge_instance_get_communication_buffer(bfinstance, NULL);
+      bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
     delete[] communication_buffer;
 
     bfbridge_free_instance(&bfinstance, &thread.bflibrary);
