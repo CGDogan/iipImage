@@ -73,13 +73,13 @@ public:
   {
     // Copy both the Java instance class and the communication buffer
     bfinstance = other.bfinstance;
-    other.bfinstance = null;
+    other.bfinstance = nullptr;
   }
   BioFormatsInstance &operator=(const BioFormatsInstance &) = delete;
   BioFormatsInstance &operator=(BioFormatsInstance &&other)
   {
     bfinstance = other.bfinstance;
-    other.bfinstance = null;
+    other.bfinstance = nullptr;
     return *this;
   }
 
