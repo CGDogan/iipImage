@@ -497,18 +497,24 @@ char *bf_get_error_convenience(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
     int len = BFFUNCV(BFGetErrorLength, Int);
-
-    // BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
-    char *buffer = bfbridge_instance_get_communication_buffer(instance, NULL);
     // The case of overflow is handled on Java side
-    buffer[len] = '\0';
-    return buffer;
+    instance->communication_buffer[len] = '\0';
+    return instance->communication_buffer;
 }
 
-int bf_get_error(bfbridge_instance_t *instance, bfbridge_library_t *library)
+int bf_get_error_length(bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    // return BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
     return BFFUNCV(BFGetErrorLength, Int);
+}
+
+int bf_is_compatible(
+    bfbridge_instance_t *instance,
+    bfbridge_library_t *library, char *filepath, int filepath_len)
+{
+    fprintf(stderr, "calling is compatible %s\n", filepath.c_str());
+    memcpy(instance->communication_buffer, filepath, filepath_len);
+    fprintf(stderr, "called is compatible\n");
+    return BFFUNC(BFIsCompatible, Int, filepath_len);
 }
 
 /*int bf_is_compatible(std::string filepath)
