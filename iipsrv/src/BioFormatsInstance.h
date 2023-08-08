@@ -113,7 +113,7 @@ public:
   std::string bf_get_error()
   {
     std::string err;
-    char *communication_buffer = communication_buffer();
+    char *buffer = communication_buffer();
     err.assign(communication_buffer,
                bf_get_error_length(bfinstance.bfbridge, thread.bflibrary));
     return err;
@@ -121,7 +121,7 @@ public:
 
   int bf_is_compatible(std::string filepath)
   {
-    char *communication_buffer = communication_buffer();
+    char *buffer = communication_buffer();
     memcpy(communication_buffer, &filepath[0], len);
     return bf_is_compatible(bfinstance.bfbridge, thread.bflibrary);
   }
