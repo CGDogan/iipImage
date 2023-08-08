@@ -213,7 +213,7 @@ bfbridge_error_t *bfbridge_make_library(
     if (!bfbridge_base)
     {
         bfbridge_basiclib_string_t *error = allocate_string("FindClass failed because org.camicroscope.BFBridge (or a dependency of it) could not be found. Are the jars in: ");
-        append_to_string(error, path_arg);
+        append_to_string(error, path_arg->str);
 
         if (BFENVA(env, ExceptionCheck) == 1)
         {
@@ -251,7 +251,7 @@ bfbridge_error_t *bfbridge_make_library(
         return make_error(                                          \
             BFBRIDGE_METHOD_NOT_FOUND,                              \
             "Could not find BFBridge method ",                      \
-            #name " with expected descriptor " decriptor);          \
+            #name " with expected descriptor " /*decriptor*/);          \
     }
 
     // To print descriptors (encoded function types) to screen
