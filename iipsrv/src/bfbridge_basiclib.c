@@ -511,7 +511,7 @@ int bf_is_compatible(
     bfbridge_instance_t *instance,
     bfbridge_library_t *library, char *filepath, int filepath_len)
 {
-    fprintf(stderr, "calling is compatible %s\n", filepath.c_str());
+    fprintf(stderr, "calling is compatible %s\n", filepath);
     memcpy(instance->communication_buffer, filepath, filepath_len);
     fprintf(stderr, "called is compatible\n");
     return BFFUNC(BFIsCompatible, Int, filepath_len);
@@ -519,9 +519,9 @@ int bf_is_compatible(
 
 /*int bf_is_compatible(std::string filepath)
 {
-    fprintf(stderr, "calling is compatible %s\n", filepath.c_str());
+    fprintf(stderr, "calling is compatible %s\n", filepath);
     int len = filepath.length();
-    memcpy(communication_buffer, filepath.c_str(), len);
+    memcpy(communication_buffer, filepath, len);
     fprintf(stderr, "called is compatible\n");
     return jvm.env->CallIntMethod(bfbridge, jvm.BFIsCompatible, len);
 }*/
@@ -530,9 +530,9 @@ int bf_is_compatible(
 
 int bf_is_compatible(std::string filepath)
 {
-    fprintf(stderr, "calling is compatible %s\n", filepath.c_str());
+    fprintf(stderr, "calling is compatible %s\n", filepath);
     int len = filepath.length();
-    memcpy(communication_buffer, filepath.c_str(), len);
+    memcpy(communication_buffer, filepath, len);
     fprintf(stderr, "called is compatible\n");
     return jvm.env->CallIntMethod(bfbridge, jvm.BFIsCompatible, len);
 }
@@ -540,7 +540,7 @@ int bf_is_compatible(std::string filepath)
 int bf_open(std::string filepath)
 {
     int len = filepath.length();
-    memcpy(communication_buffer, filepath.c_str(), len);
+    memcpy(communication_buffer, filepath, len);
     return jvm.env->CallIntMethod(bfbridge, jvm.BFOpen, len);
 }
 
