@@ -484,9 +484,6 @@ char *bfbridge_instance_get_communication_buffer(
 
 // BFSetCommunicationBuffer is used internally
 
-// Return a C string with the last error
-// This should only be called when the last bf_* method returned an error code
-// May otherwise return undisplayable characters
 char *bf_get_error_convenience(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
@@ -499,8 +496,6 @@ char *bf_get_error_convenience(
     return buffer;
 }
 
-// bf_get_error: fills the communication buffer with an error message
-// returns: the number of bytes to read
 int bf_get_error(bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
     // return BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);

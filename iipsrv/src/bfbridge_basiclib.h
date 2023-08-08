@@ -192,6 +192,17 @@ BFBRIDGE_INLINE_ME void bfbridge_free_instance(
 // expect that the user will read from there.
 BFBRIDGE_INLINE_ME char *bfbridge_instance_get_communication_buffer(bfbridge_instance_t *, int *len);
 
+// Return a C string with the last error
+// This should only be called when the last bf_* method returned an error code
+// May otherwise return undisplayable characters
+BFBRIDGE_INLINE_ME char *bf_get_error_convenience(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+// bf_get_error: fills the communication buffer with an error message
+// returns: the number of bytes to read
+BFBRIDGE_INLINE_ME int bf_get_error(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
 /*
 How is the communication buffer used internally?
 Some functions receive from BioFormats through the communication buffer
