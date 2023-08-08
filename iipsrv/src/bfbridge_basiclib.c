@@ -737,21 +737,21 @@ double bf_get_mpp_x(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     int series)
 {
-    return BFFUNCV(BFGetMPPX, Double, series);
+    return BFFUNC(BFGetMPPX, Double, series);
 }
 
 double bf_get_mpp_y(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     int series)
 {
-    return BFFUNCV(BFGetMPPY, Double, series);
+    return BFFUNC(BFGetMPPY, Double, series);
 }
 
 double bf_get_mpp_z(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     int series)
 {
-    return BFFUNCV(BFGetMPPZ, Double, series);
+    return BFFUNC(BFGetMPPZ, Double, series);
 }
 
 int bf_tools_should_generate(
