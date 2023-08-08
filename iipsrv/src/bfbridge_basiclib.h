@@ -204,9 +204,9 @@ BFBRIDGE_INLINE_ME char *bfbridge_instance_get_communication_buffer(bfbridge_ins
 BFBRIDGE_INLINE_ME char *bf_get_error_convenience(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
-// bf_get_error: fills the communication buffer with an error message
+// bf_get_error_length: fills the communication buffer with an error message
 // returns: the number of bytes to read
-BFBRIDGE_INLINE_ME int bf_get_error(
+BFBRIDGE_INLINE_ME int bf_get_error_length(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 // 1 if the filepath can be read by BioFormats otherwise 0
