@@ -120,12 +120,12 @@ public:
 
   int is_compatible(std::string filepath)
   {
-    return bf_is_compatible(&bfinstance, &thread.bflibrary, &filepath[0], len);
+    return bf_is_compatible(&bfinstance, &thread.bflibrary, &filepath[0], filepath.length());
   }
 
   int open(std::string filepath)
   {
-    return bf_open(&bfinstance, &thread.bflibrary, &filepath[0], len);
+    return bf_open(&bfinstance, &thread.bflibrary, &filepath[0], filepath.length());
   }
 
   int close()
