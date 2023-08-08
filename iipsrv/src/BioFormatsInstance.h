@@ -72,6 +72,8 @@ public:
   BioFormatsInstance(BioFormatsInstance &&other)
   {
     // Copy both the Java instance class and the communication buffer
+    // Moving removes the java class pointer from the previous
+    // so that the destruction of it doesn't break the newer class
     bfbridge_move_instance(&bfinstance, &other.bfinstance);
   }
   BioFormatsInstance &operator=(const BioFormatsInstance &) = delete;
