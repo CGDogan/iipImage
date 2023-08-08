@@ -433,10 +433,12 @@ void bfbridge_move_instance(bfbridge_instance_t *dest, bfbridge_instance_t *lib)
     {
         *dest = *lib;
         lib->bfbridge = NULL;
+        lib->communication_buffer = NULL;
     }
     else
     {
         dest->bfbridge = NULL;
+        dest->communication_buffer = NULL;
     }
 }
 
