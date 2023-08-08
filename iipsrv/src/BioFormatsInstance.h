@@ -104,7 +104,7 @@ public:
   {
     fprintf(stderr, "calling refresh\n");
     // Here is an example of calling a method manually without the C wrapper
-    thread.bflibrary.env->CallVoidMethod(bfinstance.bfbridge, thread.BFClose);
+    thread.bflibrary.env->CallVoidMethod(bfinstance.bfbridge, thread.bflibrary.BFClose);
     fprintf(stderr, "called refresh\n");
   }
 
