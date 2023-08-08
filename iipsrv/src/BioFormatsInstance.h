@@ -83,15 +83,17 @@ public:
     return *this;
   }
 
-  char *communication_buffer() {
+  char *communication_buffer()
+  {
     return bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
   }
 
   ~BioFormatsInstance()
   {
     char *communication_buffer =
-      bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
-    if (communication_buffer) {
+        bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
+    if (communication_buffer)
+    {
       delete[] communication_buffer;
     }
 
@@ -102,47 +104,43 @@ public:
   void refresh()
   {
     fprintf(stderr, "calling refresh\n");
-    // closing current file will help garbage collector do more
-    //jvm.env->CallVoidMethod(bfbridge, jvm.BFClose);
+    // Here is an example of calling a method manually without the C wrapper
     thread.bflibrary.env->CallVoidMethod(bfinstance.bfbridge, thread.bflibrary.BFClose);
     fprintf(stderr, "called refresh\n");
   }
 
+  // To be called only just after a function returns an error code
   std::string bf_get_error()
   {
-    int len = thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetErrorLength);
     std::string err;
-    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
-    err.assign(communication_buffer, len);
+    char *communication_buffer = communication_buffer();
+    err.assign(communication_buffer,
+               bf_get_error_length(bfinstance.bfbridge, thread.bflibrary));
     return err;
   }
 
   int bf_is_compatible(std::string filepath)
   {
-    fprintf(stderr, "calling is compatible %s\n", filepath.c_str());
-    int len = filepath.length();
-    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
-    memcpy(communication_buffer, filepath.c_str(), len);
-    fprintf(stderr, "called is compatible\n");
-    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFIsCompatible, len);
+    char *communication_buffer = communication_buffer();
+    memcpy(communication_buffer, &filepath[0], len);
+    return bf_is_compatible(bfinstance.bfbridge, thread.bflibrary);
   }
 
   int bf_open(std::string filepath)
   {
-    int len = filepath.length();
-    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
-    memcpy(communication_buffer, filepath.c_str(), len);
-    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFOpen, len);
+    char *communication_buffer = communication_buffer();
+    memcpy(communication_buffer, &filepath[0], len);
+    return bf_is_compatible(bfinstance.bfbridge, thread.bflibrary);
   }
 
   int bf_close()
   {
-    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFClose);
+    return bf_close(bfinstance.bfbridge, thread.bflibrary);
   }
 
   int bf_get_resolution_count()
   {
-    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetResolutionCount);
+    return bf_get_resolution_count(bfinstance.bfbridge, thread.bflibrary);
   }
 
   int bf_set_current_resolution(int res)
@@ -253,10 +251,10 @@ public:
     {
       return NULL;
     }
-    char * communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
+    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
     // We know that for this function len can never be close to
     // bfi_communication_buffer_len, so no writing past it
-    communication_buffer[len] = 0;    
+    communication_buffer[len] = 0;
     return communication_buffer;
   }
 
