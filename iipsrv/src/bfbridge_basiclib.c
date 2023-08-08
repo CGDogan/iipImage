@@ -567,6 +567,12 @@ int bf_set_current_resolution(
     return BFFUNC(BFSetCurrentResolution, Int, res);
 }
 
+int bf_get_series_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNC(BFGetSeriesCount, Int);
+}
+
 int bf_set_current_series(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     int ser)
