@@ -196,7 +196,8 @@ BFBRIDGE_INLINE_ME void bfbridge_free_instance(
 // - some of our library functions would like to return a byte array
 // so they return the number bytes to be read, an integer, and
 // expect that the user will read from there.
-BFBRIDGE_INLINE_ME char *bfbridge_instance_get_communication_buffer(bfbridge_instance_t *, int *len);
+BFBRIDGE_INLINE_ME char *bfbridge_instance_get_communication_buffer(
+    bfbridge_instance_t *, int *len);
 
 // Return a C string with the last error
 // This should only be called when the last bf_* method returned an error code
