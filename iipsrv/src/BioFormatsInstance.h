@@ -150,9 +150,9 @@ public:
     return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFSetCurrentResolution, res);
   }
 
-  int bf_set_series(int ser)
+  int bf_set_current_series(int ser)
   {
-    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFSetSeries, ser);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFSetCurrentSeries, ser);
   }
 
   int bf_get_series_count()
