@@ -39,12 +39,18 @@ TODO?: But you cant make instance if library call failed
 // C++: env->JNIMethodABC..(x,y,z)
 // C: (*env)->JNIMethodABC..(env, x,y,z)
 // This can also be used for JVM*, such as (*jvm)->DestroyJavaVM(jvm);
+// Define a second one (ENV Access Void), BFENVAV, for no args,
+// as __VA_ARGS__ requires at least one
 #ifdef __cplusplus
 #define BFENVA(env_ptr, method_name, ...) \
     ((env_ptr)->method_name(__VA_ARGS__))
+#define BFENVAV(env_ptr, method_name) \
+    ((env_ptr)->method_name())
 #else
 #define BFENVA(env_ptr, method_name, ...) \
     ((*(env_ptr))->method_name((env_ptr), __VA_ARGS__))
+#define BFENVAV(env_ptr, method_name, ...) \
+    ((*(env_ptr))->method_name((env_ptr)))
 #endif
 
 void bfbridge_free_error(bfbridge_error_t *error)
@@ -440,6 +446,9 @@ char *bfbridge_instance_get_communication_buffer(
 // Super easily:
 #define BFFUNC(method, type, ...) \
  BFENVA(BFENV, Call##type##Method, BFINSTC, library->method, __VA_ARGS__)
+// Use the second one, void one, for no args as __VA_ARGS__ requires at least one
+#define BFFUNCV(method, type) \
+    BFENVA(BFENV, Call##type##Method, BFINSTC, library->method)
 
 // BFSetCommunicationBuffer is used internally
 
@@ -449,10 +458,10 @@ char *bfbridge_instance_get_communication_buffer(
 char *bf_get_error_convenience(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    int len = BFFUNC(BFGetErrorLength, Int);
+    int len = BFFUNCV(BFGetErrorLength, Int);
 
-        // BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
-        char *buffer = bfbridge_instance_get_communication_buffer(instance, NULL);
+    // BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
+    char *buffer = bfbridge_instance_get_communication_buffer(instance, NULL);
     // The case of overflow is handled on Java side
     buffer[len] = '\0';
     return buffer;
@@ -463,7 +472,7 @@ char *bf_get_error_convenience(
 int bf_get_error(bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
     //return BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
-    return BFFUNC(BFGetErrorLength, Int);
+    return BFFUNCV(BFGetErrorLength, Int);
 }
 
 /*int bf_is_compatible(std::string filepath)
