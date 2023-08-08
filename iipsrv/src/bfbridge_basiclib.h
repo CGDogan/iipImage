@@ -110,6 +110,8 @@ typedef struct bfbridge_library
     jmethodID BFGetSizeT;
     jmethodID BFGetEffectiveSizeC;
     jmethodID BFGetImageCount;
+    jmethodID BFGetDimensionOrder;
+    jmethodID BFIsOrderCertain;
     jmethodID BFGetOptimalTileWidth;
     jmethodID BFGetOptimalTileHeight;
     jmethodID BFGetPixelType;
@@ -119,10 +121,8 @@ typedef struct bfbridge_library
     jmethodID BFIsRGB;
     jmethodID BFIsInterleaved;
     jmethodID BFIsLittleEndian;
-    jmethodID BFIsFalseColor;
     jmethodID BFIsIndexedColor;
-    jmethodID BFGetDimensionOrder;
-    jmethodID BFIsOrderCertain;
+    jmethodID BFIsFalseColor;
     jmethodID BFOpenBytes;
     jmethodID BFGetMPPX;
     jmethodID BFGetMPPY;
@@ -282,6 +282,12 @@ BFBRIDGE_INLINE_ME int bf_get_effective_size_c(
 BFBRIDGE_INLINE_ME int bf_get_image_count(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
+BFBRIDGE_INLINE_ME int bf_get_dimension_order(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_is_order_certain(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
 BFBRIDGE_INLINE_ME int bf_get_optimal_tile_width(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
@@ -313,16 +319,15 @@ BFBRIDGE_INLINE_ME int bf_is_interleaved(
 BFBRIDGE_INLINE_ME int bf_is_little_endian(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
-BFBRIDGE_INLINE_ME int bf_is_false_color(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
-
+/*
+    isindexed false, isfalsecolor false -> no table
+    isindexed true, isfalsecolor false -> table must be read
+    isindexed true, isfalsecolor true -> table can be read for precision, not obligatorily
+*/
 BFBRIDGE_INLINE_ME int bf_is_indexed_color(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
-BFBRIDGE_INLINE_ME int bf_get_dimension_order(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
-
-BFBRIDGE_INLINE_ME int bf_is_order_certain(
+BFBRIDGE_INLINE_ME int bf_is_false_color(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_open_bytes(

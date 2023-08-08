@@ -288,6 +288,8 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFGetSizeT, "()I");
     prepare_method_id(BFGetEffectiveSizeC, "()I");
     prepare_method_id(BFGetImageCount, "()I");
+    prepare_method_id(BFGetDimensionOrder, "()I");
+    prepare_method_id(BFIsOrderCertain, "()I");
     prepare_method_id(BFGetOptimalTileWidth, "()I");
     prepare_method_id(BFGetOptimalTileHeight, "()I");
     prepare_method_id(BFGetPixelType, "()I");
@@ -297,10 +299,8 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFIsRGB, "()I");
     prepare_method_id(BFIsInterleaved, "()I");
     prepare_method_id(BFIsLittleEndian, "()I");
-    prepare_method_id(BFIsFalseColor, "()I");
     prepare_method_id(BFIsIndexedColor, "()I");
-    prepare_method_id(BFGetDimensionOrder, "()I");
-    prepare_method_id(BFIsOrderCertain, "()I");
+    prepare_method_id(BFIsFalseColor, "()I");
     prepare_method_id(BFOpenBytes, "(IIII)I");
     prepare_method_id(BFGetMPPX, "()D");
     prepare_method_id(BFGetMPPY, "()D");
@@ -634,6 +634,18 @@ int bf_get_image_count(
     return BFFUNCV(BFGetImageCount, Int);
 }
 
+int bf_get_dimension_order(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGetDimensionOrder, Int);
+}
+
+int bf_is_order_certain(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFIsOrderCertain, Int);
+}
+
 int bf_get_optimal_tile_width(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
@@ -688,28 +700,16 @@ int bf_is_little_endian(
     return BFFUNCV(BFIsLittleEndian, Int);
 }
 
-int bf_is_false_color(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
-{
-    return BFFUNCV(BFIsFalseColor, Int);
-}
-
 int bf_is_indexed_color(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
     return BFFUNCV(BFIsIndexedColor, Int);
 }
 
-int bf_get_dimension_order(
+int bf_is_false_color(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return BFFUNCV(BFGetDimensionOrder, Int);
-}
-
-int bf_is_order_certain(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
-{
-    return BFFUNCV(BFIsOrderCertain, Int);
+    return BFFUNCV(BFIsFalseColor, Int);
 }
 
 int bf_open_bytes(
