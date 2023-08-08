@@ -235,10 +235,12 @@ BFBRIDGE_INLINE_ME int bf_get_resolution_count(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_set_current_resolution(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int res);
 
 BFBRIDGE_INLINE_ME int bf_set_current_series(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int ser);
 
 BFBRIDGE_INLINE_ME int bf_get_size_x(
     bfbridge_instance_t *instance, bfbridge_library_t *library);

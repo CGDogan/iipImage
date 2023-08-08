@@ -545,7 +545,7 @@ int bf_get_used_files(
 int bf_get_current_file(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return BFFUNCV(BFCurrentFile, Int);
+    return BFFUNCV(BFGetCurrentFile, Int);
 }
 
 int bf_close(
