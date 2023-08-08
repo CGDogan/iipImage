@@ -123,6 +123,8 @@ typedef struct bfbridge_library
     jmethodID BFIsLittleEndian;
     jmethodID BFIsIndexedColor;
     jmethodID BFIsFalseColor;
+    jmethodID BFGet8BitLookupTable;
+    jmethodID BFGet16BitLookupTable;
     jmethodID BFOpenBytes;
     jmethodID BFGetMPPX;
     jmethodID BFGetMPPY;
@@ -330,18 +332,24 @@ BFBRIDGE_INLINE_ME int bf_is_indexed_color(
 BFBRIDGE_INLINE_ME int bf_is_false_color(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
-BFBRIDGE_INLINE_ME int bf_open_bytes(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
-    int x, int y, int w, int h);
+// https://downloads.openmicroscopy.org/bio-formats/latest/api/loci/formats/ImageReader.html#get8BitLookupTable--
+BFBRIDGE_INLINE_ME int bf_get_8_bit_lookup_table(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_16_bit_lookup_table(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME double bf_get_mpp_x(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int series);
 
 BFBRIDGE_INLINE_ME double bf_get_mpp_y(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int series);
 
 BFBRIDGE_INLINE_ME double bf_get_mpp_z(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int series);
 
 BFBRIDGE_INLINE_ME int bf_tools_should_generate(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
