@@ -92,7 +92,9 @@ typedef struct bfbridge_library
     jmethodID BFSetCommunicationBuffer;
     jmethodID BFGetErrorLength;
     jmethodID BFIsCompatible;
+    jmethodID BFIsAnyFileOpen;
     jmethodID BFOpen;
+    jmethodID BFGetFormat;
     jmethodID BFIsSingleFile;
     jmethodID BFGetUsedFiles;
     jmethodID BFGetCurrentFile;
@@ -107,14 +109,13 @@ typedef struct bfbridge_library
     jmethodID BFGetSizeZ;
     jmethodID BFGetSizeT;
     jmethodID BFGetEffectiveSizeC;
+    jmethodID BFGetImageCount;
     jmethodID BFGetOptimalTileWidth;
     jmethodID BFGetOptimalTileHeight;
-    jmethodID BFGetFormat;
     jmethodID BFGetPixelType;
     jmethodID BFGetBitsPerPixel;
     jmethodID BFGetBytesPerPixel;
     jmethodID BFGetRGBChannelCount;
-    jmethodID BFGetImageCount;
     jmethodID BFIsRGB;
     jmethodID BFIsInterleaved;
     jmethodID BFIsLittleEndian;
@@ -126,7 +127,6 @@ typedef struct bfbridge_library
     jmethodID BFGetMPPX;
     jmethodID BFGetMPPY;
     jmethodID BFGetMPPZ;
-    jmethodID BFIsAnyFileOpen;
     jmethodID BFToolsShouldGenerate;
     jmethodID BFToolsGenerateSubresolutions;
 } bfbridge_library_t;
@@ -221,9 +221,15 @@ BFBRIDGE_INLINE_ME int bf_is_compatible(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     char *filepath, int filepath_len);
 
+BFBRIDGE_INLINE_ME int bf_is_any_file_open(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
 BFBRIDGE_INLINE_ME int bf_open(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     char *filepath, int filepath_len);
+
+BFBRIDGE_INLINE_ME int bf_get_format(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_is_single_file(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
@@ -270,16 +276,15 @@ BFBRIDGE_INLINE_ME int bf_get_size_t(
 BFBRIDGE_INLINE_ME int bf_get_effective_size_c(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
-BFBRIDGE_INLINE_ME int bf_get_effective_size_c(
+// https://downloads.openmicroscopy.org/bio-formats/latest/api/loci/formats/ImageReader.html#openBytes(int)
+// getEffectiveSizeC() * getSizeZ() * getSizeT() == getImageCount()
+BFBRIDGE_INLINE_ME int bf_get_image_count(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_get_optimal_tile_width(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_get_optimal_tile_height(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
-
-BFBRIDGE_INLINE_ME int bf_get_format(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_get_pixel_type(
@@ -292,9 +297,6 @@ BFBRIDGE_INLINE_ME int bf_get_bytes_per_pixel(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_get_rgb_channel_count(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
-
-BFBRIDGE_INLINE_ME int bf_get_image_count(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_is_rgb(
@@ -329,9 +331,6 @@ BFBRIDGE_INLINE_ME double bf_get_mpp_y(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME double bf_get_mpp_z(
-    bfbridge_instance_t *instance, bfbridge_library_t *library);
-
-BFBRIDGE_INLINE_ME int bf_is_any_file_open(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_tools_should_generate(

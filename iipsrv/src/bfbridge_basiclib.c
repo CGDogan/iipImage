@@ -270,7 +270,9 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFSetCommunicationBuffer, "(Ljava/nio/ByteBuffer;)V");
     prepare_method_id(BFGetErrorLength, "()I");
     prepare_method_id(BFIsCompatible, "(I)I");
+    prepare_method_id(BFIsAnyFileOpen, "()I");
     prepare_method_id(BFOpen, "(I)I");
+    prepare_method_id(BFGetFormat, "()I");
     prepare_method_id(BFIsSingleFile, "(I)I");
     prepare_method_id(BFGetUsedFiles, "()I");
     prepare_method_id(BFGetCurrentFile, "()I");
@@ -285,14 +287,13 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFGetSizeZ, "()I");
     prepare_method_id(BFGetSizeT, "()I");
     prepare_method_id(BFGetEffectiveSizeC, "()I");
+    prepare_method_id(BFGetImageCount, "()I");
     prepare_method_id(BFGetOptimalTileWidth, "()I");
     prepare_method_id(BFGetOptimalTileHeight, "()I");
-    prepare_method_id(BFGetFormat, "()I");
     prepare_method_id(BFGetPixelType, "()I");
     prepare_method_id(BFGetBitsPerPixel, "()I");
     prepare_method_id(BFGetBytesPerPixel, "()I");
     prepare_method_id(BFGetRGBChannelCount, "()I");
-    prepare_method_id(BFGetImageCount, "()I");
     prepare_method_id(BFIsRGB, "()I");
     prepare_method_id(BFIsInterleaved, "()I");
     prepare_method_id(BFIsLittleEndian, "()I");
@@ -304,7 +305,6 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFGetMPPX, "()D");
     prepare_method_id(BFGetMPPY, "()D");
     prepare_method_id(BFGetMPPZ, "()D");
-    prepare_method_id(BFIsAnyFileOpen, "()I");
     prepare_method_id(BFToolsShouldGenerate, "()I");
     prepare_method_id(BFToolsGenerateSubresolutions, "(III)I");
 
@@ -518,12 +518,24 @@ int bf_is_compatible(
     return BFFUNC(BFIsCompatible, Int, filepath_len);
 }
 
+int bf_is_any_file_open(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFIsAnyFileOpen, Int);
+}
+
 int bf_open(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     char *filepath, int filepath_len)
 {
     memcpy(instance->communication_buffer, filepath, filepath_len);
     return BFFUNC(BFOpen, Int, filepath_len);
+}
+
+int bf_get_format(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGetFormat, Int);
 }
 
 int bf_is_single_file(
@@ -616,6 +628,12 @@ int bf_get_effective_size_c(
     return BFFUNCV(BFGetEffectiveSizeC, Int);
 }
 
+int bf_get_image_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGetImageCount, Int);
+}
+
 int bf_get_optimal_tile_width(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
@@ -626,12 +644,6 @@ int bf_get_optimal_tile_height(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
     return BFFUNCV(BFGetOptimalTileHeight, Int);
-}
-
-int bf_get_format(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
-{
-    return BFFUNCV(BFGetFormat, Int);
 }
 
 int bf_get_pixel_type(
@@ -656,12 +668,6 @@ int bf_get_rgb_channel_count(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
     return BFFUNCV(BFGetRGBChannelCount, Int);
-}
-
-int bf_get_image_count(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
-{
-    return BFFUNCV(BFGetImageCount, Int);
 }
 
 int bf_is_rgb(
@@ -729,12 +735,6 @@ double bf_get_mpp_z(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
     return BFFUNCV(BFGetMPPZ, Double);
-}
-
-int bf_is_any_file_open(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
-{
-    return BFFUNCV(BFIsAnyFileOpen, Int);
 }
 
 int bf_tools_should_generate(
