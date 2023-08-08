@@ -104,7 +104,7 @@ public:
   {
     int len = thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFGetErrorLength);
     std::string err;
-    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance.bfbridge, NULL);
+    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
     err.assign(communication_buffer, len);
     return err;
   }
@@ -113,7 +113,7 @@ public:
   {
     fprintf(stderr, "calling is compatible %s\n", filepath.c_str());
     int len = filepath.length();
-    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance.bfbridge, NULL);
+    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
     memcpy(communication_buffer, filepath.c_str(), len);
     fprintf(stderr, "called is compatible\n");
     return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFIsCompatible, len);
@@ -122,7 +122,7 @@ public:
   int bf_open(std::string filepath)
   {
     int len = filepath.length();
-    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance.bfbridge, NULL);
+    char *communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
     memcpy(communication_buffer, filepath.c_str(), len);
     return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFOpen, len);
   }
@@ -245,7 +245,7 @@ public:
     {
       return NULL;
     }
-    char * communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance.bfbridge, NULL);
+    char * communication_buffer = bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
     // We know that for this function len can never be close to
     // bfi_communication_buffer_len, so no writing past it
     communication_buffer[len] = 0;    
