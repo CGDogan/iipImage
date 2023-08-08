@@ -274,8 +274,8 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFOpen, "(I)I");
     prepare_method_id(BFGetFormat, "()I");
     prepare_method_id(BFIsSingleFile, "(I)I");
-    prepare_method_id(BFGetUsedFiles, "()I");
     prepare_method_id(BFGetCurrentFile, "()I");
+    prepare_method_id(BFGetUsedFiles, "()I");
     prepare_method_id(BFClose, "()I");
     prepare_method_id(BFGetSeriesCount, "()I");
     prepare_method_id(BFSetCurrentSeries, "(I)I");
@@ -546,18 +546,18 @@ int bf_is_single_file(
     return BFFUNC(BFIsSingleFile, Int, filepath_len);
 }
 
+int bf_get_current_file(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGetCurrentFile, Int);
+}
+
 // Lists null-separated filenames/filepaths for the currently open file.
 // Returns bytes written including the last null
 int bf_get_used_files(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
     return BFFUNCV(BFGetUsedFiles, Int);
-}
-
-int bf_get_current_file(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
-{
-    return BFFUNCV(BFGetCurrentFile, Int);
 }
 
 int bf_close(
@@ -569,7 +569,7 @@ int bf_close(
 int bf_get_series_count(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return BFFUNC(BFGetSeriesCount, Int);
+    return BFFUNCV(BFGetSeriesCount, Int);
 }
 
 int bf_set_current_series(
