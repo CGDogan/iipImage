@@ -41,11 +41,11 @@ void BioFormatsImage::openImage() throw(file_error)
     fprintf(stderr, "ddBioFormatsImage.cc:  continue1 \n");
 
     fprintf(stderr, "dddBioFormatsImage.cc entering file\n");
-    if (!bfi.bf_open(filename))
+    if (!bfi.open(filename))
     {
         fprintf(stderr, "dddBioFormatsImage.cc cant enter file:\n");
 
-        const char *error = bfi.bf_get_error().c_str();
+        const char *error = bfi.get_error().c_str();
         fprintf(stderr, "dddBioFormatsImage.cc cant enter file %s:\n", error);
 
         logfile << "ERROR: encountered error: " << error << " while opening " << filename << " with BioFormats: " << endl
@@ -102,7 +102,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     currentY = y;
 
     // choose power of 2 to make downsample simpler.
-    int suggested_width = bfi.bf_get_optimal_tile_width();
+    int suggested_width = bfi.get_optimal_tile_width();
     if (suggested_width > 0)
     {
         suggested_width = 1 << getPowerOfTwoRoundDown(suggested_width);
@@ -116,7 +116,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         tile_width = suggested_width;
     }
 
-    int suggested_height = bfi.bf_get_optimal_tile_width();
+    int suggested_height = bfi.get_optimal_tile_width();
     if (suggested_height > 0)
     {
         suggested_height = 1 << getPowerOfTwoRoundDown(suggested_height);
@@ -130,12 +130,12 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         tile_height = suggested_height;
     }
 
-    w = bfi.bf_get_size_x();
-    h = bfi.bf_get_size_y();
+    w = bfi.get_size_x();
+    h = bfi.get_size_y();
 
     if (w < 0 || h < 0)
     {
-        const char *err = bfi.bf_get_error().c_str();
+        const char *err = bfi.get_error().c_str();
 
         logfile << "ERROR: encountered error: " << err << " while getting level0 dim" << endl;
         throw file_error("Getting bioformats level0 dimensions: " + std::string(err));
@@ -150,15 +150,15 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     // PLEASE NOTE: these can differ between resolution levels
     cerr << "Parsing details" << endl;
     cerr << "Optimal: " << tile_width << " " << tile_height << endl;
-    cerr << "rgbChannelCount: " << bfi.bf_get_rgb_channel_count() << endl; // Number of colors returned with each openbytes call
-    cerr << "sizeC: " << bfi.bf_get_size_c() << endl;
-    cerr << "effectiveSizeC: " << bfi.bf_get_effective_size_c() << endl; // colors on separate planes. 1 if all on same plane
-    cerr << "sizeZ: " << bfi.bf_get_size_z() << endl;
-    cerr << "sizeT: " << bfi.bf_get_size_t() << endl;
-    cerr << "ImageCount: " << bfi.bf_get_image_count() << endl; // number of planes in series
-    cerr << "isRGB: " << (int)bfi.bf_is_rgb() << endl;          // multiple colors per openbytes plane
-    cerr << "isInterleaved: " << (int)bfi.bf_is_interleaved() << endl;
-    cerr << "isInterleaved: " << (int)bfi.bf_is_interleaved() << endl;
+    cerr << "rgbChannelCount: " << bfi.get_rgb_channel_count() << endl; // Number of colors returned with each openbytes call
+    cerr << "sizeC: " << bfi.get_size_c() << endl;
+    cerr << "effectiveSizeC: " << bfi.get_effective_size_c() << endl; // colors on separate planes. 1 if all on same plane
+    cerr << "sizeZ: " << bfi.get_size_z() << endl;
+    cerr << "sizeT: " << bfi.get_size_t() << endl;
+    cerr << "ImageCount: " << bfi.get_image_count() << endl; // number of planes in series
+    cerr << "isRGB: " << (int)bfi.is_rgb() << endl;          // multiple colors per openbytes plane
+    cerr << "isInterleaved: " << (int)bfi.is_interleaved() << endl;
+    cerr << "isInterleaved: " << (int)bfi.is_interleaved() << endl;
 #endif
 
     fprintf(stderr, "continue info: parsing file in bioformatsimage.cc\n");
@@ -172,7 +172,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
     // iipsrv takes 1 or 3 only. we cant set this to 4 for internal use, iip will access that as well
     channels = 3;
-    channels_internal = bfi.bf_get_rgb_channel_count();
+    channels_internal = bfi.get_rgb_channel_count();
     if (channels_internal != 3 && channels_internal != 4)
     {
         if (channels_internal > 0)
@@ -183,23 +183,23 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
         }
         else
         {
-            const char *err = bfi.bf_get_error().c_str();
+            const char *err = bfi.get_error().c_str();
             fprintf(stderr, "branch2\n");
             logfile << "Error while getting channel count: " << err << endl;
             throw file_error("Error while getting channel count: " + std::string(err));
         }
     }
 
-    if (bfi.bf_get_effective_size_c() != 1)
+    if (bfi.get_effective_size_c() != 1)
     {
-        fprintf(stderr, "branch3.5 %d\n", bfi.bf_get_effective_size_c());
+        fprintf(stderr, "branch3.5 %d\n", bfi.get_effective_size_c());
         // TODO: find an example. To implement, call openBytes three times perhaps.
         // Or maybe this is when we have a RGB plus a grayscale channel?
         logfile << "Unimplemented: currently noninterleaved works if we have them on the same plane" << endl;
     }
     fprintf(stderr, "continue info50: parsing file in bioformatsimage.cc\n");
 
-    if (bfi.bf_is_indexed_color() && !bfi.bf_is_false_color())
+    if (bfi.is_indexed_color() && !bfi.is_false_color())
     {
         /*To implement this, get8BitLookupTable() or get16BitLookupTable()
         and then read from there. in theory, this might change between series/resolutions.
@@ -213,23 +213,23 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
         throw file_error("Unimplemented: False color image");
     }
 
-    if (bfi.bf_get_dimension_order() && bfi.bf_get_dimension_order()[2] != 'C')
+    if (bfi.get_dimension_order() && bfi.get_dimension_order()[2] != 'C')
     {
         fprintf(stderr, "branch6\n");
 
-        logfile << "Unimplemented: unfamiliar dimension order " << bfi.bf_get_dimension_order() << endl;
-        throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bfi.bf_get_dimension_order()));
+        logfile << "Unimplemented: unfamiliar dimension order " << bfi.get_dimension_order() << endl;
+        throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bfi.get_dimension_order()));
     }
 
-    // bfi.bf_get_bytes_per_pixel actually gives bits per channel per pixel, so don't divide by channels
-    int bytespc_internal = bfi.bf_get_bytes_per_pixel();
+    // bfi.get_bytes_per_pixel actually gives bits per channel per pixel, so don't divide by channels
+    int bytespc_internal = bfi.get_bytes_per_pixel();
     bpc = 8;
     colourspace = sRGB;
 
     /*
           if ((bpp % channels) != 0) {
         // How can this be handled? Should be very rare.
-        throw file_error("Unimplemented: bad remainder when diving bits per pixel among channels. bfi.bf_get_bits_per_pixel(): " + std::to_string(bfi.bf_get_bits_per_pixel()) + " channels: " + std::to_string(channels));
+        throw file_error("Unimplemented: bad remainder when diving bits per pixel among channels. bfi.get_bits_per_pixel(): " + std::to_string(bfi.get_bits_per_pixel()) + " channels: " + std::to_string(channels));
     }
     */
     fprintf(stderr, "continue info100: parsing file in bioformatsimage.cc\n");
@@ -238,12 +238,12 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
     {
         fprintf(stderr, "branch8\n");
 
-        const char *err = bfi.bf_get_error().c_str();
+        const char *err = bfi.get_error().c_str();
         logfile << "Error while getting bits per pixel: " << err << endl;
         throw file_error("Error while getting bits per pixel: " + std::string(err));
     }
 
-#define too_big (tile_width * tile_height * bytespc_internal * bfi.bf_get_rgb_channel_count() > bfi_communication_buffer_len)
+#define too_big (tile_width * tile_height * bytespc_internal * bfi.get_rgb_channel_count() > bfi_communication_buffer_len)
     while (too_big)
     {
         tile_height >>= 1;
@@ -259,12 +259,12 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
     bioformats_widths.clear();
     bioformats_heights.clear();
 
-    int bioformats_levels = bfi.bf_get_resolution_count();
+    int bioformats_levels = bfi.get_resolution_count();
     fprintf(stderr, "continue info170: parsing file in bioformatsimage.cc %d\n", bioformats_levels);
 
     if (bioformats_levels <= 0)
     {
-        const char *err = bfi.bf_get_error().c_str();
+        const char *err = bfi.get_error().c_str();
         logfile << "ERROR: encountered error: " << err << " while getting level count" << endl;
         throw file_error("ERROR: encountered error: " + std::string(err) + " while getting level count");
     }
@@ -278,11 +278,11 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
     for (int i = 0; i < bioformats_levels; i++)
     {
         fprintf(stderr, "continue info185: parsing file in bioformatsimage.cc\n");
-        bfi.bf_set_current_resolution(i);
+        bfi.set_current_resolution(i);
         fprintf(stderr, "continue info190: parsing file in bioformatsimage.cc\n");
 
-        ww = bfi.bf_get_size_x();
-        hh = bfi.bf_get_size_y();
+        ww = bfi.get_size_x();
+        hh = bfi.get_size_y();
 
 #ifdef DEBUG_VERBOSE
         fprintf(stderr, "resolution %d has x=%d y=%d", i, ww, hh);
@@ -413,8 +413,8 @@ void BioFormatsImage::closeImage()
     timer.start();
 #endif
 
-    fprintf(stderr, "Called bfi.bf_close in BioFormatsImage::closeImage\n");
-    bfi.bf_close();
+    fprintf(stderr, "Called bfi.close in BioFormatsImage::closeImage\n");
+    bfi.close();
 
 #ifdef DEBUG_OSI
     logfile
@@ -465,9 +465,9 @@ RawTilePtr BioFormatsImage::getTile(int seq, int ang, unsigned int iipres, int l
     /*
         int64_t layer_width = 0;
         int64_t layer_height = 0;
-        bfi.bf_set_current_resolution(osi_level);
-        layer_width = bfi.bf_get_size_x();
-        layer_height = bfi.bf_get_size_y();
+        bfi.set_current_resolution(osi_level);
+        layer_width = bfi.get_size_x();
+        layer_height = bfi.get_size_y();
 
     #ifdef DEBUG_VERBOSE
         fprintf(stderr, "layer: %d layer_width: %d layer_height: %d", layers, layer_width, layer_height);
@@ -628,9 +628,9 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     int allocate_length = rt->dataLength;
 
-    if (!bfi.bf_set_current_resolution(bestLayer))
+    if (!bfi.set_current_resolution(bestLayer))
     {
-        auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bfi.bf_get_resolution_count() - 1));
+        auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bfi.get_resolution_count() - 1));
         logfile << s;
         throw file_error(s);
     }
@@ -638,7 +638,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // We currently don't assume that this is the same among all resolutions
     // Is it?
     char should_reduce_channels_from_4to3 = 0;
-    int channels = bfi.bf_get_rgb_channel_count();
+    int channels = bfi.get_rgb_channel_count();
     if (channels != 3 && channels != 4)
     {
         throw file_error("Channels not 3 or 4: " + std::to_string(channels));
@@ -649,14 +649,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
         allocate_length = tw * th * 4 * sizeof(unsigned char);
     }
 
-    // These must be called after bfi.bf_set_current_resolution
+    // These must be called after bfi.set_current_resolution
     // It's sometimes different between resolutions
 
-    int bytespc_internal = bfi.bf_get_bytes_per_pixel();
-    int should_interleave = !bfi.bf_is_interleaved();
+    int bytespc_internal = bfi.get_bytes_per_pixel();
+    int should_interleave = !bfi.is_interleaved();
 
     // https://github.com/ome/bioformats/blob/metadata54/components/formats-api/src/loci/formats/FormatTools.java#L76
-    int pixel_type = bfi.bf_get_pixel_type();
+    int pixel_type = bfi.get_pixel_type();
 
     int should_remove_sign = 1;
     // added float and double, because they are handled specially
@@ -692,29 +692,29 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 #ifdef DEBUG_VERBOSE
     cerr << "Parsing details FOR TILE" << endl;
     cerr << "Optimal: " << tile_width << " " << tile_height << endl;
-    cerr << "rgbChannelCount: " << bfi.bf_get_rgb_channel_count() << endl; // Number of colors returned with each openbytes call
-    cerr << "sizeC: " << bfi.bf_get_size_c() << endl;
-    cerr << "effectiveSizeC: " << bfi.bf_get_effective_size_c() << endl; // colors on separate planes. 1 if all on same plane
-    cerr << "sizeZ: " << bfi.bf_get_size_z() << endl;
-    cerr << "sizeT: " << bfi.bf_get_size_t() << endl;
-    cerr << "ImageCount: " << bfi.bf_get_image_count() << endl; // number of planes in series
-    cerr << "isRGB: " << (int)bfi.bf_is_rgb() << endl;          // multiple colors per openbytes plane
-    cerr << "isInterleaved: " << (int)bfi.bf_is_interleaved() << endl;
-    cerr << "isInterleaved: " << (int)bfi.bf_is_interleaved() << endl;
+    cerr << "rgbChannelCount: " << bfi.get_rgb_channel_count() << endl; // Number of colors returned with each openbytes call
+    cerr << "sizeC: " << bfi.get_size_c() << endl;
+    cerr << "effectiveSizeC: " << bfi.get_effective_size_c() << endl; // colors on separate planes. 1 if all on same plane
+    cerr << "sizeZ: " << bfi.get_size_z() << endl;
+    cerr << "sizeT: " << bfi.get_size_t() << endl;
+    cerr << "ImageCount: " << bfi.get_image_count() << endl; // number of planes in series
+    cerr << "isRGB: " << (int)bfi.is_rgb() << endl;          // multiple colors per openbytes plane
+    cerr << "isInterleaved: " << (int)bfi.is_interleaved() << endl;
+    cerr << "isInterleaved: " << (int)bfi.is_interleaved() << endl;
 #endif
 
     // READ FROM file
 
     //======= next compute the x and y coordinates (top left corner) in level 0 coordinates
-    //======= expected by bfi.bf_open_bytes.
+    //======= expected by bfi.open_bytes.
     int tx0 = tilex * tile_width;
     int ty0 = tiley * tile_height;
 
 #ifdef DEBUG_VERBOSE
-    cerr << "bfi.bf_open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
+    cerr << "bfi.open_bytes params: " << bestLayer << " " << tx0 << " " << ty0 << " " << tw << " " << th << std::endl;
     cerr << "downsample in level " << bioformats_downsample_in_level[osi_level] << endl;
 
-    cerr << "this layer has resolution x=" << bfi.bf_get_size_x() << " y=" << bfi.bf_get_size_y() << endl;
+    cerr << "this layer has resolution x=" << bfi.get_size_x() << " y=" << bfi.get_size_y() << endl;
 #endif
 
     if (!rt->data)
@@ -730,23 +730,23 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     cerr << "returned from there\n";
     // end BREAK*/
 
-    cerr << "calling bfi.bf_open_bytes\n";
+    cerr << "calling bfi.open_bytes\n";
 
     // https://stackoverflow.com/questions/31657511/chrono-the-difference-between-two-points-in-time-in-milliseconds
     auto start = std::chrono::high_resolution_clock::now();
-    int bytes_received = bfi.bf_open_bytes(tx0, ty0, tw, th);
+    int bytes_received = bfi.open_bytes(tx0, ty0, tw, th);
     auto finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> elapsed = finish - start;
     milliseconds += elapsed.count();
     cerr << "Milliseconds: " << milliseconds << endl;
     if (bytes_received < 0)
     {
-        cerr << "bfi.bf_open_bytes got an error! expected this many bytes: " << (channels_internal * bytespc_internal * tw * th) << " but got " << bfi.bf_get_error().c_str();
-        const char *error = bfi.bf_get_error().c_str();
+        cerr << "bfi.open_bytes got an error! expected this many bytes: " << (channels_internal * bytespc_internal * tw * th) << " but got " << bfi.get_error().c_str();
+        const char *error = bfi.get_error().c_str();
         logfile << "ERROR: encountered error: " << error << " while reading region exact at  " << tx0 << "x" << ty0 << " dim " << tw << "x" << th << " with BioFormats: " << error << endl;
         throw file_error("ERROR: encountered error: " + std::string(error) + " while reading region exact at " + std::to_string(tx0) + "x" + std::to_string(ty0) + " dim " + std::to_string(tw) + "x" + std::to_string(th) + " with BioFormats: " + std::string(error));
     }
-    cerr << "bfi.bf_open_bytes returned with success for this many bytes: "
+    cerr << "bfi.open_bytes returned with success for this many bytes: "
          << bytes_received << std::endl;
     cerr << "channels_internal " << channels_internal << " bytespc_internal"
          << bytespc_internal << " tw th " << tw << " " << th << std::endl;
@@ -803,7 +803,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // if data in le -> pick last, data be -> pick first.
     // but there are two branches - if we cast from double/float
     // the data's endianness depends on platform, otherwise
-    // on file format, so from bfi.bf_is_little_endian
+    // on file format, so from bfi.is_little_endian
     int pick_byte;
     unsigned char *buf = (unsigned char *)bfi.communication_buffer();
 
@@ -816,8 +816,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     if (should_convert_from_float)
     {
-        cerr << "endianness of file is little: " << (int)bfi.bf_is_little_endian() << endl;
-        if (bfi.bf_is_little_endian() != pick_byte)
+        cerr << "endianness of file is little: " << (int)bfi.is_little_endian() << endl;
+        if (bfi.is_little_endian() != pick_byte)
         {
             cerr << "swapping\n";
             unsigned int *buf_as_int = (unsigned int *)buf;
@@ -837,7 +837,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     }
     else if (should_convert_from_double)
     {
-        if (bfi.bf_is_little_endian() != pick_byte)
+        if (bfi.is_little_endian() != pick_byte)
         {
             unsigned long int *buf_as_long_int = (unsigned long int *)buf;
             for (int i = 0; i < pixels * channels_internal; i++)
@@ -858,7 +858,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // int cases
     if (bytespc_internal != 1)
     {
-        pick_byte = bfi.bf_is_little_endian();
+        pick_byte = bfi.is_little_endian();
 
         int coefficient = bytespc_internal;
         int offset = pick_byte ? (coefficient - 1) : 0;
