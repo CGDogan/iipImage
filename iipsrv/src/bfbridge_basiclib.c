@@ -358,8 +358,8 @@ bfbridge_error_t *bfbridge_make_instance(
         if (BFENVA(env, ExceptionCheck) == 1)
         {
             // As of JDK 20, NewDirectByteBuffer only raises OutOfMemoryError
-            BFENVA(env, ExceptionDescribe)
-            BFENVA(env, DeleteGlobalRef, bfbridge)
+            BFENVA(env, ExceptionDescribe);
+            BFENVA(env, DeleteGlobalRef, bfbridge);
 
             return make_error(
                 BFBRIDGE_OUT_OF_MEMORY_ERROR,
@@ -368,7 +368,7 @@ bfbridge_error_t *bfbridge_make_instance(
         }
         else
         {
-            BFENVA(env, DeleteGlobalRef, bfbridge)
+            BFENVA(env, DeleteGlobalRef, bfbridge);
             return make_error(
                 BFBRIDGE_JVM_LACKS_BYTE_BUFFERS,
                 "Used JVM implementation does not support direct byte buffers"
