@@ -22,6 +22,7 @@ TODO?: But you cant make instance if library call failed
 
 #include "bfbridge_basiclib.h"
 #include <stdio.h>
+#include <string.h>
 
 #ifdef WIN32
 #include <windows.h>
