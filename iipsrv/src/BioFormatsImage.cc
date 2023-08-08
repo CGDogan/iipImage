@@ -213,7 +213,7 @@ then do for 0th plane: check is fake color, then do get8BitLookupTable and get16
         throw file_error("Unimplemented: False color image");
     }
 
-    if (bfi.get_dimension_order() && bfi.get_dimension_order()[2] != 'C')
+    if (bfi.get_dimension_order().length() && bfi.get_dimension_order()[2] != 'C')
     {
         fprintf(stderr, "branch6\n");
 
