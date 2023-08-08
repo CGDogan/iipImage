@@ -18,7 +18,7 @@ TODO?: But you cant make instance if library call failed
 */
 
 // If inlining but erroneously still compiling .c, make it empty
-#if !(defined(BFBRIDGE_INLINE) && !defined(BFBRIDGE_HEADER))
+#if !(defined(BFBRIDGE_SEMI_HEADER_ONLY_LIB) && !defined(BFBRIDGE_HEADER))
 
 #include "bfbridge_basiclib.h"
 #include <stdio.h>

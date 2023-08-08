@@ -5,9 +5,27 @@
  * Also see: BioFormatsThread.h in github.com/camicroscope/iipImage
  */
 
-// Optionally define: BFBRIDGE_INLINE (makes it a header-only library)
-// Optionally define: BFBRIDGE_INLINE_EXTRA (not recommended)
+// Optionally define: BFBRIDGE_SEMI_HEADER_ONLY_LIB
+// This method allows inlining all small functions,
+// specifically, all functions except bfbridge_make_library and bfbridge_make_instance,
+// while keeping the final executable size small.
+// The best way to define it is -DBFBRIDGE_SEMI_HEADER_ONLY_LIB to the compiler.
+// It would also work, for speed, to define BFBRIDGE_SEMI_HEADER_ONLY_LIB
+// just before #include "bfbridge_basiclib.h" for any files you'd like to
+// see work efficiently.
+
+// Optionally define: BFBRIDGE_HEADER_ONLY_LIB
+// This method makes this a header-only library,
+// removing the need to compile the .c file.
+// This can be combined with BFBRIDGE_SEMI_HEADER_ONLY_LIB as well:
+// You can include with BFBRIDGE_HEADER_ONLY_LIB from one file and
+// with BFBRIDGE_SEMI_HEADER_ONLY_LIB from the other.
+// BFBRIDGE_HEADER_ONLY_LIB can be used, for example, if you have a
+// .c file from where you make bfbridge functions available to your other code,
+// you can use BFBRIDGE_HEADER_ONLY_LIB to reduce a layer of call indirection.
+
 // Optionally define: BFBRIDGE_KNOW_BUFFER_LEN
+// This will save some memory by not storing buffer length in our structs.
 
 #ifndef BFBRIDGE_BASICLIB_H
 #define BFBRIDGE_BASICLIB_H
@@ -18,132 +36,133 @@
 extern "C" {
 #endif
 
-#ifdef BFBRIDGE_INLINE_EXTRA
-#define BFBRIDGE_INLINE
-#define BFBRIDGE_INLINE_ME_EXTRA static inline
-#elif defined(BFBRIDGE_INLINE)
-#define BFBRIDGE_INLINE_ME_EXTRA static
-#else
-#define BFBRIDGE_INLINE_ME_EXTRA
+#ifdef BFBRIDGE_HEADER_ONLY_LIB
+#define BFBRIDGE_SEMI_HEADER_ONLY_LIB
 #endif
 
 // As an example, inlining solves the issue that
 // passing struct ptrs requires dereference https://stackoverflow.com/a/552250
 // so without inline, we would need to pass instance pointers by value
-#ifdef BFBRIDGE_INLINE
+#ifdef BFBRIDGE_SEMI_HEADER_ONLY_LIB
 #define BFBRIDGE_INLINE_ME static inline
 #else
 #define BFBRIDGE_INLINE_ME
 #endif
 
-typedef enum bfbridge_error_code
-{
-    BFBRIDGE_INVALID_CLASSPATH,
-    BFBRIDGE_CLASS_NOT_FOUND,
-    BFBRIDGE_METHOD_NOT_FOUND,
-    // https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes
-    BFBRIDGE_JNI_ERR = JNI_ERR,
-    BFBRIDGE_JNI_EDETACHED = JNI_EDETACHED,
-    BFBRIDGE_JNI_EVERSION = JNI_EVERSION,
-    BFBRIDGE_JNI_ENOMEM = JNI_EVERSION,
-    BFBRIDGE_JNI_EEXIST = JNI_EEXIST,
-    BFBRIDGE_JNI_EINVAL = JNI_EINVAL,
+#ifdef BFBRIDGE_HEADER_ONLY_LIB
+#define BFBRIDGE_INLINE_ME_EXTRA static
+#else
+#define BFBRIDGE_INLINE_ME_EXTRA
+#endif
 
-    // Instance initialization only:
-    BFBRIDGE_INVALID_COMMUNICATON_BUFFER,
-    BFBRIDGE_OUT_OF_MEMORY_ERROR,
-    BFBRIDGE_JVM_LACKS_BYTE_BUFFERS,
-} bfbridge_error_code_t;
+    typedef enum bfbridge_error_code
+    {
+        BFBRIDGE_INVALID_CLASSPATH,
+        BFBRIDGE_CLASS_NOT_FOUND,
+        BFBRIDGE_METHOD_NOT_FOUND,
+        // https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes
+        BFBRIDGE_JNI_ERR = JNI_ERR,
+        BFBRIDGE_JNI_EDETACHED = JNI_EDETACHED,
+        BFBRIDGE_JNI_EVERSION = JNI_EVERSION,
+        BFBRIDGE_JNI_ENOMEM = JNI_EVERSION,
+        BFBRIDGE_JNI_EEXIST = JNI_EEXIST,
+        BFBRIDGE_JNI_EINVAL = JNI_EINVAL,
 
-typedef struct bfbridge_error
-{
-    bfbridge_error_code_t code;
-    char *description;
-} bfbridge_error_t;
+        // Instance initialization only:
+        BFBRIDGE_INVALID_COMMUNICATON_BUFFER,
+        BFBRIDGE_OUT_OF_MEMORY_ERROR,
+        BFBRIDGE_JVM_LACKS_BYTE_BUFFERS,
+    } bfbridge_error_code_t;
 
-BFBRIDGE_INLINE_ME void bfbridge_free_error(bfbridge_error_t *);
+    typedef struct bfbridge_error
+    {
+        bfbridge_error_code_t code;
+        char *description;
+    } bfbridge_error_t;
 
-typedef struct bfbridge_library
-{
-    JavaVM *jvm;
-    JNIEnv *env;
+    BFBRIDGE_INLINE_ME void bfbridge_free_error(bfbridge_error_t *);
 
-    // Calling FindClass later invalidates this pointer,
-    // so please use this jclass variable instead of FindClass.
-    jclass bfbridge_base;
+    typedef struct bfbridge_library
+    {
+        JavaVM *jvm;
+        JNIEnv *env;
 
-    jmethodID constructor;
+        // Calling FindClass later invalidates this pointer,
+        // so please use this jclass variable instead of FindClass.
+        jclass bfbridge_base;
 
-    // Please keep this list in order with javap output
-    // See the comment "To print descriptors (encoded function types) ..."
-    // for the javap command
-    jmethodID BFSetCommunicationBuffer;
-    jmethodID BFGetErrorLength;
-    jmethodID BFIsCompatible;
-    jmethodID BFOpen;
-    jmethodID BFIsSingleFile;
-    jmethodID BFGetUsedFiles;
-    jmethodID BFGetCurrentFile;
-    jmethodID BFClose;
-    jmethodID BFGetResolutionCount;
-    jmethodID BFSetCurrentResolution;
-    jmethodID BFSetSeries;
-    jmethodID BFGetSeriesCount;
-    jmethodID BFGetSizeX;
-    jmethodID BFGetSizeY;
-    jmethodID BFGetSizeZ;
-    jmethodID BFGetSizeT;
-    jmethodID BFGetSizeC;
-    jmethodID BFGetEffectiveSizeC;
-    jmethodID BFGetOptimalTileWidth;
-    jmethodID BFGetOptimalTileHeight;
-    jmethodID BFGetFormat;
-    jmethodID BFGetPixelType;
-    jmethodID BFGetBitsPerPixel;
-    jmethodID BFGetBytesPerPixel;
-    jmethodID BFGetRGBChannelCount;
-    jmethodID BFGetImageCount;
-    jmethodID BFIsRGB;
-    jmethodID BFIsInterleaved;
-    jmethodID BFIsLittleEndian;
-    jmethodID BFIsFalseColor;
-    jmethodID BFIsIndexedColor;
-    jmethodID BFGetDimensionOrder;
-    jmethodID BFIsOrderCertain;
-    jmethodID BFOpenBytes;
-    jmethodID BFGetMPPX;
-    jmethodID BFGetMPPY;
-    jmethodID BFGetMPPZ;
-    jmethodID BFIsAnyFileOpen;
-    jmethodID BFToolsShouldGenerate;
-    jmethodID BFToolsGenerateSubresolutions;
-} bfbridge_library_t;
+        jmethodID constructor;
 
-// On success, returns NULL and fills *dest
-// On failure, returns error, and it may have modified *dest
-// cpdir: a string to a single directory containing jar files (and maybe classes)
-// cachedir: NULL or the directory path to store file caches for faster opening
-BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_library(
-    bfbridge_library_t *dest,
-    char *cpdir,
-    char *cachedir);
+        // Please keep this list in order with javap output
+        // See the comment "To print descriptors (encoded function types) ..."
+        // for the javap command
+        jmethodID BFSetCommunicationBuffer;
+        jmethodID BFGetErrorLength;
+        jmethodID BFIsCompatible;
+        jmethodID BFOpen;
+        jmethodID BFIsSingleFile;
+        jmethodID BFGetUsedFiles;
+        jmethodID BFGetCurrentFile;
+        jmethodID BFClose;
+        jmethodID BFGetResolutionCount;
+        jmethodID BFSetCurrentResolution;
+        jmethodID BFSetSeries;
+        jmethodID BFGetSeriesCount;
+        jmethodID BFGetSizeX;
+        jmethodID BFGetSizeY;
+        jmethodID BFGetSizeZ;
+        jmethodID BFGetSizeT;
+        jmethodID BFGetSizeC;
+        jmethodID BFGetEffectiveSizeC;
+        jmethodID BFGetOptimalTileWidth;
+        jmethodID BFGetOptimalTileHeight;
+        jmethodID BFGetFormat;
+        jmethodID BFGetPixelType;
+        jmethodID BFGetBitsPerPixel;
+        jmethodID BFGetBytesPerPixel;
+        jmethodID BFGetRGBChannelCount;
+        jmethodID BFGetImageCount;
+        jmethodID BFIsRGB;
+        jmethodID BFIsInterleaved;
+        jmethodID BFIsLittleEndian;
+        jmethodID BFIsFalseColor;
+        jmethodID BFIsIndexedColor;
+        jmethodID BFGetDimensionOrder;
+        jmethodID BFIsOrderCertain;
+        jmethodID BFOpenBytes;
+        jmethodID BFGetMPPX;
+        jmethodID BFGetMPPY;
+        jmethodID BFGetMPPZ;
+        jmethodID BFIsAnyFileOpen;
+        jmethodID BFToolsShouldGenerate;
+        jmethodID BFToolsGenerateSubresolutions;
+    } bfbridge_library_t;
 
-// Copies while making the freeing of the previous a noop
-// Dest: doesn't need to be initialized but allocated
-// This function would benefit from restrict but if we inline, not necessary
-BFBRIDGE_INLINE_ME void bfbridge_move_library(
-    bfbridge_library_t *dest, bfbridge_library_t *lib);
+    // On success, returns NULL and fills *dest
+    // On failure, returns error, and it may have modified *dest
+    // cpdir: a string to a single directory containing jar files (and maybe classes)
+    // cachedir: NULL or the directory path to store file caches for faster opening
+    BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_library(
+        bfbridge_library_t *dest,
+        char *cpdir,
+        char *cachedir);
 
-// Does not free the library struct but its contents
-BFBRIDGE_INLINE_ME void bfbridge_free_library(bfbridge_library_t *);
+    // Copies while making the freeing of the previous a noop
+    // Dest: doesn't need to be initialized but allocated
+    // This function would benefit from restrict but if we inline, not necessary
+    BFBRIDGE_INLINE_ME void bfbridge_move_library(
+        bfbridge_library_t *dest, bfbridge_library_t *lib);
 
-// Almost all functions that need a bfbridge_instance_t must be passed
-// the instance's related bfbridge_library_t and not any other bfbridge_library_t
+    // Does not free the library struct but its contents
+    BFBRIDGE_INLINE_ME void bfbridge_free_library(bfbridge_library_t *);
 
-typedef struct bfbridge_instance
-{
-    jobject bfbridge;
-    char *communication_buffer;
+    // Almost all functions that need a bfbridge_instance_t must be passed
+    // the instance's related bfbridge_library_t and not any other bfbridge_library_t
+
+    typedef struct bfbridge_instance
+    {
+        jobject bfbridge;
+        char *communication_buffer;
 #ifndef BFBRIDGE_KNOW_BUFFER_LEN
     int communication_buffer_len;
 #endif
@@ -213,7 +232,7 @@ receives bytes to the communication buffer. Returns an int,
 bytes to be read, which then the user of the library should read from the buffer.
  */
 
-#if defined(BFBRIDGE_INLINE)
+#ifdef BFBRIDGE_SEMI_HEADER_ONLY_LIB
 #define BFBRIDGE_HEADER
 #include "bfbridge_basiclib.c"
 #undef BFBRIDGE_HEADER
