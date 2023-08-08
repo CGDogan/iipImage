@@ -730,7 +730,7 @@ int bf_open_bytes(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     int plane, int x, int y, int w, int h)
 {
-    return BFFUNC(BFIsOrderCertain, Int, plane, x, y, w, h);
+    return BFFUNC(BFOpenBytes, Int, plane, x, y, w, h);
 }
 
 double bf_get_mpp_x(
