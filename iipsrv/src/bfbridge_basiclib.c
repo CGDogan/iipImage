@@ -335,7 +335,8 @@ bfbridge_error_t *bfbridge_make_instance(
     {
         return make_error(
             BFBRIDGE_INVALID_COMMUNICATON_BUFFER,
-            "communication_buffer NULL or has negative length");
+            "communication_buffer NULL or has negative length",
+            NULL);
     }
 
     JNIEnv *env = library->env;
@@ -407,7 +408,7 @@ void bfbridge_free_instance(
     // Ease of freeing
     if (instance->bfbridge)
     {
-        BFENVA(library->env, DeleteGlobalRef, bfbridge);
+        BFENVA(library->env, DeleteGlobalRef, instance->bfbridge);
     }
 }
 
