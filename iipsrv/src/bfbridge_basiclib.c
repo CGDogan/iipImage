@@ -14,7 +14,7 @@ Free can be called for both the library and the instance
 because the makers set to null if going to fail
 so you can call free regardless of whether the makers failed.
 
-TODO?: But you cant make instance if library call failed
+But you can make instance if library call failed
 */
 
 // If inlining but erroneously still compiling .c, make it empty
