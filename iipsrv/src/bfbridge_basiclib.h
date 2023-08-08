@@ -340,6 +340,10 @@ BFBRIDGE_INLINE_ME int bf_get_8_bit_lookup_table(
 BFBRIDGE_INLINE_ME int bf_get_16_bit_lookup_table(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
+BFBRIDGE_INLINE_ME int bf_open_bytes(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int plane, int x, int y, int w, int h);
+
 BFBRIDGE_INLINE_ME double bf_get_mpp_x(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     int series);
