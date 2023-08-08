@@ -258,7 +258,7 @@ bfbridge_error_t *bfbridge_make_library(
         return make_error(                                          \
             BFBRIDGE_METHOD_NOT_FOUND,                              \
             "Could not find BFBridge method ",                      \
-            #name ". Maybe check and update the descriptor?");          \
+            #name ". Maybe check and update the descriptor?");      \
     }
 
     // To print descriptors (encoded function types) to screen
@@ -277,13 +277,13 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFClose, "()I");
     prepare_method_id(BFGetResolutionCount, "()I");
     prepare_method_id(BFSetCurrentResolution, "(I)I");
-    prepare_method_id(BFSetSeries, "(I)I");
     prepare_method_id(BFGetSeriesCount, "()I");
+    prepare_method_id(BFSetCurrentSeries, "(I)I");
     prepare_method_id(BFGetSizeX, "()I");
     prepare_method_id(BFGetSizeY, "()I");
+    prepare_method_id(BFGetSizeC, "()I");
     prepare_method_id(BFGetSizeZ, "()I");
     prepare_method_id(BFGetSizeT, "()I");
-    prepare_method_id(BFGetSizeC, "()I");
     prepare_method_id(BFGetEffectiveSizeC, "()I");
     prepare_method_id(BFGetOptimalTileWidth, "()I");
     prepare_method_id(BFGetOptimalTileHeight, "()I");
@@ -352,7 +352,8 @@ bfbridge_error_t *bfbridge_make_instance(
     dest->communication_buffer_len = communication_buffer_len;
 #endif
 
-    if (!library->jvm) {
+    if (!library->jvm)
+    {
         return make_error(
             BFBRIDGE_LIBRARY_UNINITIALIZED,
             "a bfbridge_library_t must have been initialized before bfbridge_make_instance",
@@ -471,9 +472,6 @@ char *bfbridge_instance_get_communication_buffer(
     return instance->communication_buffer;
 }
 
-// Methods
-// Please keep in order with bfbridge_library_t members
-
 // Shorthand for JavaENV:
 #define BFENV (library->env)
 // Instance class:
@@ -482,7 +480,7 @@ char *bfbridge_instance_get_communication_buffer(
 // Call easily
 // #define BFFUNC(method_name, ...) BFENVA(BFENV, method_name, BFINSTC, __VA_ARGS__)
 // Even more easily:
-// #define BFFUNC(caller, method, ...) \
+//      #define BFFUNC(caller, method, ...) \
 //BFENVA(BFENV, caller, BFINSTC, library->method, __VA_ARGS__)
 // Super easily:
 #define BFFUNC(method, type, ...) \
@@ -490,6 +488,9 @@ char *bfbridge_instance_get_communication_buffer(
 // Use the second one, void one, for no args as __VA_ARGS__ requires at least one
 #define BFFUNCV(method, type) \
     BFENVA(BFENV, Call##type##Method, BFINSTC, library->method)
+
+// Methods
+// Please keep in order with bfbridge_library_t members
 
 // BFSetCommunicationBuffer is used internally
 
@@ -508,8 +509,8 @@ int bf_get_error_length(bfbridge_instance_t *instance, bfbridge_library_t *libra
 }
 
 int bf_is_compatible(
-    bfbridge_instance_t *instance,
-    bfbridge_library_t *library, char *filepath, int filepath_len)
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    char *filepath, int filepath_len)
 {
     fprintf(stderr, "calling is compatible %s\n", filepath);
     memcpy(instance->communication_buffer, filepath, filepath_len);
@@ -517,172 +518,227 @@ int bf_is_compatible(
     return BFFUNC(BFIsCompatible, Int, filepath_len);
 }
 
-/*int bf_is_compatible(std::string filepath)
+int bf_open(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    char *filepath, int filepath_len)
 {
-    fprintf(stderr, "calling is compatible %s\n", filepath);
-    int len = filepath.length();
-    memcpy(communication_buffer, filepath, len);
-    fprintf(stderr, "called is compatible\n");
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsCompatible, len);
-}*/
-
-/*
-
-int bf_is_compatible(std::string filepath)
-{
-    fprintf(stderr, "calling is compatible %s\n", filepath);
-    int len = filepath.length();
-    memcpy(communication_buffer, filepath, len);
-    fprintf(stderr, "called is compatible\n");
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsCompatible, len);
+    memcpy(instance->communication_buffer, filepath, filepath_len);
+    return BFFUNC(BFOpen, Int, filepath_len);
 }
 
-int bf_open(std::string filepath)
+int bf_is_single_file(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    char *filepath, int filepath_len)
 {
-    int len = filepath.length();
-    memcpy(communication_buffer, filepath, len);
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFOpen, len);
+    memcpy(instance->communication_buffer, filepath, filepath_len);
+    return BFFUNC(BFIsSingleFile, Int, filepath_len);
 }
 
-int bf_close()
+// Lists null-separated filenames/filepaths for the currently open file.
+// Returns bytes written including the last null
+int bf_get_used_files(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFClose);
+    return BFFUNCV(BFGetUsedFiles, Int);
 }
 
-int bf_get_resolution_count()
+int bf_get_current_file(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetResolutionCount);
+    return BFFUNCV(BFCurrentFile, Int);
 }
 
-int bf_set_current_resolution(int res)
+int bf_close(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFSetCurrentResolution, res);
+    return BFFUNCV(BFClose, Int);
 }
 
-int bf_set_series(int ser)
+int bf_get_resolution_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFSetSeries, ser);
+    return BFFUNCV(BFGetResolutionCount, Int);
 }
 
-int bf_get_series_count()
+int bf_set_current_resolution(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int res)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSeriesCount);
+    return BFFUNC(BFSetCurrentResolution, Int, res);
 }
 
-int bf_get_size_x()
+int bf_set_current_series(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int ser)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeX);
+    return BFFUNC(BFSetCurrentSeries, Int, ser);
 }
 
-int bf_get_size_y()
+int bf_get_size_x(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeY);
+    return BFFUNCV(BFGetSizeX, Int);
 }
 
-int bf_get_size_z()
+int bf_get_size_y(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeZ);
+    return BFFUNCV(BFGetSizeY, Int);
 }
 
-int bf_get_size_c()
+int bf_get_size_c(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeC);
+    return BFFUNCV(BFGetSizeC, Int);
 }
 
-int bf_get_size_t()
+int bf_get_size_z(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetSizeT);
+    return BFFUNCV(BFGetSizeZ, Int);
 }
 
-int bf_get_effective_size_c()
+int bf_get_size_t(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetEffectiveSizeC);
+    return BFFUNCV(BFGetSizeT, Int);
 }
 
-int bf_get_optimal_tile_width()
+int bf_get_effective_size_c(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetOptimalTileWidth);
+    return BFFUNCV(BFGetEffectiveSizeC, Int);
 }
 
-int bf_get_optimal_tile_height()
+int bf_get_optimal_tile_width(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetOptimalTileHeight);
+    return BFFUNCV(BFGetOptimalTileWidth, Int);
 }
 
-int bf_get_pixel_type()
+int bf_get_optimal_tile_height(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetPixelType);
+    return BFFUNCV(BFGetOptimalTileHeight, Int);
 }
 
-int bf_get_bytes_per_pixel()
+int bf_get_format(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetBytesPerPixel);
+    return BFFUNCV(BFGetFormat, Int);
 }
 
-int bf_get_rgb_channel_count()
+int bf_get_pixel_type(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetRGBChannelCount);
+    return BFFUNCV(BFGetPixelType, Int);
 }
 
-int bf_get_image_count()
+int bf_get_bits_per_pixel(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFGetImageCount);
+    return BFFUNCV(BFGetBitsPerPixel, Int);
 }
 
-int bf_is_rgb()
+int bf_get_bytes_per_pixel(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsRGB);
+    return BFFUNCV(BFGetBytesPerPixel, Int);
 }
 
-int bf_is_interleaved()
+int bf_get_rgb_channel_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsInterleaved);
+    return BFFUNCV(BFGetRGBChannelCount, Int);
 }
 
-int bf_is_little_endian()
+int bf_get_image_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsLittleEndian);
+    return BFFUNCV(BFGetImageCount, Int);
 }
 
-int bf_is_false_color()
+int bf_is_rgb(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsFalseColor);
+    return BFFUNCV(BFIsRGB, Int);
 }
 
-int bf_is_indexed_color()
+int bf_is_interleaved(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsIndexedColor);
+    return BFFUNCV(BFIsInterleaved, Int);
 }
 
-// Returns char* to communication_buffer that will later be overwritten
-char *bf_get_dimension_order()
+int bf_is_little_endian(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    int len = jvm.env->CallIntMethod(bfbridge, jvm.BFGetDimensionOrder);
-    if (len < 0)
-    {
-        return NULL;
-    }
-    // We know that for this function len can never be close to
-    // bfi_communication_buffer_len, so no writing past it
-    communication_buffer[len] = 0;
-    return communication_buffer;
+    return BFFUNCV(BFIsLittleEndian, Int);
 }
 
-int bf_is_order_certain()
+int bf_is_false_color(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFIsOrderCertain);
+    return BFFUNCV(BFIsFalseColor, Int);
 }
 
-int bf_open_bytes(int x, int y, int w, int h)
+int bf_is_indexed_color(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return jvm.env->CallIntMethod(bfbridge, jvm.BFOpenBytes, x, y, w, h);
-}*/
+    return BFFUNCV(BFIsIndexedColor, Int);
+}
 
+int bf_get_dimension_order(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGetDimensionOrder, Int);
+}
+
+int bf_is_order_certain(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFIsOrderCertain, Int);
+}
+
+int bf_open_bytes(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int x, int y, int w, int h)
+{
+    return BFFUNC(BFIsOrderCertain, Int, x, y, w, h);
+}
+
+double bf_get_mpp_x(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGetMPPX, Double);
+}
+
+double bf_get_mpp_y(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGetMPPY, Double);
+}
+
+double bf_get_mpp_z(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGetMPPZ, Double);
+}
+
+int bf_is_any_file_open(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFIsAnyFileOpen, Int);
+}
+
+int bf_tools_should_generate(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFToolsShouldGenerate, Int);
+}
+
+#undef BFENVA
 #undef BFENV
 #undef BFINSTC
-
-#ifdef __cplusplus
-#undef BFENVA
-#endif
 
 #endif // !(defined(BFBRIDGE_INLINE) && !defined(BFBRIDGE_HEADER))

@@ -93,13 +93,13 @@ typedef struct bfbridge_library
     jmethodID BFClose;
     jmethodID BFGetResolutionCount;
     jmethodID BFSetCurrentResolution;
-    jmethodID BFSetSeries;
     jmethodID BFGetSeriesCount;
+    jmethodID BFSetCurrentSeries;
     jmethodID BFGetSizeX;
     jmethodID BFGetSizeY;
+    jmethodID BFGetSizeC;
     jmethodID BFGetSizeZ;
     jmethodID BFGetSizeT;
-    jmethodID BFGetSizeC;
     jmethodID BFGetEffectiveSizeC;
     jmethodID BFGetOptimalTileWidth;
     jmethodID BFGetOptimalTileHeight;
@@ -207,6 +207,122 @@ BFBRIDGE_INLINE_ME char *bf_get_error_convenience(
 // bf_get_error: fills the communication buffer with an error message
 // returns: the number of bytes to read
 BFBRIDGE_INLINE_ME int bf_get_error(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+// 1 if the filepath can be read by BioFormats otherwise 0
+BFBRIDGE_INLINE_ME int bf_is_compatible(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    char *filepath, int filepath_len)
+
+BFBRIDGE_INLINE_ME int bf_open(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    char *filepath, int filepath_len);
+
+BFBRIDGE_INLINE_ME int bf_is_single_file(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    char *filepath, int filepath_len);
+
+BFBRIDGE_INLINE_ME int bf_get_used_files(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_current_file(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_close(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_resolution_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_set_current_resolution(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_set_current_series(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_size_x(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_size_y(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_size_c(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_size_z(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_size_t(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_effective_size_c(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_effective_size_c(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_optimal_tile_width(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_optimal_tile_height(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_format(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_pixel_type(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_bits_per_pixel(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_bytes_per_pixel(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_rgb_channel_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_image_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_is_rgb(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_is_interleaved(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_is_little_endian(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_is_false_color(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_is_indexed_color(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_get_dimension_order(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_is_order_certain(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_open_bytes(
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int x, int y, int w, int h);
+
+BFBRIDGE_INLINE_ME double bf_get_mpp_x(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME double bf_get_mpp_y(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME double bf_get_mpp_z(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_is_any_file_open(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
+
+BFBRIDGE_INLINE_ME int bf_tools_should_generate(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 /*
