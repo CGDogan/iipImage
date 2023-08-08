@@ -267,7 +267,7 @@ public:
 
   int bf_open_bytes(int x, int y, int w, int h)
   {
-    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFOpenBytes, x, y, w, h);
+    return thread.bflibrary.env->CallIntMethod(bfinstance.bfbridge, thread.bflibrary.BFOpenBytes, 0, x, y, w, h);
   }
 };
 
