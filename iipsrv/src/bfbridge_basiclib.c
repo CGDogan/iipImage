@@ -352,6 +352,13 @@ bfbridge_error_t *bfbridge_make_instance(
     dest->communication_buffer_len = communication_buffer_len;
 #endif
 
+    if (!library->jvm) {
+        return make_error(
+            BFBRIDGE_LIBRARY_UNINITIALIZED,
+            "a bfbridge_library_t must have been initialized before bfbridge_make_instance",
+            NULL);
+    }
+
     if (communication_buffer == NULL || communication_buffer_len < 0)
     {
         return make_error(
