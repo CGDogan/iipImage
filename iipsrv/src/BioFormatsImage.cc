@@ -805,7 +805,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     // the data's endianness depends on platform, otherwise
     // on file format, so from bfi.bf_is_little_endian
     int pick_byte;
-    unsigned char *buf = (unsigned char *)bfi.communication_buffer;
+    unsigned char *buf = (unsigned char *)bfi.communication_buffer();
 
 // The common case for float and double branches, change later otherwise
 #if !defined(__BYTE_ORDER) || __BYTE_ORDER == __LITTLE_ENDIAN
@@ -885,9 +885,9 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
     if (should_interleave)
     {
-        char *red = bfi.communication_buffer;
-        char *green = &bfi.communication_buffer[pixels];
-        char *blue = &bfi.communication_buffer[2 * pixels];
+        char *red = bfi.communication_buffer();
+        char *green = &bfi.communication_buffer()[pixels];
+        char *blue = &bfi.communication_buffer()[2 * pixels];
 
         for (int i = 0; i < pixels; i++)
         {
@@ -910,14 +910,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
             {
                 // This can be optimized I think with uint64 operations?
                 // Depends on compiler
-                data_out[3 * i] = bfi.communication_buffer[4 * i];
-                data_out[3 * i + 1] = bfi.communication_buffer[4 * i + 1];
-                data_out[3 * i + 2] = bfi.communication_buffer[4 * i + 2];
+                data_out[3 * i] = bfi.communication_buffer()[4 * i];
+                data_out[3 * i + 1] = bfi.communication_buffer()[4 * i + 1];
+                data_out[3 * i + 2] = bfi.communication_buffer()[4 * i + 2];
             }
         }
         else
         {
-            memcpy(rt->data, bfi.communication_buffer, bytes_received);
+            memcpy(rt->data, bfi.communication_buffer(), bytes_received);
         }
     }
 

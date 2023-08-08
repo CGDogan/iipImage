@@ -83,7 +83,7 @@ public:
     return *this;
   }
 
-  char *comuniation_buffer() {
+  char *comunication_buffer() {
     return bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
   }
 
