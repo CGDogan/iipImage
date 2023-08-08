@@ -212,7 +212,7 @@ BFBRIDGE_INLINE_ME int bf_get_error(
 // 1 if the filepath can be read by BioFormats otherwise 0
 BFBRIDGE_INLINE_ME int bf_is_compatible(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
-    char *filepath, int filepath_len)
+    char *filepath, int filepath_len);
 
 BFBRIDGE_INLINE_ME int bf_open(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
