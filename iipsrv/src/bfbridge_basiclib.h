@@ -96,8 +96,8 @@ typedef struct bfbridge_library
     jmethodID BFOpen;
     jmethodID BFGetFormat;
     jmethodID BFIsSingleFile;
-    jmethodID BFGetUsedFiles;
     jmethodID BFGetCurrentFile;
+    jmethodID BFGetUsedFiles;
     jmethodID BFClose;
     jmethodID BFGetSeriesCount;
     jmethodID BFSetCurrentSeries;
@@ -231,14 +231,15 @@ BFBRIDGE_INLINE_ME int bf_open(
 BFBRIDGE_INLINE_ME int bf_get_format(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
+// You may use bf_get_used_files for already opened files instead
 BFBRIDGE_INLINE_ME int bf_is_single_file(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     char *filepath, int filepath_len);
 
-BFBRIDGE_INLINE_ME int bf_get_used_files(
+BFBRIDGE_INLINE_ME int bf_get_current_file(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
-BFBRIDGE_INLINE_ME int bf_get_current_file(
+BFBRIDGE_INLINE_ME int bf_get_used_files(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_close(
@@ -287,6 +288,10 @@ BFBRIDGE_INLINE_ME int bf_get_optimal_tile_width(
 BFBRIDGE_INLINE_ME int bf_get_optimal_tile_height(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
+/*
+https://github.com/ome/bioformats/blob/9cb6cfaaa5361bcc4ed9f9841f2a4caa29aad6c7/components/formats-api/src/loci/formats/FormatTools.java#L98
+You may use this to determine number of bytes in a pixel or if float type
+*/
 BFBRIDGE_INLINE_ME int bf_get_pixel_type(
     bfbridge_instance_t *instance, bfbridge_library_t *library);
 
