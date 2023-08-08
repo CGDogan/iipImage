@@ -1,7 +1,7 @@
 #include "BioFormatsInstance.h"
 #include "BioFormatsThread.h"
 
-BioFormatsThread BioFormatsInstance::jvm;
+BioFormatsThread BioFormatsInstance::thread;
 
 BioFormatsInstance::BioFormatsInstance()
 {
