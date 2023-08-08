@@ -231,7 +231,6 @@ bfbridge_error_t *bfbridge_make_library(
 
     free_string(path_arg);
 
-    dest->jvm = jvm;
     dest->env = env;
     dest->bfbridge_base = bfbridge_base;
 
@@ -301,6 +300,9 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFIsAnyFileOpen, "()I");
     prepare_method_id(BFToolsShouldGenerate, "()I");
     prepare_method_id(BFToolsGenerateSubresolutions, "(III)I");
+
+    // Ease of freeing: keep null until we can return without error
+    dest->jvm = jvm;
 
     return NULL;
 }
@@ -393,6 +395,8 @@ bfbridge_error_t *bfbridge_make_instance(
     */
     BFENVA(env, CallVoidMethod, bfbridge, library->BFSetCommunicationBuffer, buffer);
     BFENVA(env, DeleteLocalRef, buffer);
+
+    // Ease of freeing: keep null until we can return without error
     dest->bfbridge = bfbridge;
     return NULL;
 }
@@ -427,6 +431,15 @@ char *bfbridge_instance_get_communication_buffer(
 // Instance class:
 #define BFINSTC (*instance->bfbridge)
 
+// Call easily
+//#define BFFUNC(method_name, ...) BFENVA(BFENV, method_name, BFINSTC, __VA_ARGS__)
+// Even more easily:
+//#define BFFUNC(caller, method, ...) \
+//BFENVA(BFENV, caller, BFINSTC, library->method, __VA_ARGS__)
+// Super easily:
+#define BFFUNC(method, type, ...) \
+ BFENVA(BFENV, Call##type##Method, BFINSTC, library->method, __VA_ARGS__)
+
 // BFSetCommunicationBuffer is used internally
 
 // Return a C string with the last error
@@ -435,8 +448,10 @@ char *bfbridge_instance_get_communication_buffer(
 char *bf_get_error_convenience(
     bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    int len = BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
-    char *buffer = bfbridge_instance_get_communication_buffer(instance, NULL);
+    int len = BFFUNC(BFGetErrorLength, Int);
+
+        // BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
+        char *buffer = bfbridge_instance_get_communication_buffer(instance, NULL);
     // The case of overflow is handled on Java side
     buffer[len] = '\0';
     return buffer;
@@ -446,7 +461,8 @@ char *bf_get_error_convenience(
 // returns: the number of bytes to read
 int bf_get_error(bfbridge_instance_t *instance, bfbridge_library_t *library)
 {
-    return BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
+    //return BFENV->CallIntMethod(BFENV, BFINSTC, library->BFGetErrorLength);
+    return BFFUNC(BFGetErrorLength, Int);
 }
 
 /*int bf_is_compatible(std::string filepath)
