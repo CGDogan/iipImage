@@ -257,7 +257,7 @@ bfbridge_error_t *bfbridge_make_library(
         return make_error(                                          \
             BFBRIDGE_METHOD_NOT_FOUND,                              \
             "Could not find BFBridge method ",                      \
-            #name " with expected descriptor " ##decriptor);          \
+            #name ". Maybe check and update the descriptor?");          \
     }
 
     // To print descriptors (encoded function types) to screen
