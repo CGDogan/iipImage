@@ -301,10 +301,12 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFIsLittleEndian, "()I");
     prepare_method_id(BFIsIndexedColor, "()I");
     prepare_method_id(BFIsFalseColor, "()I");
-    prepare_method_id(BFOpenBytes, "(IIII)I");
-    prepare_method_id(BFGetMPPX, "()D");
-    prepare_method_id(BFGetMPPY, "()D");
-    prepare_method_id(BFGetMPPZ, "()D");
+    prepare_method_id(BFGet8BitLookupTable, "()I");
+    prepare_method_id(BFGet16BitLookupTable, "()I");
+    prepare_method_id(BFOpenBytes, "(IIIII)I");
+    prepare_method_id(BFGetMPPX, "(I)D");
+    prepare_method_id(BFGetMPPY, "(I)D");
+    prepare_method_id(BFGetMPPZ, "(I)D");
     prepare_method_id(BFToolsShouldGenerate, "()I");
     prepare_method_id(BFToolsGenerateSubresolutions, "(III)I");
 
@@ -712,29 +714,44 @@ int bf_is_false_color(
     return BFFUNCV(BFIsFalseColor, Int);
 }
 
+int bf_get_8_bit_lookup_table(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGet8BitLookupTable, Int);
+}
+
+int bf_get_16_bit_lookup_table(
+    bfbridge_instance_t *instance, bfbridge_library_t *library)
+{
+    return BFFUNCV(BFGet16BitLookupTable, Int);
+}
+
 int bf_open_bytes(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
-    int x, int y, int w, int h)
+    int plane, int x, int y, int w, int h)
 {
-    return BFFUNC(BFIsOrderCertain, Int, x, y, w, h);
+    return BFFUNC(BFIsOrderCertain, Int, plane, x, y, w, h);
 }
 
 double bf_get_mpp_x(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int series)
 {
-    return BFFUNCV(BFGetMPPX, Double);
+    return BFFUNCV(BFGetMPPX, Double, series);
 }
 
 double bf_get_mpp_y(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int series)
 {
-    return BFFUNCV(BFGetMPPY, Double);
+    return BFFUNCV(BFGetMPPY, Double, series);
 }
 
 double bf_get_mpp_z(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    int series)
 {
-    return BFFUNCV(BFGetMPPZ, Double);
+    return BFFUNCV(BFGetMPPZ, Double, series);
 }
 
 int bf_tools_should_generate(
