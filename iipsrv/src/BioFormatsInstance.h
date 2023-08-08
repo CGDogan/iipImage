@@ -83,6 +83,10 @@ public:
     return *this;
   }
 
+  char *comuniation_buffer() {
+    return bfbridge_instance_get_communication_buffer(&bfinstance, NULL);
+  }
+
   ~BioFormatsInstance()
   {
     char *communication_buffer =
