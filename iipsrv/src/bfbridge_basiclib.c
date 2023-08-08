@@ -12,7 +12,9 @@ maybe: "failure guarantees")
 Ease of freeing:
 Free can be called for both the library and the instance
 because the makers set to null if going to fail
-so you can call free regardless of whether the makers failed
+so you can call free regardless of whether the makers failed.
+
+TODO?: But you cant make instance if library call failed
 */
 
 // If inlining but erroneously still compiling .c, make it empty
@@ -36,10 +38,13 @@ so you can call free regardless of whether the makers failed
 // call JNI in its both modes
 // C++: env->JNIMethodABC..(x,y,z)
 // C: (*env)->JNIMethodABC..(env, x,y,z)
+// This can also be used for JVM*, such as (*jvm)->DestroyJavaVM(jvm);
 #ifdef __cplusplus
-#define BFENVA(env, method_name, ...) (env)->method_name(__VA_ARGS__)
+#define BFENVA(env_ptr, method_name, ...) \
+    ((env_ptr)->method_name(__VA_ARGS__))
 #else
-#define BFENVA(env, method_name, ...) (*(env))->method_name((env), __VA_ARGS__)
+#define BFENVA(env_ptr, method_name, ...) \
+    ((*(env_ptr))->method_name((env_ptr), __VA_ARGS__))
 #endif
 
 void bfbridge_free_error(bfbridge_error_t *error)
@@ -112,7 +117,7 @@ bfbridge_error_t *bfbridge_make_library(
     bfbridge_library_t *dest, char *cpdir, char *cachedir)
 {
     // Ease of freeing
-    dest->env = NULL;
+    dest->jvm = NULL;
 
     if (cpdir == NULL || cpdir[0] == '\0')
     {
@@ -201,23 +206,23 @@ bfbridge_error_t *bfbridge_make_library(
     if (code < 0)
     {
         free_string(path_arg);
-        return make_error((bfbridge_error_code_t) code, "JNI_CreateJavaVM failed, please see https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes for error code description", NULL);
+        return make_error((bfbridge_error_code_t)code, "JNI_CreateJavaVM failed, please see https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes for error code description", NULL);
     }
 
-    jclass bfbridge_base = (*env)->FindClass(env, "org/camicroscope/BFBridge");
+    jclass bfbridge_base = BFENVA(env, FindClass, "org/camicroscope/BFBridge");
     if (!bfbridge_base)
     {
         bfbridge_basiclib_string_t *error = allocate_string("FindClass failed because org.camicroscope.BFBridge (or a dependency of it) could not be found. Are the jars in: ");
         append_to_string(error, path_arg);
 
-        if ((*env)->ExceptionCheck(env) == 1)
+        if (BFENVA(env, ExceptionCheck) == 1)
         {
-            (*env)->ExceptionDescribe(env);
+            BFENVA(env, ExceptionDescribe);
             append_to_string(error, "? An exception was printed to stderr.");
         }
 
         free_string(path_arg);
-        jvm->DestroyJavaVM();
+        BFENVA(jvm, DestroyJavaVM);
 
         bfbridge_error_t *err = make_error(BFBRIDGE_CLASS_NOT_FOUND, error->str, NULL);
         free_string(error);
@@ -230,20 +235,20 @@ bfbridge_error_t *bfbridge_make_library(
     dest->env = env;
     dest->bfbridge_base = bfbridge_base;
 
-    dest->constructor = (*env)->GetMethodID(env, bfbridge_base, "<init>", "()V");
+    dest->constructor = BFENVA(env, GetMethodID, bfbridge_base, "<init>", "()V");
     if (!dest->constructor)
     {
-        jvm->DestroyJavaVM();
+        BFENVA(jvm, DestroyJavaVM);
         return make_error(BFBRIDGE_METHOD_NOT_FOUND, "Could not find BFBridge constructor", NULL);
     }
 
     // Now do the same for methods but in shorthand form
 #define prepare_method_id(name, descriptor)                         \
     dest->name =                                                    \
-        (*env)->GetMethodID(env, bfbridge_base, #name, descriptor); \
+        BFENVA(env, GetMethodID, bfbridge_base, #name, descriptor); \
     if (!dest->name)                                                \
     {                                                               \
-        jvm->DestroyJavaVM();                                       \
+        BFENVA(jvm, DestroyJavaVM);                                 \
         return make_error(                                          \
             BFBRIDGE_METHOD_NOT_FOUND,                              \
             "Could not find BFBridge method ",                      \
@@ -303,9 +308,9 @@ bfbridge_error_t *bfbridge_make_library(
 void bfbridge_free_library(bfbridge_library_t *lib)
 {
     // Ease of freeing
-    if (lib->env)
+    if (lib->jvm)
     {
-        (*(lib->env))->DestroyJavaVM(env);
+        BFENVA(lib->jvm, DestroyJavaVM);
     }
     // Now, after DestroyJavaVM, there's no need to free bfbridge_base
     // DetachCurrentThread would also free this reference
@@ -334,21 +339,25 @@ bfbridge_error_t *bfbridge_make_instance(
     JNIEnv *env = library->env;
 
     jobject bfbridge_local =
-        (*env)->NewObject(env, library->bfbridge_base, library->constructor);
+        BFENVA(env, NewObject, library->bfbridge_base, library->constructor);
     // Should be freed: bfbridge
-    jobject bfbridge = (jobject)((*env)->NewGlobalRef(env, bfbridge_local));
-    (*env)->DeleteLocalRef(env, bfbridge_local);
+    jobject bfbridge = (jobject)BFENVA(env, NewGlobalRef, bfbridge_local);
+    BFENVA(env, DeleteLocalRef, bfbridge_local);
 
     // Should be freed: bfbridge, buffer (the jobject only)
     jobject buffer =
-        (*env)->NewDirectByteBuffer(env, communication_buffer, communication_buffer_len);
+        BFENVA(env,
+               NewDirectByteBuffer,
+               communication_buffer,
+               communication_buffer_len);
     if (!buffer)
     {
-        if ((*env)->ExceptionCheck(env) == 1)
+        if (BFENVA(env, ExceptionCheck) == 1)
         {
             // As of JDK 20, NewDirectByteBuffer only raises OutOfMemoryError
-            (*env)->ExceptionDescribe(env);
-            (*env)->DeleteGlobalRef(env, bfbridge);
+            BFENVA(env, ExceptionDescribe)
+            BFENVA(env, DeleteGlobalRef, bfbridge)
+
             return make_error(
                 BFBRIDGE_OUT_OF_MEMORY_ERROR,
                 "NewDirectByteBuffer failed, printing debug info to stderr",
@@ -356,7 +365,7 @@ bfbridge_error_t *bfbridge_make_instance(
         }
         else
         {
-            (*env)->DeleteGlobalRef(env, bfbridge);
+            BFENVA(env, DeleteGlobalRef, bfbridge)
             return make_error(
                 BFBRIDGE_JVM_LACKS_BYTE_BUFFERS,
                 "Used JVM implementation does not support direct byte buffers"
@@ -376,14 +385,14 @@ bfbridge_error_t *bfbridge_make_instance(
     /*
     How we would do if we hadn't been caching methods beforehand: This way:
     jmethodID BFSetCommunicationBuffer =
-      (*env)->GetMethodID(env, library->bfbridge_base, "BFSetCommunicationBuffer",
-      "(Ljava/nio/ByteBuffer;)V"
+      BFENVA(env, GetMethodID,
+      library->bfbridge_base, "BFSetCommunicationBuffer",
+      "(Ljava/nio/ByteBuffer;)V");
     );
-    (*env)->CallVoidMethod(env, bfbridge, library->BFSetCommunicationBuffer, buffer);
+    BFENVA(env, CallVoidMethod, bfbridge, library->BFSetCommunicationBuffer, buffer);
     */
-    (*env)->CallVoidMethod(env, bfbridge, library->BFSetCommunicationBuffer, buffer);
-
-    (*env)->DeleteLocalRef(env, buffer);
+    BFENVA(env, CallVoidMethod, bfbridge, library->BFSetCommunicationBuffer, buffer);
+    BFENVA(env, DeleteLocalRef, buffer);
     dest->bfbridge = bfbridge;
     return NULL;
 }
@@ -394,7 +403,7 @@ void bfbridge_free_instance(
     // Ease of freeing
     if (instance->bfbridge)
     {
-        (*library->env)->DeleteGlobalRef(library->env, bfbridge);
+        BFENVA(library->env, DeleteGlobalRef, bfbridge);
     }
 }
 
