@@ -6,8 +6,16 @@
  */
 
 // Optionally define: BFBRIDGE_INLINE (makes it a header-only library)
-// Optionally define: BFBRIDGE_INLINE_EXTRA (not recommended)
+// Please note: in this case you're encouraged to call bfbridge_make_library
+// and bfbridge_make_library from a single compilation unit only to save from
+// final executable size, or wrap it around a non-static caller which
+// you can call from multiple files
+// Please note: The best way to define BFBRIDGE_INLINE is through the flag
+// -DBFBRIDGE_INLINE but it also works speed-wise to #define BFBRIDGE_INLINE
+// before you include it.
+
 // Optionally define: BFBRIDGE_KNOW_BUFFER_LEN
+// This will save some memory by not storing buffer length in our structs.
 
 #ifndef BFBRIDGE_BASICLIB_H
 #define BFBRIDGE_BASICLIB_H
@@ -18,10 +26,7 @@
 extern "C" {
 #endif
 
-#ifdef BFBRIDGE_INLINE_EXTRA
-#define BFBRIDGE_INLINE
-#define BFBRIDGE_INLINE_ME_EXTRA static inline
-#elif defined(BFBRIDGE_INLINE)
+#ifdef BFBRIDGE_INLINE
 #define BFBRIDGE_INLINE_ME_EXTRA static
 #else
 #define BFBRIDGE_INLINE_ME_EXTRA
@@ -213,7 +218,7 @@ receives bytes to the communication buffer. Returns an int,
 bytes to be read, which then the user of the library should read from the buffer.
  */
 
-#if defined(BFBRIDGE_INLINE)
+#ifdef BFBRIDGE_INLINE
 #define BFBRIDGE_HEADER
 #include "bfbridge_basiclib.c"
 #undef BFBRIDGE_HEADER
