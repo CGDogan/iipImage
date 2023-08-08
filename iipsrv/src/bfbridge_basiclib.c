@@ -434,9 +434,9 @@ char *bfbridge_instance_get_communication_buffer(
 // Please keep in order with bfbridge_library_t members
 
 // Shorthand for JavaENV:
-#define BFENV (*library->env)
+#define BFENV (library->env)
 // Instance class:
-#define BFINSTC (*instance->bfbridge)
+#define BFINSTC (instance->bfbridge)
 
 // Call easily
 //#define BFFUNC(method_name, ...) BFENVA(BFENV, method_name, BFINSTC, __VA_ARGS__)
