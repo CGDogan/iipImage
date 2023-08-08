@@ -104,7 +104,7 @@ public:
   {
     fprintf(stderr, "calling refresh\n");
     // Here is an example of calling a method manually without the C wrapper
-    thread.bflibrary.env->CallVoidMethod(bfinstance.bfbridge, thread.bflibrary.BFClose);
+    thread.bflibrary.env->CallVoidMethod(&bfinstance, &thread.bflibrary.BFClose);
     fprintf(stderr, "called refresh\n");
   }
 
@@ -114,123 +114,123 @@ public:
     std::string err;
     char *buffer = communication_buffer();
     err.assign(communication_buffer,
-               bf_get_error_length(bfinstance.bfbridge, thread.bflibrary));
+               bf_get_error_length(&bfinstance, &thread.bflibrary));
     return err;
   }
 
   int is_compatible(std::string filepath)
   {
-    return bf_is_compatible(bfinstance.bfbridge, thread.bflibrary, &filepath[0], len);
+    return bf_is_compatible(&bfinstance, &thread.bflibrary, &filepath[0], len);
   }
 
   int open(std::string filepath)
   {
-    return bf_open(bfinstance.bfbridge, thread.bflibrary, &filepath[0], len);
+    return bf_open(&bfinstance, &thread.bflibrary, &filepath[0], len);
   }
 
   int close()
   {
-    return bf_close(bfinstance.bfbridge, thread.bflibrary);
+    return bf_close(&bfinstance, &thread.bflibrary);
   }
 
   int get_resolution_count()
   {
-    return bf_get_resolution_count(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_resolution_count(&bfinstance, &thread.bflibrary);
   }
 
   int set_current_resolution(int res)
   {
-    return bf_set_current_resolution(bfinstance.bfbridge, thread.bflibrary, res);
+    return bf_set_current_resolution(&bfinstance, &thread.bflibrary, res);
   }
 
   int get_size_x()
   {
-    return bf_get_size_x(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_size_x(&bfinstance, &thread.bflibrary);
   }
 
   int get_size_y()
   {
-    return bf_get_size_y(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_size_y(&bfinstance, &thread.bflibrary);
   }
 
   int get_size_z()
   {
-    return bf_get_size_z(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_size_z(&bfinstance, &thread.bflibrary);
   }
 
   int get_size_c()
   {
-    return bf_get_size_c(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_size_c(&bfinstance, &thread.bflibrary);
   }
 
   int get_size_t()
   {
-    return bf_get_size_t(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_size_t(&bfinstance, &thread.bflibrary);
   }
 
   int get_effective_size_c()
   {
-    return bf_get_size_c(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_size_c(&bfinstance, &thread.bflibrary);
   }
 
   int get_optimal_tile_width()
   {
-    return bf_get_optimal_tile_width(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_optimal_tile_width(&bfinstance, &thread.bflibrary);
   }
 
   int get_optimal_tile_height()
   {
-    return bf_get_optimal_tile_height(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_optimal_tile_height(&bfinstance, &thread.bflibrary);
   }
 
   int get_pixel_type()
   {
-    return bf_get_pixel_type(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_pixel_type(&bfinstance, &thread.bflibrary);
   }
 
   int get_bytes_per_pixel()
   {
-    return bf_get_bytes_per_pixel(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_bytes_per_pixel(&bfinstance, &thread.bflibrary);
   }
 
   int get_rgb_channel_count()
   {
-    return bf_get_rgb_channel_count(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_rgb_channel_count(&bfinstance, &thread.bflibrary);
   }
 
   int get_image_count()
   {
-    return bf_get_rgb_channel_count(bfinstance.bfbridge, thread.bflibrary);
+    return bf_get_rgb_channel_count(&bfinstance, &thread.bflibrary);
   }
 
   int is_rgb()
   {
-    return bf_is_rgb(bfinstance.bfbridge, thread.bflibrary);
+    return bf_is_rgb(&bfinstance, &thread.bflibrary);
   }
 
   int is_interleaved()
   {
-    return bf_is_interleaved(bfinstance.bfbridge, thread.bflibrary);
+    return bf_is_interleaved(&bfinstance, &thread.bflibrary);
   }
 
   int is_little_endian()
   {
-    return bf_is_little_endian(bfinstance.bfbridge, thread.bflibrary);
+    return bf_is_little_endian(&bfinstance, &thread.bflibrary);
   }
 
   int is_false_color()
   {
-    return bf_is_false_color(bfinstance.bfbridge, thread.bflibrary);
+    return bf_is_false_color(&bfinstance, &thread.bflibrary);
   }
 
   int is_indexed_color()
   {
-    return bf_is_indexed_color(bfinstance.bfbridge, thread.bflibrary);
+    return bf_is_indexed_color(&bfinstance, &thread.bflibrary);
   }
 
   std::string get_dimension_order()
   {
-    int len = bf_get_dimension_order(bfinstance.bfbridge, thread.bflibrary);
+    int len = bf_get_dimension_order(&bfinstance, &thread.bflibrary);
     if (len < 0)
     {
       return "";
@@ -243,12 +243,12 @@ public:
 
   int is_order_certain()
   {
-    return bf_is_order_certain(bfinstance.bfbridge, thread.bflibrary);
+    return bf_is_order_certain(&bfinstance, &thread.bflibrary);
   }
 
   int open_bytes(int x, int y, int w, int h)
   {
-    return bf_open_bytes(bfinstance.bfbridge, thread.bflibrary, 0, x, y, w, h);
+    return bf_open_bytes(&bfinstance, &thread.bflibrary, 0, x, y, w, h);
   }
 };
 
