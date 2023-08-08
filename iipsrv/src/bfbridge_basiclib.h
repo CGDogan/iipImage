@@ -128,6 +128,12 @@ BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_library(
     char *cpdir,
     char *cachedir);
 
+// Copies while making the freeing of the previous a noop
+// Dest: doesn't need to be initialized but allocated
+// This function would benefit from restrict but if we inline, not necessary
+BFBRIDGE_INLINE_ME void bfbridge_move_library(
+    bfbridge_library_t *dest, bfbridge_library_t *lib);
+
 // Does not free the library struct but its contents
 BFBRIDGE_INLINE_ME void bfbridge_free_library(bfbridge_library_t *);
 
@@ -163,6 +169,12 @@ BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_instance(
     bfbridge_library_t *library,
     char *communication_buffer,
     int communication_buffer_len);
+
+// Copies while making the freeing of the previous a noop
+// Dest: doesn't need to be initialized but allocated
+// This function would benefit from restrict but if we inline, not necessary
+BFBRIDGE_INLINE_ME void bfbridge_move_instance(
+    bfbridge_instance_t *dest, bfbridge_instance_t *lib);
 
 // bfbridge_free_instance mustnt't be called after bfbridge_free_library
 // bfbridge_free_library removes the need to call bfbridge_free_instance.

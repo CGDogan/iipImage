@@ -72,14 +72,12 @@ public:
   BioFormatsInstance(BioFormatsInstance &&other)
   {
     // Copy both the Java instance class and the communication buffer
-    bfinstance = other.bfinstance;
-    other.bfinstance = nullptr;
+    bfbridge_move_instance(&bfinstance, &other);
   }
   BioFormatsInstance &operator=(const BioFormatsInstance &) = delete;
   BioFormatsInstance &operator=(BioFormatsInstance &&other)
   {
-    bfinstance = other.bfinstance;
-    other.bfinstance = nullptr;
+    bfbridge_move_instance(&bfinstance, &other);
     return *this;
   }
 
