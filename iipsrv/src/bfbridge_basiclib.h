@@ -58,6 +58,7 @@ typedef enum bfbridge_error_code
     BFBRIDGE_INVALID_COMMUNICATON_BUFFER,
     BFBRIDGE_OUT_OF_MEMORY_ERROR,
     BFBRIDGE_JVM_LACKS_BYTE_BUFFERS,
+    BFBRIDGE_LIBRARY_UNINITIALIZED,
 } bfbridge_error_code_t;
 
 typedef struct bfbridge_error
