@@ -91,10 +91,10 @@ typedef struct bfbridge_library
     jmethodID BFGetUsedFiles;
     jmethodID BFGetCurrentFile;
     jmethodID BFClose;
-    jmethodID BFGetResolutionCount;
-    jmethodID BFSetCurrentResolution;
     jmethodID BFGetSeriesCount;
     jmethodID BFSetCurrentSeries;
+    jmethodID BFGetResolutionCount;
+    jmethodID BFSetCurrentResolution;
     jmethodID BFGetSizeX;
     jmethodID BFGetSizeY;
     jmethodID BFGetSizeC;
@@ -237,6 +237,9 @@ BFBRIDGE_INLINE_ME int bf_get_resolution_count(
 BFBRIDGE_INLINE_ME int bf_set_current_resolution(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
     int res);
+
+BFBRIDGE_INLINE_ME int bf_get_series_count(
+    bfbridge_instance_t *instance, bfbridge_library_t *library);
 
 BFBRIDGE_INLINE_ME int bf_set_current_series(
     bfbridge_instance_t *instance, bfbridge_library_t *library,
