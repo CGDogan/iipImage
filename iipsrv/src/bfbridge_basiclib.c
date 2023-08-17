@@ -233,7 +233,7 @@ bfbridge_error_t *bfbridge_make_vm(bfbridge_vm_t *dest,
     if (code < 0)
     {
         free_string(path_arg);
-        char code_string[2] = {-(char)code + '0', 0};
+        char code_string[2] = {'0' + (char)(-code), 0};
         if (code > 9) {
             // Only supports 1 digit now.
             code_string[0] = 0;
@@ -312,7 +312,7 @@ bfbridge_error_t *bfbridge_make_thread(
     JNIEnv *env;
     jint code = BFENVA(vm->jvm, AttachCurrentThread, (void **)&env, NULL);
     if (code < 0) {
-        char code_string[2] = {-(char)code + '0', 0};
+        char code_string[2] = {'0' + (char)(-code), 0};
         if (code > 9) {
             // Only supports 1 digit now.
             code_string[0] = 0;
@@ -325,7 +325,7 @@ bfbridge_error_t *bfbridge_make_thread(
     jclass bfbridge_base = BFENVA(env, FindClass, "org/camicroscope/BFBridge");
     if (!bfbridge_base)
     {
-        char *note = NULL;
+        const char *note = NULL;
         if (BFENVAV(env, ExceptionCheck) == 1)
         {
             BFENVAV(env, ExceptionDescribe);
