@@ -307,8 +307,11 @@ bfbridge_error_t *bfbridge_make_thread(
     fprintf(stderr, "bfbridge_make_thread01\n");
 
     if (!vm->jvm) {
+        fprintf(stderr, "bfbridge_make_thread02\n");
+
         return make_error(BFBRIDGE_LIBRARY_UNINITIALIZED, "bfbridge_make_thread requires successful bfbridge_make_vm", NULL);
     }
+        fprintf(stderr, "bfbridge_make_thread03\n");
 
     *dest->vm = *vm;
     fprintf(stderr, "bfbridge_make_thread1\n");
