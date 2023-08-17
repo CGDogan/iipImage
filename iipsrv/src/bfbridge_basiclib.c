@@ -233,9 +233,10 @@ bfbridge_error_t *bfbridge_make_vm(bfbridge_vm_t *dest,
     if (code < 0)
     {
         free_string(path_arg);
-        char code_string[2] = {'0' + (char)(-code), 0};
+        // Make error code positive:
+        char code_string[2] = {(char)('0' + (-code)), 0};
         if (code > 9) {
-            // Only supports 1 digit now.
+            // This code supports only 1 digit now.
             code_string[0] = 0;
         }
 
@@ -312,9 +313,9 @@ bfbridge_error_t *bfbridge_make_thread(
     JNIEnv *env;
     jint code = BFENVA(vm->jvm, AttachCurrentThread, (void **)&env, NULL);
     if (code < 0) {
-        char code_string[2] = {'0' + (char)(-code), 0};
+        char code_string[2] = {(char)('0' + (-code)), 0};
         if (code > 9) {
-            // Only supports 1 digit now.
+            // This code supports only 1 digit now.
             code_string[0] = 0;
         }
         return make_error((bfbridge_error_code_t)code, "AttachCurrentThread failed, please see https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes for error code description: -", code_string);
