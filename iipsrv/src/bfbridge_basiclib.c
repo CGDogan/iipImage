@@ -1,7 +1,7 @@
 // TODO: To be moved to decoders directory
 
 // TODO: Add example use. Mention that
-/*bfbridge_make_library will either return success
+/*bfbridge_make_thread will either return success
 or won't require any free, except for the user-allocated struct
 
 make_instance will either return success or fail while setting
@@ -10,11 +10,15 @@ allow you to call free_instance even if unsuccessful (write under heading
 maybe: "failure guarantees")
 
 Ease of freeing:
-Free can be called for both the library and the instance
+Free can be called for both the thread and the instance
 because the makers set to null if going to fail
 so you can call free regardless of whether the makers failed.
 
-But you can make instance if library call failed
+But you can make instance if thread call failed.
+And now hopefully you can make and free instance after thread make failed
+
+Not handled: calling free functions will NULL: as allocation
+takes outside of this library and responsibility of the user
 */
 
 // If inlining but erroneously still compiling .c, make it empty
@@ -23,6 +27,7 @@ But you can make instance if library call failed
 #include "bfbridge_basiclib.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -80,7 +85,7 @@ static bfbridge_basiclib_string_t *allocate_string(const char *initial)
     return bbs;
 }
 
-static void free_string(bfbridge_basiclib_string *bbs)
+static void free_string(bfbridge_basiclib_string_t *bbs)
 {
     free(bbs->str);
     free(bbs);
@@ -103,6 +108,8 @@ static void append_to_string(bfbridge_basiclib_string_t *bbs, const char *s)
 }
 
 // description: optional string to be appended to end of operation
+// Note: make_error copies strings supplied to it, so you should free them
+// after calling it, before returning it
 static bfbridge_error_t *make_error(
     bfbridge_error_code_t code,
     const char *operation,
@@ -119,16 +126,16 @@ static bfbridge_error_t *make_error(
     return error;
 }
 
-// JVM restriction: Allows only one JVM alive per thread
-bfbridge_error_t *bfbridge_make_library(
-    bfbridge_library_t *dest, char *cpdir, char *cachedir)
+bfbridge_error_t *bfbridge_make_vm(bfbridge_vm_t *dest,
+    char *cpdir,
+    char *cachedir)
 {
     // Ease of freeing
     dest->jvm = NULL;
 
     if (cpdir == NULL || cpdir[0] == '\0')
     {
-        return make_error(BFBRIDGE_INVALID_CLASSPATH, "bfbridge_make_library: no classpath supplied", NULL);
+        return make_error(BFBRIDGE_INVALID_CLASSPATH, "bfbridge_make_thread: no classpath supplied", NULL);
     }
 
     // Plus one if needed for the purpose below, and one for nullchar
@@ -163,9 +170,10 @@ bfbridge_error_t *bfbridge_make_library(
     if (!cp_dir)
     {
         free_string(path_arg);
-        return make_error(BFBRIDGE_INVALID_CLASSPATH, "bfbridge_make_library: a single classpath folder containing jars was expected but got ", cp);
+        return make_error(BFBRIDGE_INVALID_CLASSPATH, "bfbridge_make_thread: a single classpath folder containing jars was expected but got ", cp);
     }
     struct dirent *cp_dirent;
+    // BUG: one of the cp_dirent is "..", the parent folder
     while ((cp_dirent = readdir(cp_dir)) != NULL)
     {
         append_to_string(path_arg, BFBRIDGE_JNI_PATH_SEPARATOR_STR);
@@ -201,35 +209,65 @@ bfbridge_error_t *bfbridge_make_library(
         options[vm_args.nOptions++].optionString = cache_arg->str;
     }
 
+    // Check if JVM already exists
+    {
+    JavaVM* vmbuf[3];
+    jsize x = 0;
+    int code = JNI_GetCreatedJavaVMs(vmbuf, 3, &x);
+    printf("check code: %d %d\n", code, x);
+    }
+
     JavaVM *jvm;
     JNIEnv *env;
 
     // Should be freed: path_arg, cache_arg, jvm
     int code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);
-    free_string(cache_arg);
+    /*fprintf(stderr, "%d create jvm code\n", code);
+    code = BFENVAV(jvm, DestroyJavaVM);
+    fprintf(stderr, "%d destroy jvm code\n", code);
 
-    // Should be freed: path_arg, jvm
+    code = JNI_CreateJavaVM(&jvm, (void **)&env, &vm_args);*/
+
+    free_string(cache_arg);
 
     if (code < 0)
     {
         free_string(path_arg);
-        return make_error((bfbridge_error_code_t)code, "JNI_CreateJavaVM failed, please see https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes for error code description", NULL);
+        char code_string[2] = {-code + '0', 0};
+        if (code > 9) {
+            // Only supports 1 digit now.
+            code_string[0] = 0;
+        }
+
+        /*printf("printing:::\n");
+        // Handle "Other error"
+        if (BFENVAV(env, ExceptionCheck) == 1)
+        {
+        printf("printing::::\n");
+            BFENVAV(env, ExceptionDescribe);
+        }
+        printf("printing:\n");*/
+
+        return make_error((bfbridge_error_code_t)code, "JNI_CreateJavaVM failed, please see https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes for error code description: -", code_string);
     }
 
+    // Should be freed: jvm, path_arg
+
+    // Verify this early
     jclass bfbridge_base = BFENVA(env, FindClass, "org/camicroscope/BFBridge");
     if (!bfbridge_base)
     {
         bfbridge_basiclib_string_t *error = allocate_string("FindClass failed because org.camicroscope.BFBridge (or a dependency of it) could not be found. Are the jars in: ");
         append_to_string(error, path_arg->str);
 
-        if (BFENVA(env, ExceptionCheck) == 1)
+        if (BFENVAV(env, ExceptionCheck) == 1)
         {
-            BFENVA(env, ExceptionDescribe);
-            append_to_string(error, "? An exception was printed to stderr.");
+            BFENVAV(env, ExceptionDescribe);
+            append_to_string(error, " An exception was printed to stderr.");
         }
 
         free_string(path_arg);
-        BFENVA(jvm, DestroyJavaVM);
+        BFENVAV(jvm, DestroyJavaVM);
 
         bfbridge_error_t *err = make_error(BFBRIDGE_CLASS_NOT_FOUND, error->str, NULL);
         free_string(error);
@@ -237,16 +275,78 @@ bfbridge_error_t *bfbridge_make_library(
     }
 
     free_string(path_arg);
+    dest->jvm = jvm;
+    return NULL;
+}
 
-    dest->env = env;
+void bfbridge_move_vm(bfbridge_vm_t *dest, bfbridge_vm_t *from)
+{
+    if (from->jvm) {
+        *dest = *from;
+        from->jvm = NULL;
+    } else {
+        dest->jvm = NULL;
+    }
+}
+
+void bfbridge_free_vm(bfbridge_vm_t *dest)
+{
+    if (dest->jvm) {
+        BFENVAV(dest->jvm, DestroyJavaVM);
+        dest->jvm = NULL;
+    }
+}
+
+bfbridge_error_t *bfbridge_make_thread(
+    bfbridge_thread_t *dest, bfbridge_vm_t *vm)
+{
+    // Ease of freeing
+    dest->env = NULL;
+
+    if (!vm->jvm) {
+        return make_error(BFBRIDGE_LIBRARY_UNINITIALIZED, "bfbridge_make_thread requires successful bfbridge_make_vm", NULL);
+    }
+
+    *dest->vm = *vm;
+
+    JNIEnv *env;
+    jint code = BFENVA(vm->jvm, AttachCurrentThread, (void **)&env, NULL);
+    if (code < 0) {
+        char code_string[2] = {-code + '0', 0};
+        if (code > 9) {
+            // Only supports 1 digit now.
+            code_string[0] = 0;
+        }
+        return make_error((bfbridge_error_code_t)code, "AttachCurrentThread failed, please see https://docs.oracle.com/en/java/javase/20/docs/specs/jni/functions.html#return-codes for error code description: -", code_string);
+    }
+
+    // Should be freed: current thread (to be detached)
+
+    jclass bfbridge_base = BFENVA(env, FindClass, "org/camicroscope/BFBridge");
+    if (!bfbridge_base)
+    {
+        char *note = NULL;
+        if (BFENVAV(env, ExceptionCheck) == 1)
+        {
+            BFENVAV(env, ExceptionDescribe);
+            note = " An exception was printed to stderr.";
+        }
+
+        BFENVAV(vm->jvm, DetachCurrentThread);
+
+        return make_error(BFBRIDGE_CLASS_NOT_FOUND, "FindClass failed because org.camicroscope.BFBridge (or a dependency of it) could not be found.", note);
+    }
+
     dest->bfbridge_base = bfbridge_base;
 
     dest->constructor = BFENVA(env, GetMethodID, bfbridge_base, "<init>", "()V");
     if (!dest->constructor)
     {
-        BFENVA(jvm, DestroyJavaVM);
+        BFENVAV(vm->jvm, DetachCurrentThread);
         return make_error(BFBRIDGE_METHOD_NOT_FOUND, "Could not find BFBridge constructor", NULL);
     }
+
+    char *method_cannot_be_found = NULL;
 
     // Now do the same for methods but in shorthand form
 #define prepare_method_id(name, descriptor)                         \
@@ -254,11 +354,17 @@ bfbridge_error_t *bfbridge_make_library(
         BFENVA(env, GetMethodID, bfbridge_base, #name, descriptor); \
     if (!dest->name)                                                \
     {                                                               \
-        BFENVA(jvm, DestroyJavaVM);                                 \
-        return make_error(                                          \
-            BFBRIDGE_METHOD_NOT_FOUND,                              \
-            "Could not find BFBridge method ",                      \
-            #name ". Maybe check and update the descriptor?");      \
+        method_cannot_be_found = #name;                             \
+        goto prepare_method_error;                                  \
+    }
+
+    if (0) {
+    prepare_method_error:
+        BFENVAV(vm->jvm, DetachCurrentThread);
+        return make_error(
+            BFBRIDGE_METHOD_NOT_FOUND,                              
+            "Please check and update the method and/or the descriptor, as currently it cannot be found, for the method: ",                      
+            method_cannot_be_found);
     }
 
     // To print descriptors (encoded function types) to screen
@@ -304,6 +410,7 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFGet8BitLookupTable, "()I");
     prepare_method_id(BFGet16BitLookupTable, "()I");
     prepare_method_id(BFOpenBytes, "(IIIII)I");
+    prepare_method_id(BFOpenThumbBytes, "(III)I");
     prepare_method_id(BFGetMPPX, "(I)D");
     prepare_method_id(BFGetMPPY, "(I)D");
     prepare_method_id(BFGetMPPZ, "(I)D");
@@ -311,54 +418,60 @@ bfbridge_error_t *bfbridge_make_library(
     prepare_method_id(BFToolsGenerateSubresolutions, "(III)I");
 
     // Ease of freeing: keep null until we can return without error
-    dest->jvm = jvm;
+    dest->env = env;
 
     return NULL;
 }
 
-void bfbridge_move_library(bfbridge_library_t *dest, bfbridge_library_t *lib)
+void bfbridge_move_thread(bfbridge_thread_t *dest, bfbridge_thread_t *thread)
 {
     // Ease of freeing
-    if (lib->jvm)
+    if (thread->env)
     {
-        *dest = *lib;
-        lib->jvm = NULL;
+        *dest = *thread;
+        thread->env = NULL;
     }
     else
     {
-        dest->jvm = NULL;
+        dest->env = NULL;
     }
 }
 
-void bfbridge_free_library(bfbridge_library_t *lib)
+void bfbridge_free_thread(bfbridge_thread_t *dest)
 {
     // Ease of freeing
-    if (lib->jvm)
+    if (dest->env && dest->vm->jvm)
     {
-        BFENVA(lib->jvm, DestroyJavaVM);
+        int code = BFENVAV(dest->vm->jvm, DetachCurrentThread);
+        __builtin_printf("DetachCurrentThread %d\n\n", code);
+        dest->env = NULL;
     }
-    // Now, after DestroyJavaVM, there's no need to free bfbridge_base
-    // DetachCurrentThread would also free this reference
 }
 
 bfbridge_error_t *bfbridge_make_instance(
     bfbridge_instance_t *dest,
-    bfbridge_library_t *library,
+    bfbridge_thread_t *thread,
     char *communication_buffer,
     int communication_buffer_len)
 {
+    setbuf(stdout, NULL);
+    printf("c: makeinstance0\n");
     // Ease of freeing
     dest->bfbridge = NULL;
+    printf("c: makeinstance01\n");
     dest->communication_buffer = communication_buffer;
+    printf("c: makeinstance02\n");
 #ifndef BFBRIDGE_KNOW_BUFFER_LEN
     dest->communication_buffer_len = communication_buffer_len;
-#endif
+    printf("c: makeinstance03\n");
 
-    if (!library->jvm)
+#endif
+    printf("c: makeinstance1\n");
+    if (!thread->env)
     {
         return make_error(
             BFBRIDGE_LIBRARY_UNINITIALIZED,
-            "a bfbridge_library_t must have been initialized before bfbridge_make_instance",
+            "a bfbridge_thread_t must have been initialized before bfbridge_make_instance",
             NULL);
     }
 
@@ -370,13 +483,23 @@ bfbridge_error_t *bfbridge_make_instance(
             NULL);
     }
 
-    JNIEnv *env = library->env;
-
+    JNIEnv *env = thread->env;
+    printf("c: makeinstance2\n");
+    printf("c: makeinstance2%p %p\n", thread->bfbridge_base, thread->constructor);
+    printf("%d, %d\n", *(int*)thread->bfbridge_base,
+    *(int*)thread->constructor);
+     //   BFENVAV(thread->jvm, DestroyJavaVM);
+    printf("c: makeinstance2%p %p\n", thread->bfbridge_base, thread->constructor);
+    //thread->constructor = BFENVA(env, GetMethodID, thread->bfbridge_base, "<init>", "()V");
     jobject bfbridge_local =
-        BFENVA(env, NewObject, library->bfbridge_base, library->constructor);
+        BFENVA(env, NewObject, thread->bfbridge_base, thread->constructor);
+    printf("c: makeinstance21\n");
+    
     // Should be freed: bfbridge
     jobject bfbridge = (jobject)BFENVA(env, NewGlobalRef, bfbridge_local);
+    printf("c: makeinstance23\n");
     BFENVA(env, DeleteLocalRef, bfbridge_local);
+    printf("c: makeinstance25\n");
 
     // Should be freed: bfbridge, buffer (the jobject only)
     jobject buffer =
@@ -386,10 +509,10 @@ bfbridge_error_t *bfbridge_make_instance(
                communication_buffer_len);
     if (!buffer)
     {
-        if (BFENVA(env, ExceptionCheck) == 1)
+        if (BFENVAV(env, ExceptionCheck) == 1)
         {
             // As of JDK 20, NewDirectByteBuffer only raises OutOfMemoryError
-            BFENVA(env, ExceptionDescribe);
+            BFENVAV(env, ExceptionDescribe);
             BFENVA(env, DeleteGlobalRef, bfbridge);
 
             return make_error(
@@ -403,30 +526,32 @@ bfbridge_error_t *bfbridge_make_instance(
             return make_error(
                 BFBRIDGE_JVM_LACKS_BYTE_BUFFERS,
                 "Used JVM implementation does not support direct byte buffers"
-                "which means that communication between Java and our library"
+                "which means that communication between Java and our thread"
                 "would need to copy data inefficiently, but only"
-                "the direct byte buffer mode is supported by our library",
+                "the direct byte buffer mode is supported by our thread",
                 // To implement this, one can save, in a boolean flag
-                // in this library, that a copy required, then
+                // in this thread, that a copy required, then
                 // make a function in Java that makes new java.nio.ByteBuffer
                 // and sets the buffer variable to it,
                 // then use getByteArrayRegion and setByteArrayRegion from
-                // this library to copy when needed to interact with buffer.
+                // this thread to copy when needed to interact with buffer.
                 NULL);
         }
     }
+    printf("c: makeinstance3\n");
 
     /*
     How we would do if we hadn't been caching methods beforehand: This way:
     jmethodID BFSetCommunicationBuffer =
       BFENVA(env, GetMethodID,
-      library->bfbridge_base, "BFSetCommunicationBuffer",
+      thread->bfbridge_base, "BFSetCommunicationBuffer",
       "(Ljava/nio/ByteBuffer;)V");
     );
-    BFENVA(env, CallVoidMethod, bfbridge, library->BFSetCommunicationBuffer, buffer);
+    BFENVA(env, CallVoidMethod, bfbridge, thread->BFSetCommunicationBuffer, buffer);
     */
-    BFENVA(env, CallVoidMethod, bfbridge, library->BFSetCommunicationBuffer, buffer);
+    BFENVA(env, CallVoidMethod, bfbridge, thread->BFSetCommunicationBuffer, buffer);
     BFENVA(env, DeleteLocalRef, buffer);
+    printf("c: makeinstance4\n");
 
     // Ease of freeing: keep null until we can return without error
     dest->bfbridge = bfbridge;
@@ -436,14 +561,14 @@ bfbridge_error_t *bfbridge_make_instance(
 // Copies while making the freeing of the previous a noop
 // Dest: doesn't need to be initialized but allocated
 // This function would benefit from restrict but if we inline, not necessary
-void bfbridge_move_instance(bfbridge_instance_t *dest, bfbridge_instance_t *lib)
+void bfbridge_move_instance(bfbridge_instance_t *dest, bfbridge_instance_t *thread)
 {
     // Ease of freeing
-    if (lib->bfbridge)
+    if (thread->bfbridge)
     {
-        *dest = *lib;
-        lib->bfbridge = NULL;
-        lib->communication_buffer = NULL;
+        *dest = *thread;
+        thread->bfbridge = NULL;
+        thread->communication_buffer = NULL;
     }
     else
     {
@@ -453,12 +578,13 @@ void bfbridge_move_instance(bfbridge_instance_t *dest, bfbridge_instance_t *lib)
 }
 
 void bfbridge_free_instance(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     // Ease of freeing
-    if (instance->bfbridge)
+    if (instance->bfbridge && thread->env && thread->vm->jvm)
     {
-        BFENVA(library->env, DeleteGlobalRef, instance->bfbridge);
+        BFENVA(thread->env, DeleteGlobalRef, instance->bfbridge);
+        instance->bfbridge = NULL;
     }
 }
 
@@ -475,29 +601,30 @@ char *bfbridge_instance_get_communication_buffer(
 }
 
 // Shorthand for JavaENV:
-#define BFENV (library->env)
+#define BFENV (thread->env)
 // Instance class:
 #define BFINSTC (instance->bfbridge)
 
+// Goal: e.g. BFENVA(BFENV, thread->BFGetErrorLength, BFINSTC, arg1, arg2, ...)
 // Call easily
 // #define BFFUNC(method_name, ...) BFENVA(BFENV, method_name, BFINSTC, __VA_ARGS__)
 // Even more easily:
-//      #define BFFUNC(caller, method, ...) \
-//BFENVA(BFENV, caller, BFINSTC, library->method, __VA_ARGS__)
+//      #define BFFUNC(caller, method, ...)
+//BFENVA(BFENV, caller, BFINSTC, thread->method, __VA_ARGS__)
 // Super easily:
 #define BFFUNC(method, type, ...) \
-    BFENVA(BFENV, Call##type##Method, BFINSTC, library->method, __VA_ARGS__)
+    BFENVA(BFENV, Call##type##Method, BFINSTC, thread->method, __VA_ARGS__)
 // Use the second one, void one, for no args as __VA_ARGS__ requires at least one
 #define BFFUNCV(method, type) \
-    BFENVA(BFENV, Call##type##Method, BFINSTC, library->method)
+    BFENVA(BFENV, Call##type##Method, BFINSTC, thread->method)
 
 // Methods
-// Please keep in order with bfbridge_library_t members
+// Please keep in order with bfbridge_thread_t members
 
 // BFSetCommunicationBuffer is used internally
 
 char *bf_get_error_convenience(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     int len = BFFUNCV(BFGetErrorLength, Int);
     // The case of overflow is handled on Java side
@@ -505,13 +632,13 @@ char *bf_get_error_convenience(
     return instance->communication_buffer;
 }
 
-int bf_get_error_length(bfbridge_instance_t *instance, bfbridge_library_t *library)
+int bf_get_error_length(bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetErrorLength, Int);
 }
 
 int bf_is_compatible(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
     char *filepath, int filepath_len)
 {
     fprintf(stderr, "calling is compatible %s\n", filepath);
@@ -521,13 +648,13 @@ int bf_is_compatible(
 }
 
 int bf_is_any_file_open(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFIsAnyFileOpen, Int);
 }
 
 int bf_open(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
     char *filepath, int filepath_len)
 {
     memcpy(instance->communication_buffer, filepath, filepath_len);
@@ -535,13 +662,13 @@ int bf_open(
 }
 
 int bf_get_format(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetFormat, Int);
 }
 
 int bf_is_single_file(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
     char *filepath, int filepath_len)
 {
     memcpy(instance->communication_buffer, filepath, filepath_len);
@@ -549,7 +676,7 @@ int bf_is_single_file(
 }
 
 int bf_get_current_file(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetCurrentFile, Int);
 }
@@ -557,205 +684,212 @@ int bf_get_current_file(
 // Lists null-separated filenames/filepaths for the currently open file.
 // Returns bytes written including the last null
 int bf_get_used_files(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetUsedFiles, Int);
 }
 
 int bf_close(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFClose, Int);
 }
 
 int bf_get_series_count(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetSeriesCount, Int);
 }
 
 int bf_set_current_series(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
     int ser)
 {
     return BFFUNC(BFSetCurrentSeries, Int, ser);
 }
 
 int bf_get_resolution_count(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetResolutionCount, Int);
 }
 
 int bf_set_current_resolution(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
     int res)
 {
     return BFFUNC(BFSetCurrentResolution, Int, res);
 }
 
 int bf_get_size_x(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetSizeX, Int);
 }
 
 int bf_get_size_y(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetSizeY, Int);
 }
 
 int bf_get_size_c(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetSizeC, Int);
 }
 
 int bf_get_size_z(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetSizeZ, Int);
 }
 
 int bf_get_size_t(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetSizeT, Int);
 }
 
 int bf_get_effective_size_c(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetEffectiveSizeC, Int);
 }
 
 int bf_get_image_count(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetImageCount, Int);
 }
 
 int bf_get_dimension_order(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetDimensionOrder, Int);
 }
 
 int bf_is_order_certain(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFIsOrderCertain, Int);
 }
 
 int bf_get_optimal_tile_width(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetOptimalTileWidth, Int);
 }
 
 int bf_get_optimal_tile_height(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetOptimalTileHeight, Int);
 }
 
 int bf_get_pixel_type(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetPixelType, Int);
 }
 
 int bf_get_bits_per_pixel(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetBitsPerPixel, Int);
 }
 
 int bf_get_bytes_per_pixel(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetBytesPerPixel, Int);
 }
 
 int bf_get_rgb_channel_count(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGetRGBChannelCount, Int);
 }
 
 int bf_is_rgb(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFIsRGB, Int);
 }
 
 int bf_is_interleaved(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFIsInterleaved, Int);
 }
 
 int bf_is_little_endian(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFIsLittleEndian, Int);
 }
 
 int bf_is_indexed_color(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFIsIndexedColor, Int);
 }
 
 int bf_is_false_color(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFIsFalseColor, Int);
 }
 
 int bf_get_8_bit_lookup_table(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGet8BitLookupTable, Int);
 }
 
 int bf_get_16_bit_lookup_table(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFGet16BitLookupTable, Int);
 }
 
 int bf_open_bytes(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
     int plane, int x, int y, int w, int h)
 {
     return BFFUNC(BFOpenBytes, Int, plane, x, y, w, h);
 }
 
+int bf_open_thumb_bytes(
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
+    int plane, int w, int h)
+{
+    return BFFUNC(BFOpenThumbBytes, Int, plane, w, h);
+}
+
 double bf_get_mpp_x(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
     int series)
 {
     return BFFUNC(BFGetMPPX, Double, series);
 }
 
 double bf_get_mpp_y(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
     int series)
 {
     return BFFUNC(BFGetMPPY, Double, series);
 }
 
 double bf_get_mpp_z(
-    bfbridge_instance_t *instance, bfbridge_library_t *library,
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread,
     int series)
 {
     return BFFUNC(BFGetMPPZ, Double, series);
 }
 
 int bf_tools_should_generate(
-    bfbridge_instance_t *instance, bfbridge_library_t *library)
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
 {
     return BFFUNCV(BFToolsShouldGenerate, Int);
 }

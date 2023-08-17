@@ -12,23 +12,11 @@
 #define BFBRIDGE_KNOW_BUFFER_LEN
 #include "bfbridge_basiclib.h"
 
-/*
-JVM/JNI has a requirement that a thread of ours
-can only create 1 JVM. This can be shared among BioFormatsInstances,
-or we can fork() to use new JVMs.
-
-If we move to a multithread architecture, we can dedicate one
-thread to JVM and interact through it, or make a new JVM from every thread
-or call DetachCurrentThread then AttachCurrentThread in every thread.
-Note: Detaching thread invalidates references https://stackoverflow.com/q/47834463
-
-Instead we can use multiple BioFormatsInstance in a thread. These
-allow keeping multiple files open. They share a JVM.
-*/
 class BioFormatsThread
 {
 public:
-    bfbridge_library_t bflibrary;
+    bfbridge_vm_t bfvm;
+    bfbridge_thread_t bfthread;
 
     BioFormatsThread();
 
@@ -40,7 +28,12 @@ public:
 
     ~BioFormatsThread()
     {
-        bfbridge_free_library(&bflibrary);
+        bfbridge_free_thread(&bfthread);
+
+        // Must run only once, on app termination
+        // Any other time, it breaks JVM and won't run again
+        // Therefore even if JVM is unused for some time, it must be kept alive
+        bfbridge_free_vm(&bfvm);
     }
 };
 
