@@ -29,7 +29,7 @@ BioFormatsThread::BioFormatsThread() {
         fprintf(stderr, "BioFormatsThread.cc bfbridge_make_vm gave error\n");
         throw "";
     }
-    fprintf(stderr, "started bioformatsthrea3\n");
+    fprintf(stderr, "started bioformatsthreadd3\n");
 
     // Expensive function being used from a header-only library.
     // Shouldn't be called from a header file
