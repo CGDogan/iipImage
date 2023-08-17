@@ -313,7 +313,7 @@ bfbridge_error_t *bfbridge_make_thread(
     }
         fprintf(stderr, "bfbridge_make_thread03\n");
 
-    *dest->vm = *vm;
+    dest->vm = vm;
     fprintf(stderr, "bfbridge_make_thread1\n");
     JNIEnv *env;
     jint code = BFENVA(vm->jvm, AttachCurrentThread, (void **)&env, NULL);
