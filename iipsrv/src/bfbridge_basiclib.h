@@ -79,6 +79,8 @@ typedef struct bfbridge_vm {
 } bfbridge_vm_t;
 
 // A process can call bfbridge_make_vm at most once
+// cpdir: a string to a single directory containing jar files (and maybe classes)
+// cachedir: NULL or the directory path to store file caches for faster opening
 BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_vm(bfbridge_vm_t *dest,
     char *cpdir,
     char *cachedir);
@@ -87,6 +89,8 @@ BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_vm(bfbridge_vm_t *dest,
 // Do not use for moving from one thread/process to another
 BFBRIDGE_INLINE_ME void bfbridge_move_vm(bfbridge_vm_t *dest, bfbridge_vm_t *from);
 
+// Due to JVM restrictions, after bfbridge_free_vm, bfbridge_make_vm will fail with error code -1.
+// Hence bfbridge_free_vm should not be called until the process will never call/construct JVM again.
 BFBRIDGE_INLINE_ME void bfbridge_free_vm(bfbridge_vm_t*);
 
 typedef struct bfbridge_thread
@@ -153,10 +157,12 @@ typedef struct bfbridge_thread
     jmethodID BFToolsGenerateSubresolutions;
 } bfbridge_thread_t;
 
+// bfbridge_make_thread attaches the current thread to the JVM
+// and fills *dest. Calling when already attached is a noop
+// but it fills *dest if you lost it. (Not tested: It might
+// make the previous bfbridge_thread_t for this thread invalid)
 // On success, returns NULL and fills *dest
 // On failure, returns error, and it may have modified *dest
-// cpdir: a string to a single directory containing jar files (and maybe classes)
-// cachedir: NULL or the directory path to store file caches for faster opening
 BFBRIDGE_INLINE_ME_EXTRA bfbridge_error_t *bfbridge_make_thread(
     bfbridge_thread_t *dest,
     bfbridge_vm_t *vm);
@@ -169,6 +175,8 @@ BFBRIDGE_INLINE_ME void bfbridge_move_thread(
     bfbridge_thread_t *dest, bfbridge_thread_t *lib);
 
 // Does not free the thread struct but its contents
+// To move from one thread to another, free the current thread and call
+// bfbridge_make_thread on the new thread (or in the opposite order)
 BFBRIDGE_INLINE_ME void bfbridge_free_thread(bfbridge_thread_t *);
 
 // Almost all functions that need a bfbridge_instance_t must be passed
