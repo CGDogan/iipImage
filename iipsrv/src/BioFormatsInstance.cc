@@ -10,7 +10,7 @@ BioFormatsInstance::BioFormatsInstance()
     bfbridge_error_t *error =
         bfbridge_make_instance(
             &bfinstance,
-            &thread.bflibrary,
+            &thread.bfthread,
             new char[bfi_communication_buffer_len],
             bfi_communication_buffer_len);
     if (error)

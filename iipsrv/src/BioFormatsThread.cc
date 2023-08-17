@@ -22,11 +22,17 @@ BioFormatsThread::BioFormatsThread() {
         cachedir = NULL;
     }
 
+    bfbridge_error_t *error = bfbridge_make_vm(&bfvm, cpdir, cachedir);
+    if (error) {
+        fprintf(stderr, "BioFormatsThread.cc bfbridge_make_vm gave error\n");
+        throw "";
+    }
+
     // Expensive function being used from a header-only library.
     // Shouldn't be called from a header file
-    bfbridge_error_t *error = bfbridge_make_library(&bflibrary, cpdir, cachedir);
+    error = bfbridge_make_thread(&bfthread, &bfvm);
     if (error) {
-        fprintf(stderr, "BioFormatsThread.cc gave error\n");
+        fprintf(stderr, "BioFormatsThread.cc bfbridge_make_thread gave error\n");
         throw "";
     }
 }
