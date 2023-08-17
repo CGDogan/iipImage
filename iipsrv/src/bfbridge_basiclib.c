@@ -309,9 +309,10 @@ bfbridge_error_t *bfbridge_make_thread(
     }
 
     *dest->vm = *vm;
-
+    fprintf(stderr, "bfbridge_make_thread1\n");
     JNIEnv *env;
     jint code = BFENVA(vm->jvm, AttachCurrentThread, (void **)&env, NULL);
+    fprintf(stderr, "bfbridge_make_thread2\n");
     if (code < 0) {
         char code_string[2] = {(char)('0' + (-code)), 0};
         if (code > 9) {
@@ -322,6 +323,7 @@ bfbridge_error_t *bfbridge_make_thread(
     }
 
     // Should be freed: current thread (to be detached)
+    fprintf(stderr, "bfbridge_make_thread3\n");
 
     jclass bfbridge_base = BFENVA(env, FindClass, "org/camicroscope/BFBridge");
     if (!bfbridge_base)
@@ -339,7 +341,7 @@ bfbridge_error_t *bfbridge_make_thread(
     }
 
     dest->bfbridge_base = bfbridge_base;
-
+    fprintf(stderr, "bfbridge_make_thread4\n");
     dest->constructor = BFENVA(env, GetMethodID, bfbridge_base, "<init>", "()V");
     if (!dest->constructor)
     {
