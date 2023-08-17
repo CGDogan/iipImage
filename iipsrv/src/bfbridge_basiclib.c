@@ -233,7 +233,7 @@ bfbridge_error_t *bfbridge_make_vm(bfbridge_vm_t *dest,
     if (code < 0)
     {
         free_string(path_arg);
-        char code_string[2] = {-code + '0', 0};
+        char code_string[2] = {-(char)code + '0', 0};
         if (code > 9) {
             // Only supports 1 digit now.
             code_string[0] = 0;
@@ -312,7 +312,7 @@ bfbridge_error_t *bfbridge_make_thread(
     JNIEnv *env;
     jint code = BFENVA(vm->jvm, AttachCurrentThread, (void **)&env, NULL);
     if (code < 0) {
-        char code_string[2] = {-code + '0', 0};
+        char code_string[2] = {-(char)code + '0', 0};
         if (code > 9) {
             // Only supports 1 digit now.
             code_string[0] = 0;
@@ -346,16 +346,16 @@ bfbridge_error_t *bfbridge_make_thread(
         return make_error(BFBRIDGE_METHOD_NOT_FOUND, "Could not find BFBridge constructor", NULL);
     }
 
-    char *method_cannot_be_found = NULL;
+    const char *method_cannot_be_found = NULL;
 
     // Now do the same for methods but in shorthand form
-#define prepare_method_id(name, descriptor)                         \
-    dest->name =                                                    \
-        BFENVA(env, GetMethodID, bfbridge_base, #name, descriptor); \
-    if (!dest->name)                                                \
-    {                                                               \
-        method_cannot_be_found = #name;                             \
-        goto prepare_method_error;                                  \
+#define prepare_method_id(name, descriptor)                                 \
+    dest->name =                                                            \
+        BFENVA(env, GetMethodID, bfbridge_base, #name, (char *)descriptor); \
+    if (!dest->name)                                                        \
+    {                                                                       \
+        method_cannot_be_found = #name;                                     \
+        goto prepare_method_error;                                          \
     }
 
     if (0) {
