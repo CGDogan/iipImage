@@ -301,7 +301,7 @@ void bfbridge_free_vm(bfbridge_vm_t *dest)
 bfbridge_error_t *bfbridge_make_thread(
     bfbridge_thread_t *dest, bfbridge_vm_t *vm)
 {
-    fprintf(stderr, "bfbridge_make_thread00\n");
+        fprintf(stderr, "bfbridge_make_thread00\n");
     // Ease of freeing
     dest->env = NULL;
     fprintf(stderr, "bfbridge_make_thread01\n");
@@ -318,6 +318,17 @@ bfbridge_error_t *bfbridge_make_thread(
     JNIEnv *env;
     jint code = BFENVA(vm->jvm, AttachCurrentThread, (void **)&env, NULL);
     fprintf(stderr, "bfbridge_make_thread2\n");
+/*    // Ease of freeing
+    dest->env = NULL;
+
+    if (!vm->jvm) {
+        return make_error(BFBRIDGE_LIBRARY_UNINITIALIZED, "bfbridge_make_thread requires successful bfbridge_make_vm", NULL);
+    }
+
+    dest->vm = vm;
+
+    JNIEnv *env;
+    jint code = BFENVA(vm->jvm, AttachCurrentThread, (void **)&env, NULL);*/
     if (code < 0) {
         char code_string[2] = {(char)('0' + (-code)), 0};
         if (code > 9) {
@@ -328,7 +339,6 @@ bfbridge_error_t *bfbridge_make_thread(
     }
 
     // Should be freed: current thread (to be detached)
-    fprintf(stderr, "bfbridge_make_thread3\n");
 
     jclass bfbridge_base = BFENVA(env, FindClass, "org/camicroscope/BFBridge");
     if (!bfbridge_base)
@@ -346,7 +356,7 @@ bfbridge_error_t *bfbridge_make_thread(
     }
 
     dest->bfbridge_base = bfbridge_base;
-    fprintf(stderr, "bfbridge_make_thread4\n");
+
     dest->constructor = BFENVA(env, GetMethodID, bfbridge_base, "<init>", "()V");
     if (!dest->constructor)
     {
@@ -422,6 +432,7 @@ bfbridge_error_t *bfbridge_make_thread(
     prepare_method_id(BFGetMPPX, "(I)D");
     prepare_method_id(BFGetMPPY, "(I)D");
     prepare_method_id(BFGetMPPZ, "(I)D");
+    prepare_method_id(BFDumpOMEXMLMetadata, "()I");
     prepare_method_id(BFToolsShouldGenerate, "()I");
     prepare_method_id(BFToolsGenerateSubresolutions, "(III)I");
 
@@ -499,6 +510,14 @@ bfbridge_error_t *bfbridge_make_instance(
      //   BFENVAV(thread->jvm, DestroyJavaVM);
     printf("c: makeinstance2%p %p\n", thread->bfbridge_base, thread->constructor);
     //thread->constructor = BFENVA(env, GetMethodID, thread->bfbridge_base, "<init>", "()V");
+
+    JNIEnv *env2;
+    printf("env pointer for this thread oming\n");
+
+    // verify attached
+    BFENVA(thread->vm->jvm, GetEnv, (void**)&env2, 20);
+    printf("env pointer for this thread %p\n", env2);
+
     jobject bfbridge_local =
         BFENVA(env, NewObject, thread->bfbridge_base, thread->constructor);
     printf("c: makeinstance21\n");
@@ -894,6 +913,12 @@ double bf_get_mpp_z(
     int series)
 {
     return BFFUNC(BFGetMPPZ, Double, series);
+}
+
+int bf_dump_ome_xml_metadata(
+    bfbridge_instance_t *instance, bfbridge_thread_t *thread)
+{
+    return BFFUNCV(BFDumpOMEXMLMetadata, Int);
 }
 
 int bf_tools_should_generate(
