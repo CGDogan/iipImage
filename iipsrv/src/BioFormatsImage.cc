@@ -135,18 +135,15 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
   cerr << "isInterleaved: " << (int)bfi.is_interleaved() << endl;
 #endif
 
-  // iipsrv takes 1 or 3 only. tell iip that we'll give it a 3-channel image
-  channels = 3;
-
   // Note: this code assumes that the number of channels is the same among resolutions
   // otherwise should be moved to getnativetile
   channels_internal = bfi.get_rgb_channel_count();
-  if (channels_internal != 3 && channels_internal != 4)
+  if (channels_internal != 1 && channels_internal != 3 && channels_internal != 4)
   {
     if (channels_internal > 0)
     {
-      logfile << "Unimplemented: only support 3, 4 channels, not " << channels_internal << endl;
-      throw file_error("Unimplemented: only support 3, 4 channels, not " + std::to_string(channels_internal));
+      logfile << "Unimplemented: only support 1, 3 or 4 channels, not " << channels_internal << endl;
+      throw file_error("Unimplemented: only support 1, 3 or 4 channels, not " + std::to_string(channels_internal));
     }
     else
     {
@@ -155,6 +152,9 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
       throw file_error("Error while getting channel count: " + err);
     }
   }
+  
+  // iipsrv takes 1 or 3 only. we may need to reduce to 3 from 4, but the end result would be 3.
+  channels = (channels_internal == 1) ? 1 : 3;
 
   if (bfi.is_indexed_color() && !bfi.is_false_color())
   {
@@ -175,7 +175,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
   // bfi.get_bytes_per_pixel actually gives bits per channel per pixel, so don't divide by channels
   int bytespc_internal = bfi.get_bytes_per_pixel();
   bpc = 8;
-  colourspace = sRGB;
+  colourspace = (channels == 1) ? sRGB : GREYSCALE;
 
   if (bytespc_internal <= 0)
   {
@@ -525,10 +525,10 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   }*/
 
   // create the RawTile object
-  RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, 3, bpc));
+  RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, channels, bpc));
 
   // compute the size, etc
-  rt->dataLength = tw * th * 3 * sizeof(unsigned char);
+  rt->dataLength = tw * th * channels * sizeof(unsigned char);
   rt->filename = getImagePath();
   rt->timestamp = timestamp;
 
@@ -558,7 +558,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   should_reduce_channels_from_4to3 = channels_internal == 4;
 
   // Known to differ among resolutions
-  int should_interleave = !bfi.is_interleaved();
+  int should_interleave = !bfi.is_interleaved() && channels != 1;
 
   // Perhaps the next three can be cached
   // https://github.com/ome/bioformats/blob/metadata54/components/formats-api/src/loci/formats/FormatTools.java#L76
