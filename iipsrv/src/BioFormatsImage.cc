@@ -644,6 +644,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 #ifdef DEBUG_OSI
   auto start = std::chrono::high_resolution_clock::now();
 #endif
+cerr << "DELETEME: " << tx0 << " " << ty0 << " " << tw << " " << th;
   int bytes_received = bfi.open_bytes(tx0, ty0, tw, th);
 
 #ifdef DEBUG_OSI
