@@ -28,6 +28,9 @@ RUN ln -s /etc/apache2/mods-available/proxy.conf /etc/apache2/mods-enabled/proxy
 COPY apache2.conf /etc/apache2/apache2.conf
 COPY ports.conf /etc/apache2/ports.conf
 
+## print error
+RUN ln -sf /proc/self/fd/1 /var/log/apache2/error.log
+
 ###  iipsrv
 WORKDIR /root/src/iipsrv
 RUN ./autogen.sh
