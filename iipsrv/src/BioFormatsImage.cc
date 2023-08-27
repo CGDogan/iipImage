@@ -555,14 +555,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   rt->filename = getImagePath();
   rt->timestamp = timestamp;
 
-  int allocate_length = rt->dataLength;
-
   if (bfi.set_current_resolution(bestLayer) < 0)
   {
     auto s = string("FATAL : bad resolution: " + std::to_string(bestLayer) + " rather than up to " + std::to_string(bfi.get_resolution_count() - 1));
     logfile << s;
     throw file_error(s);
   }
+
+  int allocate_length = rt->dataLength;
 
   // Note: Pixel formats are either the same for every resolution (see: channels_internal)
   // or can differ between resolutions (see: should_interleave).
@@ -590,6 +590,8 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   // https://github.com/ome/bioformats/blob/metadata54/components/formats-api/src/loci/formats/FormatTools.java#L76
   int pixel_type = bfi.get_pixel_type();
   int bytespc_internal = bfi.get_bytes_per_pixel();
+
+  allocate_length *= bytespc_internal;
 
   int should_remove_sign = 1;
   // added float and double for exclusion, because they are handled specially
