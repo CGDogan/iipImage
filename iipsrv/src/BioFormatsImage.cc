@@ -575,15 +575,13 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   if (channels != 3 && channels != 4)
   {
     throw file_error("Channels not 3 or 4: " + std::to_string(channels));
-  }
-  if (channels == 4)
-  {
-    should_reduce_channels_from_4to3 = 1;
-    allocate_length = tw * th * 4 * sizeof(unsigned char);
   }*/
 
   // cached:
-  should_reduce_channels_from_4to3 = channels_internal == 4;
+  if (channels_internal == 4) {
+    should_reduce_channels_from_4to3 = 1;
+    allocate_length = tw * th * 4 * sizeof(unsigned char);
+  } // Assume otherwise 3
 
   // Known to differ among resolutions
   int should_interleave = !bfi.is_interleaved();
