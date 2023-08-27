@@ -14,7 +14,7 @@ AM_CFLAGS = -DBFBRIDGE_INLINE
 
 # jni-md.h should also be included hence the platform paths, see link in https://stackoverflow.com/a/37029528
 # https://github.com/openjdk/jdk/blob/6e3cc131daa9f3b883164333bdaad7aa3a6ca018/src/jdk.hotspot.agent/share/classes/sun/jvm/hotspot/utilities/PlatformInfo.java#L32
-AM_CPPFLAGS += -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(JAVA_HOME)/include/darwin -I$(JAVA_HOME)/include/win32 -I$(JAVA_HOME)/include/bsd -DBFBRIDGE_INLINE
+AM_CPPFLAGS += -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(JAVA_HOME)/include/darwin -I$(JAVA_HOME)/include/win32 -I$(JAVA_HOME)/include/bsd
 
 iipsrv_fcgi_LDADD = Main.o
 
