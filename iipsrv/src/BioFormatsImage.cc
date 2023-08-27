@@ -138,7 +138,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
   // PLEASE NOTE: these can differ between resolution levels
   cerr << "Parsing details" << endl;
-  cerr << "Optimal: " << tile_width << " " << tile_height << endl;
+  cerr << "opt wh: " << bfi.get_optimal_tile_width() << " " << bfi.get_optimal_tile_height() << endl;
+  cerr << "tile wh: " << tile_width << " " << tile_height << endl;
   cerr << "rgbChannelCount: " << bfi.get_rgb_channel_count() << endl; // Number of colors returned with each openbytes call
   cerr << "sizeC: " << bfi.get_size_c() << endl;
   cerr << "effectiveSizeC: " << bfi.get_effective_size_c() << endl; // colors on separate planes. 1 if all on same plane
