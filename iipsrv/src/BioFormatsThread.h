@@ -16,7 +16,7 @@
 #include <jni.h>
 #include <string>
 #include <stdlib.h>
-#include "../BFBridge/c/bfbridge_basiclib.h"
+#include "../../BFBridge/c/bfbridge_basiclib.h"
 
 class BioFormatsThread
 {
