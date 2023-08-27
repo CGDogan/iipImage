@@ -15,7 +15,7 @@ BioFormatsThread::BioFormatsThread()
   if (!cpdir || cpdir[0] == '\0')
   {
     std::cerr << "Please set BFBRIDGE_CLASSPATH to a single directory where jar files can be found.\n";
-    throw std::runtime_error("Please set BFBRIDGE_CLASSPATH to a single directory where jar files can be found.\n")
+    throw std::runtime_error("Please set BFBRIDGE_CLASSPATH to a single directory where jar files can be found.\n");
   }
 
   // Optional:
