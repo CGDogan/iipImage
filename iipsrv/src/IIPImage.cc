@@ -133,6 +133,7 @@ void IIPImage::testImageType() throw(file_error)
           format = TIF;
           return;
         }*/
+        cerr << "chosen: openslide";
         // OpenSlide but not generic tiff
         format = OPENSLIDE;
         return;
@@ -148,9 +149,12 @@ void IIPImage::testImageType() throw(file_error)
       // -1 -> error
       if ( code == 1 ) {
         format = BIOFORMATS;
-        cerr << "bioformats";
+        cerr << "chosen: bioformats";
+
         return;
       }
+      cerr << "chosen: not biof";
+
       BioFormatsManager::free( std::move(bfi) );
     }
 
