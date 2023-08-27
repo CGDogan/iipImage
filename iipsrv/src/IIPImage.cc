@@ -125,20 +125,21 @@ void IIPImage::testImageType() throw(file_error)
     cerr << "debug: deleteme";
 
     // OpenSlide
-    {
+    /*{
       const char * vendor = openslide_detect_vendor( path.c_str() );
       if ( vendor != NULL ) {
-        /*if ( !strcmp(vendor, "generic-tiff") ) {
+        if ( !strcmp(vendor, "generic-tiff") ) {
           // Have generic TIFF, so use iipsrv reader
+          cerr << "chosen: generic tiff";
           format = TIF;
           return;
-        }*/
+        }
         cerr << "chosen: openslide";
         // OpenSlide but not generic tiff
         format = OPENSLIDE;
         return;
       }
-    }
+    }*/
 
     // BioFormats
     {

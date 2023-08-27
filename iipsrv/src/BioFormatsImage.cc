@@ -580,7 +580,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   // cached:
   if (channels_internal == 4) {
     should_reduce_channels_from_4to3 = 1;
-    allocate_length = tw * th * 4 * sizeof(unsigned char);
+    allocate_length = tw * th * 4 * sizeof(unsigned char); // channel removal is done on the output buffer
   } // Assume otherwise 3
 
   // Known to differ among resolutions
@@ -590,8 +590,6 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   // https://github.com/ome/bioformats/blob/metadata54/components/formats-api/src/loci/formats/FormatTools.java#L76
   int pixel_type = bfi.get_pixel_type();
   int bytespc_internal = bfi.get_bytes_per_pixel();
-
-  allocate_length *= bytespc_internal;
 
   int should_remove_sign = 1;
   // added float and double for exclusion, because they are handled specially
