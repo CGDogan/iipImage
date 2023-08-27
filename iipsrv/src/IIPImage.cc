@@ -128,11 +128,11 @@ void IIPImage::testImageType() throw(file_error)
     {
       const char * vendor = openslide_detect_vendor( path.c_str() );
       if ( vendor != NULL ) {
-        if ( !strcmp(vendor, "generic-tiff") ) {
+        /*if ( !strcmp(vendor, "generic-tiff") ) {
           // Have generic TIFF, so use iipsrv reader
           format = TIF;
           return;
-        }
+        }*/
         // OpenSlide but not generic tiff
         format = OPENSLIDE;
         return;
