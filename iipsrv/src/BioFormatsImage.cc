@@ -96,7 +96,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
   // make it a square, rectangles have been associated with problems
   tile_width = bfi.get_optimal_tile_width();
   if (tile_width > 0) {
-    tile_width = 1 << getPowerOfTwoRoundDown(suggested_width);
+    tile_width = 1 << getPowerOfTwoRoundDown(tile_width);
   } if (tile_width < 128) {
     tile_width = 256;
   } else if (tile_width > 512) {
