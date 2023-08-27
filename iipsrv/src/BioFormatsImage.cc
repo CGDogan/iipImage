@@ -7,8 +7,8 @@
 #include <cassert>
 
 #include <limits>
+// #define DEBUG_OSI 1
 #include <chrono>
-#define DEBUG_OSI 1
 using namespace std;
 
 extern std::ofstream logfile;
@@ -544,7 +544,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   // Note: Pixel formats are either the same for every resolution (see: channels_internal)
   // or can differ between resolutions (see: should_interleave).
   // Assuming the former saves lots of time. The latter must be called after set_current_resolution.
-  // 1 JNI call is less than 1ms according to https://stackoverflow.com/a/36141175
+  // 1 JNI call takes less than 1ms according to https://stackoverflow.com/a/36141175
   char should_reduce_channels_from_4to3 = 0;
 
   // uncached:
@@ -555,10 +555,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   }*/
 
   // cached:
-  if (channels_internal == 4) {
-    should_reduce_channels_from_4to3 = 1;
-    allocate_length = tw * th * 4 * sizeof(unsigned char); // channel removal is done on the output buffer
-  } // Assume otherwise 3
+  should_reduce_channels_from_4to3 = channels_internal == 4;
 
   // Known to differ among resolutions
   int should_interleave = !bfi.is_interleaved();
@@ -751,7 +748,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     for (int i = 0; i < pixels * channels_internal; i++)
     {
       // Unnecessary copy rather than considering these offset and coefficient
-      // variables when we'll already copy, but this allows readability
+      // variables when we'll already copy in the next steps, but this allows readability
       // and not making the common 8-bit reading slower
       buf[i] = buf[coefficient * i + offset];
     }
@@ -771,9 +768,9 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
 
   if (should_interleave)
   {
-    char *red = bfi.communication_buffer();
-    char *green = &bfi.communication_buffer()[pixels];
-    char *blue = &bfi.communication_buffer()[2 * pixels];
+    char *red = buf;
+    char *green = &buf[pixels];
+    char *blue = &buf[2 * pixels];
 
     for (int i = 0; i < pixels; i++)
     {
@@ -794,14 +791,14 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
     {
       for (int i = 0; i < pixels; i++)
       {
-        data_out[3 * i] = bfi.communication_buffer()[4 * i];
-        data_out[3 * i + 1] = bfi.communication_buffer()[4 * i + 1];
-        data_out[3 * i + 2] = bfi.communication_buffer()[4 * i + 2];
+        data_out[3 * i] = buf[4 * i];
+        data_out[3 * i + 1] = buf[4 * i + 1];
+        data_out[3 * i + 2] = buf[4 * i + 2];
       }
     }
     else
     {
-      memcpy(rt->data, bfi.communication_buffer(), bytes_received);
+      memcpy(data_out, buf, bytes_received);
     }
   }
 
