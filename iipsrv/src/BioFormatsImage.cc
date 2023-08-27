@@ -663,7 +663,7 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   if (bytes_received != channels_internal * bytespc_internal * tw * th)
   {
     cerr << "got an unexpected number of bytes\n";
-    throw file_error("ERROR: expected len " + std::to_string(channels * bpc / 8 * tw * th) + " but got " + std::to_string(bytes_received));
+    throw file_error("ERROR: expected len " + std::to_string(channels * bytespc_internal * tw * th) + " but got " + std::to_string(bytes_received));
   }
   // Note: please don't copy anything more than
   // bytes_received when it's positive as the rest contains junk from the past
