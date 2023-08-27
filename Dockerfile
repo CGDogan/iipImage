@@ -1,4 +1,4 @@
-FROM caMicroscope/image-decoders
+FROM image-decoders
 
 ### update
 ARG DEBIAN_FRONTEND=noninteractive
