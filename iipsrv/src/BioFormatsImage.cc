@@ -8,7 +8,7 @@
 
 #include <limits>
 #include <chrono>
-#define DEBUG_OSI 1
+// #define DEBUG_OSI 1
 using namespace std;
 
 extern std::ofstream logfile;
@@ -635,12 +635,12 @@ RawTilePtr BioFormatsImage::getNativeTile(const size_t tilex, const size_t tiley
   if (!rt->data)
     throw file_error(string("FATAL : BioFormatsImage read_region => allocation memory ERROR"));
 
-#ifdef DEBUG_OSI
+#ifdef BENCHMARK
   auto start = std::chrono::high_resolution_clock::now();
 #endif
   int bytes_received = bfi.open_bytes(tx0, ty0, tw, th);
 
-#ifdef DEBUG_OSI
+#ifdef BENCHMARK
   auto finish = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double, std::milli> elapsed = finish - start;
   milliseconds += elapsed.count();
