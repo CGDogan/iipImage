@@ -271,7 +271,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
   // what if there are ~~openslide~~ bioformats levels with dim smaller than this?
 
   // populate at 1/2 size steps
-  while ((w > 256) || (h > 256))
+  while ((w > tile_width) || (h > tile_height))
   {
     // need a level that has image completely inside 1 tile.
     // (stop with both w and h less than tile_w/h,  previous iteration divided by 2.
