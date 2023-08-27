@@ -8,7 +8,7 @@
 
 #include <limits>
 #include <chrono>
-// #define DEBUG_OSI 1
+#define DEBUG_OSI 1
 using namespace std;
 
 extern std::ofstream logfile;
