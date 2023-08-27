@@ -173,8 +173,8 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
   if (bfi.get_effective_size_c() != 1)
   {
     // We need to find an example file to learn how to parse such files
-    logfile << "Unimplemented: get_effective_size_c is not one but " << bfi.get_effective_size_c() << endl;
-    throw file_error("Unimplemented: get_effective_size_c is not one but " + std::to_string(bfi.get_effective_size_c()));
+    /*logfile << "Unimplemented: get_effective_size_c is not one but " << bfi.get_effective_size_c() << endl;
+    throw file_error("Unimplemented: get_effective_size_c is not one but " + std::to_string(bfi.get_effective_size_c()));*/
   }
 
   if (bfi.is_indexed_color() && !bfi.is_false_color())
