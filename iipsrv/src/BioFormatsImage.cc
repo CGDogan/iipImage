@@ -106,7 +106,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     tile_width = suggested_width;
   }
 
-  int suggested_height = bfi.get_optimal_tile_height();
+  int suggested_height = bfi.get_optimal_tile_width();
   if (suggested_height > 0)
   {
     suggested_height = 1 << getPowerOfTwoRoundDown(suggested_height);
@@ -170,13 +170,6 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     }
   }
 
-  if (bfi.get_effective_size_c() != 1)
-  {
-    // We need to find an example file to learn how to parse such files
-    /*logfile << "Unimplemented: get_effective_size_c is not one but " << bfi.get_effective_size_c() << endl;
-    throw file_error("Unimplemented: get_effective_size_c is not one but " + std::to_string(bfi.get_effective_size_c()));*/
-  }
-
   if (bfi.is_indexed_color() && !bfi.is_false_color())
   {
     // We must read from the table
@@ -215,7 +208,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
   }
 #undef too_big
 
-  // save the openslide dimensions.
+  // save the bioformats dimensions.
   std::vector<int> bioformats_widths, bioformats_heights;
   bioformats_widths.clear();
   bioformats_heights.clear();
