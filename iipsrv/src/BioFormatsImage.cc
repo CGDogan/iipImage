@@ -130,7 +130,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     logfile << "ERROR: encountered error: " << err << " while getting level0 dim" << endl;
     throw file_error("Getting bioformats level0 dimensions: " + err);
   }
-
+#define DEBUG_OSI
 #ifdef DEBUG_OSI
   logfile << "dimensions :" << w << " x " << h << endl;
   // logfile << "comment : " << comment << endl;
