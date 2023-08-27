@@ -122,6 +122,7 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char msbtiff[4] = {0x49,0x49,0x2A,0x00};  // Big Endian TIFF
     unsigned char lbigtiff[4] = {0x4D,0x4D,0x00,0x2B}; // Little Endian BigTIFF
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
+    cerr << "debug: deleteme";
 
     // OpenSlide
     {
@@ -147,6 +148,7 @@ void IIPImage::testImageType() throw(file_error)
       // -1 -> error
       if ( code == 1 ) {
         format = BIOFORMATS;
+        cerr << "bioformats";
         return;
       }
       BioFormatsManager::free( std::move(bfi) );
