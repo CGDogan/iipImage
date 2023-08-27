@@ -93,33 +93,17 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
   currentY = y;
 
   // choose power of 2 to make downsample simpler.
-  int suggested_width = bfi.get_optimal_tile_width();
-  if (suggested_width > 0)
-  {
-    suggested_width = 1 << getPowerOfTwoRoundDown(suggested_width);
-  }
-  if (suggested_width > 2048 || suggested_width < 128)
-  {
+  // make it a square, rectangles have been associated with problems
+  tile_width = bfi.get_optimal_tile_width();
+  if (tile_width > 0) {
+    tile_width = 1 << getPowerOfTwoRoundDown(suggested_width);
+  } if (tile_width < 128) {
     tile_width = 256;
-  }
-  else
-  {
-    tile_width = suggested_width;
+  } else if (tile_width > 512) {
+    tile_width = 512;
   }
 
-  int suggested_height = bfi.get_optimal_tile_height();
-  if (suggested_height > 0)
-  {
-    suggested_height = 1 << getPowerOfTwoRoundDown(suggested_height);
-  }
-  if (suggested_height > 2048 || suggested_height < 128)
-  {
-    tile_height = 256;
-  }
-  else
-  {
-    tile_height = suggested_height;
-  }
+  tile_height = tile_width;
 
   w = bfi.get_size_x();
   h = bfi.get_size_y();
