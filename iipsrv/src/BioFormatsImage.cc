@@ -188,8 +188,6 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
   while (too_big)
   {
     tile_height >>= 1;
-    if (!too_big)
-      break;
     tile_width >>= 1;
   }
 #undef too_big
