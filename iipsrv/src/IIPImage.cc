@@ -122,24 +122,25 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char msbtiff[4] = {0x49,0x49,0x2A,0x00};  // Big Endian TIFF
     unsigned char lbigtiff[4] = {0x4D,0x4D,0x00,0x2B}; // Little Endian BigTIFF
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
-    cerr << "debug: deleteme";
+
+    // TODO Deleteme
+    format = BIOFORMATS;
+    return;
 
     // OpenSlide
-    /*{
+    {
       const char * vendor = openslide_detect_vendor( path.c_str() );
       if ( vendor != NULL ) {
         if ( !strcmp(vendor, "generic-tiff") ) {
           // Have generic TIFF, so use iipsrv reader
-          cerr << "chosen: generic tiff";
           format = TIF;
           return;
         }
-        cerr << "chosen: openslide";
         // OpenSlide but not generic tiff
         format = OPENSLIDE;
         return;
       }
-    }*/
+    }
 
     // BioFormats
     {
@@ -150,11 +151,8 @@ void IIPImage::testImageType() throw(file_error)
       // -1 -> error
       if ( code == 1 ) {
         format = BIOFORMATS;
-        cerr << "chosen: bioformats";
-
         return;
       }
-      cerr << "chosen: not biof";
 
       BioFormatsManager::free( std::move(bfi) );
     }

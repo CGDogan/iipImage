@@ -70,11 +70,11 @@ static unsigned int getPowerOfTwoRoundDown(unsigned int a)
   return sizeof(unsigned int) * 8 - __builtin_clz(a) - 1;
 #else
   unsigned int x = 0;
-  while (a >> 1)
+  while (a >>= 1)
   {
     x++;
   }
-  return x - 1;
+  return x;
 #endif
 }
 
