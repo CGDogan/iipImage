@@ -107,7 +107,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     tile_width = suggested_width;
   }
 
-  int suggested_height = bfi.get_optimal_tile_width();
+  int suggested_height = bfi.get_optimal_tile_height();
   if (suggested_height > 0)
   {
     suggested_height = 1 << getPowerOfTwoRoundDown(suggested_height);
