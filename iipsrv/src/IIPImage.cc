@@ -129,7 +129,7 @@ void IIPImage::testImageType() throw(file_error)
       if ( vendor != NULL ) {
         if ( !strcmp(vendor, "generic-tiff") ) {
           // Have generic TIFF, so use iipsrv reader
-          format = TIF
+          format = TIF;
           return;
         }
         // OpenSlide but not generic tiff
@@ -206,7 +206,7 @@ void IIPImage::testImageType() throw(file_error)
         suffix=="bif")
     	format = OPENSLIDE;
     else if (
-      suffix = "v3draw" ||
+      suffix == "v3draw" ||
       suffix == "ano" ||
         suffix == "cfg" ||
         suffix == "csv" ||
