@@ -166,11 +166,13 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     throw file_error("Unimplemented: False color image");
   }
 
+  /*
+  This isn't necessary. Almost always true. 1D image had 'C' as the last char.
   if (bfi.get_dimension_order().length() && bfi.get_dimension_order()[2] != 'C')
   {
     logfile << "Unimplemented: unfamiliar dimension order " << bfi.get_dimension_order() << endl;
     throw file_error("Unimplemented: unfamiliar dimension order " + std::string(bfi.get_dimension_order()));
-  }
+  }*/
 
   // bfi.get_bytes_per_pixel actually gives bits per channel per pixel, so don't divide by channels
   int bytespc_internal = bfi.get_bytes_per_pixel();
