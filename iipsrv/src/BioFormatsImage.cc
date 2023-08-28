@@ -166,8 +166,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
     throw file_error("Unimplemented: False color image");
   }
 
-  /*
-  This isn't necessary. Almost always true. 1D image had 'C' as the last char.
+  /* This is usually true but for single channeled images 'C' is the last
   if (bfi.get_dimension_order().length() && bfi.get_dimension_order()[2] != 'C')
   {
     logfile << "Unimplemented: unfamiliar dimension order " << bfi.get_dimension_order() << endl;
@@ -333,7 +332,7 @@ void BioFormatsImage::loadImageInfo(int x, int y) throw(file_error)
 
   numResolutions = numTilesX.size();
 
-  // only support bpp of 8 (255 max), and 3 channels
+  // wrap to [0.0,255.0]
   min.assign(channels, 0.0f);
   max.assign(channels, (float)(1 << bpc) - 1.0f);
 }
