@@ -881,7 +881,7 @@ RawTilePtr BioFormatsImage::halfsampleAndComposeTile(const size_t tilex, const s
   RawTilePtr rt(new RawTile(tiley * ntlx + tilex, iipres, 0, 0, tw, th, channels, bpc));
 
   // compute the size, etc
-  rt->dataLength = tw * th * 3;
+  rt->dataLength = tw * th * channels;
   rt->filename = getImagePath();
   rt->timestamp = timestamp;
 
