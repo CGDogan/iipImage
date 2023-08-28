@@ -124,7 +124,7 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
 
     // OpenSlide
-    {
+    /*{
       const char * vendor = openslide_detect_vendor( path.c_str() );
       if ( vendor != NULL ) {
         if ( !strcmp(vendor, "generic-tiff") ) {
@@ -136,7 +136,7 @@ void IIPImage::testImageType() throw(file_error)
         format = OPENSLIDE;
         return;
       }
-    }
+    }*/
 
     // BioFormats
     {
@@ -154,7 +154,7 @@ void IIPImage::testImageType() throw(file_error)
     }
 
     // IIPsrv builtin
-    {
+    /*{
       if( memcmp( header, j2k, 10 ) == 0 ) {
         format = JPEG2000;
         return;
@@ -165,7 +165,7 @@ void IIPImage::testImageType() throw(file_error)
         format = TIF;
         return;
       }
-    }
+    }*/
     format = UNSUPPORTED;
 
   }
