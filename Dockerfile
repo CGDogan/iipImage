@@ -29,7 +29,7 @@ COPY apache2.conf /etc/apache2/apache2.conf
 COPY ports.conf /etc/apache2/ports.conf
 
 ## Print BioFormats errors, etc. to Docker console (stderr)
-#RUN ln -sf /proc/self/fd/1 /var/log/apache2/error.log
+RUN ln -sf /proc/self/fd/1 /var/log/apache2/error.log
 
 ###  iipsrv
 WORKDIR /root/src/iipsrv

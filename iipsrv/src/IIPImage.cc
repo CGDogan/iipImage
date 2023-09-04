@@ -22,7 +22,7 @@
 
 
 #include "IIPImage.h"
-
+#include <stderr.h>
 #ifdef HAVE_GLOB_H
 #include <glob.h>
 #endif
@@ -124,31 +124,45 @@ void IIPImage::testImageType() throw(file_error)
     unsigned char bbigtiff[4] = {0x49,0x49,0x2B,0x00}; // Big Endian BigTIFF
 
     // OpenSlide
+__builtin_fprintf(stderr, "1\n");
     {
       const char * vendor = openslide_detect_vendor( path.c_str() );
       if ( vendor != NULL ) {
+__builtin_fprintf(stderr, "2\n");
+
         if ( !strcmp(vendor, "generic-tiff") ) {
           // Have generic TIFF, so use iipsrv reader
+__builtin_fprintf(stderr, "3\n");
+
           format = TIF;
           return;
         }
         // OpenSlide but not generic tiff
         format = OPENSLIDE;
+__builtin_fprintf(stderr, "4\n");
+
         return;
       }
     }
 
     // BioFormats
     {
+__builtin_fprintf(stderr, "5\n");
+
       BioFormatsInstance bfi = BioFormatsManager::get_new();
+__builtin_fprintf(stderr, "6\n");
+
       int code = bfi.is_compatible( path );
       //  1 -> compatible
       //  0 -> incompatible
       // -1 -> error
       if ( code == 1 ) {
+__builtin_fprintf(stderr, "7\n");
+
         format = BIOFORMATS;
         return;
       }
+__builtin_fprintf(stderr, "8\n");
 
       BioFormatsManager::free( std::move(bfi) );
     }
@@ -166,6 +180,8 @@ void IIPImage::testImageType() throw(file_error)
         return;
       }
     }
+__builtin_fprintf(stderr, "9\n");
+
     format = UNSUPPORTED;
 
   }
