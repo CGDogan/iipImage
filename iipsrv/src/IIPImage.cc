@@ -22,7 +22,7 @@
 
 
 #include "IIPImage.h"
-#include <stderr.h>
+#include <stdio.h>
 #ifdef HAVE_GLOB_H
 #include <glob.h>
 #endif
