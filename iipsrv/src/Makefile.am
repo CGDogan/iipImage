@@ -49,6 +49,8 @@ iipsrv_fcgi_SOURCES = \
 			Tokenizer.h \
 			IIPResponse.h \
 			IIPResponse.cc \
+			BioFormatsManager.h \
+			BioFormatsManager.cc \
 			View.h \
 			View.cc \
 			Transforms.h \
