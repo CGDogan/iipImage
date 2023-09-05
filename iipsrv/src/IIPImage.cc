@@ -146,7 +146,7 @@ __builtin_fprintf(stderr, "4\n");
     }
 
     // BioFormats
-    {
+    /*{
 __builtin_fprintf(stderr, "5\n");
 
       BioFormatsInstance bfi = BioFormatsManager::get_new();
@@ -165,7 +165,7 @@ __builtin_fprintf(stderr, "7\n");
 __builtin_fprintf(stderr, "8\n");
 
       BioFormatsManager::free( std::move(bfi) );
-    }
+    }*/
 
     // IIPsrv builtin
     {

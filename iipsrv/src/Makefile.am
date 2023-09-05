@@ -39,12 +39,6 @@ iipsrv_fcgi_SOURCES = \
 			TPTImage.cc \
 			OpenSlideImage.h \
 			OpenSlideImage.cc \
-			BioFormatsImage.h \
-			BioFormatsImage.cc \
-			BioFormatsInstance.h \
-			BioFormatsInstance.cc \
-			BioFormatsThread.h \
-			BioFormatsThread.cc \
 			JPEGCompressor.h \
 			JPEGCompressor.cc \
 			RawTile.h \
