@@ -21,6 +21,7 @@
 
 #include <ctime>
 #include "OpenSlideImage.h"
+#include "BioFormatsImage.h"
 #include <sys/stat.h>
 #include <limits>
 
@@ -126,6 +127,12 @@ void FIF::run( Session* session, const string& src ){
           temp = IIPImagePtr(new OpenSlideImage( test, session->tileCache ));
         }
 #pragma mark Adding in basic bioformats functionality
+        else if (format == BIOFORMATS)
+        {
+          if (session->loglevel >= 2)
+            *(session->logfile) << "FIF :: BioFormats image detected" << endl;
+          temp = IIPImagePtr(new BioFormatsImage(test, session->tileCache));
+        }
 #ifdef HAVE_KAKADU
         else if( format == JPEG2000 ){
           if( session->loglevel >= 2 ) *(session->logfile) << "FIF :: JPEG2000 image detected" << endl;
